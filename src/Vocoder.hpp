@@ -6,6 +6,7 @@
 namespace vockit {
 constexpr int kBands=24;
 constexpr float pi=3.14159265358979323846f;
+constexpr float kPi=pi; // Retain API compatibility with DSP regression tests.
 inline float clamp(float v,float lo,float hi){return std::max(lo,std::min(v,hi));}
 struct Bandpass {
  float low=0,band=0,f=0,q=0;
