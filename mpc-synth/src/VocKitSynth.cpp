@@ -115,11 +115,17 @@ private:
      if(device.find("/dev/")==0 && mount!="/" && mount!="/boot" && mount!="/boot/efi")
        roots.insert(mount);
    }
-   for(const std::string& root:roots)scanFolder(root,0);
+   for(const std::string& root:roots){
+     std::string drive=root;
+     const auto slash=drive.find_last_of('/');
+     if(slash!=std::string::npos && slash+1<drive.size())drive=drive.substr(slash+1);
+     if(drive.empty())drive="Internal";
+     scanFolder(root,0,drive);
+   }
 #endif
  }
 #if !defined(_WIN32)
- void scanFolder(const std::string& folder,int depth) {
+ void scanFolder(const std::string& folder,int depth,const std::string& displayPath) {
    if(depth>5 || filePaths_.size()>=129)return;
    DIR* dir=opendir(folder.c_str());
    if(!dir)return;
@@ -136,7 +142,7 @@ private:
      const std::string path=folder+"/"+name;
      struct stat st{};
      if(lstat(path.c_str(),&st)!=0)continue;
-     if(S_ISDIR(st.st_mode)) {scanFolder(path,depth+1);continue;}
+     if(S_ISDIR(st.st_mode)) {scanFolder(path,depth+1,displayPath+"/"+name);continue;}
      if(!S_ISREG(st.st_mode))continue;
      const auto dot=name.find_last_of('.');
      if(dot==std::string::npos)continue;
@@ -144,7 +150,7 @@ private:
      std::transform(ext.begin(),ext.end(),ext.begin(),[](unsigned char ch){return char(std::tolower(ch));});
      if(ext!=".wav")continue;
      filePaths_.push_back(path);
-     fileNames_.push_back(name);
+     fileNames_.push_back(displayPath+"/"+name);
    }
  }
 #endif
