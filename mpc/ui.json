@@ -52,6 +52,10 @@
           "widget": "knob"
         },
         {
+          "param": "Octave",
+          "widget": "knob"
+        },
+        {
           "param": "Chord",
           "widget": "slider",
           "overlay": "menu"
@@ -71,6 +75,10 @@
         {
           "param": "Carrier",
           "widget": "fader"
+        },
+        {
+          "param": "Noise Osc",
+          "widget": "knob"
         }
       ]
     },
