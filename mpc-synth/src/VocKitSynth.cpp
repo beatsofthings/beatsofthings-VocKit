@@ -8,7 +8,7 @@
 
 class VocKitSynth : public mpc::Plugin {
 public:
- enum Params { Level, Source, Loop, Speed, Pitch, Attack, Release, Mix, Tone, Input, Preview, PreviewLevel, NumParams };
+ enum Params { Level, Source, Loop, Speed, Pitch, Attack, Release, Mix, Tone, Input, Preview, PreviewLevel, Formant, Band01, NumParams=Band01+24 };
  static mpc::PluginInfo makeInfo() {
    mpc::PluginInfo i;
    i.name="VocKit Synth";i.vendor="Beats of Things";
@@ -29,6 +29,11 @@ public:
    addParam(mpc::floatParam("input","Input",0.f,200.f,100.f,"%",0));
    addParam(mpc::boolParam("preview","Preview",true));
    addParam(mpc::floatParam("previewlevel","Preview Level",0.f,100.f,80.f,"%",0));
+   addParam(mpc::floatParam("formant","Formant Shift",-12.f,12.f,0.f,"st",1));
+   for(int i=0;i<24;++i){
+     const std::string name="Band "+std::to_string(i+1);
+     addParam(mpc::floatParam("band"+std::to_string(i+1),name.c_str(),0.f,200.f,100.f,"%",0));
+   }
  }
  void prepare(double sr,int)override {
    sr_=float(sr);
@@ -47,6 +52,8 @@ public:
    voc_.setWet(1.f);
    voc_.setTone(get(Tone)*.01f);
    voc_.setAttackRelease(get(Attack),get(Release));
+   voc_.setFormant(get(Formant));
+   for(int i=0;i<24;++i)voc_.setBandLevel(i,get(Band01+i)*.01f);
    const int source=getInt(Source);
    if(source!=lastSource_) { lastSource_=source; previewPosition_=0.f;previewPlaying_=getBool(Preview); }
    int pos=0;
