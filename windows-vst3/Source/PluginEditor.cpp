@@ -67,11 +67,12 @@ void VocKitEditor::paint(juce::Graphics& g){
  }
  if(page==2){
   g.setColour(juce::Colours::lightgrey);g.setFont(juce::Font(juce::FontOptions(15.f)));
-  g.drawFittedText("INTERNAL: VocKit on voice track. MIC: Audio track, input monitoring ON, headphones.",30,410,990,24,juce::Justification::centredLeft,1);
-  g.drawFittedText("JURA: JURA -> Submix 1 pan LEFT; Voice -> Submix 1 pan RIGHT; VocKit only on Submix 1.",30,441,990,24,juce::Justification::centredLeft,1);
-  g.drawFittedText("Set Carrier Mode to L Carrier / R Voice. Verify stereo separation before the effect.",30,472,990,24,juce::Justification::centredLeft,1);
-  g.drawFittedText("TIPS: bright saw carrier, no reverb before VocKit; 100% Wet for testing; shorter release for fast rap.",30,501,990,24,juce::Justification::centredLeft,1);
-  g.drawFittedText("Guides, updates and tools: https://mpctoolkit.com",30,526,990,24,juce::Justification::centredLeft,1);
+  g.drawFittedText("PRESETS (use MPC host preset menu above): Retro Robot | JURA Carrier L / Voice R | JURA Carrier R / Voice L",30,393,990,24,juce::Justification::centredLeft,1);
+  g.drawFittedText("INTERNAL: VocKit on voice track. MIC: Audio track, input monitoring ON, headphones.",30,420,990,24,juce::Justification::centredLeft,1);
+  g.drawFittedText("JURA: JURA -> Submix 1 pan LEFT; Voice -> Submix 1 pan RIGHT; VocKit only on Submix 1.",30,448,990,24,juce::Justification::centredLeft,1);
+  g.drawFittedText("Set Carrier Mode to L Carrier / R Voice. Verify stereo separation before the effect.",30,475,990,24,juce::Justification::centredLeft,1);
+  g.drawFittedText("TIPS: bright saw carrier, no reverb before VocKit; 100% Wet for testing; shorter release for fast rap.",30,502,990,24,juce::Justification::centredLeft,1);
+  g.drawFittedText("Guides, updates and tools: https://mpctoolkit.com",30,529,990,24,juce::Justification::centredLeft,1);
  }
 }
 void VocKitEditor::setControl(int index,float normalized){
