@@ -59,7 +59,8 @@ public:
      syn_[i].configure(hz*std::pow(2.f,formant_/12.f),sr_,5.f);
    }
  }
- float tick(float input){
+ float tick(float input){return tick(input,0.f,false);}
+ float tick(float input,float externalCarrier,bool useExternal){
    if(!std::isfinite(input))input=0.f;
    // Oscillator pitch ratios: unison / octave / fifth / minor / major.
    constexpr float minor[]={1.f,1.1892071f,1.4983071f};
@@ -77,6 +78,7 @@ public:
    }
    if(!gate_)carrier=0.f;
    carrier*=.42f;
+   if(useExternal)carrier=std::isfinite(externalCarrier)?clamp(externalCarrier,-2.f,2.f):0.f;
    float sum=0.f;
    for(int i=0;i<kBands;++i){
      float amplitude=env_[i].tick(ana_[i].tick(input));
