@@ -12,8 +12,9 @@ private:
  std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> modeAttachment;
  juce::OwnedArray<juce::Slider> bands;
  juce::OwnedArray<juce::Label> labels;
- std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>> attachments;
  juce::OwnedArray<juce::Slider> knobs;
  juce::OwnedArray<juce::Label> knobLabels;
+ // Attachments must be destroyed BEFORE their sliders (reverse member order).
+ std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>> attachments;
  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VocKitEditor)
 };
