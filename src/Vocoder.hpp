@@ -35,8 +35,10 @@ public:
      ana_[i].configure(hz,sr_,2.8f);
      syn_[i].configure(hz,sr_,2.8f);
      env_[i].configure(sr_,attack_,release_);
+     env_[i].env=0.f;
    }
    phase_.fill(0.f);
+   sibilanceLow_=0.f; sibilanceEnv_=0.f; noiseState_=0x12345678u;
  }
  void setAttackRelease(float a,float r){
    a=clamp(a,.1f,200.f);r=clamp(r,2.f,1000.f);
@@ -86,11 +88,11 @@ public:
    sibilanceEnv_=0.97f*sibilanceEnv_+0.03f*transient;
    noiseState_=noiseState_*1664525u+1013904223u;
    const float noise=float((noiseState_>>8)&0xffffu)/32767.5f-1.f;
-   const float consonant=clamp(sibilanceEnv_*5.f,0.f,.65f);
+   const float consonant=gate_?clamp(sibilanceEnv_*5.f,0.f,.65f):0.f;
    float sum=0.f;
    for(int i=0;i<kBands;++i){
      float amplitude=env_[i].tick(ana_[i].tick(input));
-     const float excitation=(i>=17)?carrier*(1.f-consonant)+noise*consonant*.55f:carrier;
+     const float excitation=(i>=17 && gate_)?carrier*(1.f-consonant)+noise*consonant*.55f:carrier;
      sum+=syn_[i].tick(excitation)*clamp(amplitude*12.f,0.f,1.f)*bandLevel_[i];
    }
    float processed=std::tanh(sum*1.1f);
