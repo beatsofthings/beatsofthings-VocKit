@@ -14,6 +14,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout VocKitProcessor::makeParams(
  add("attack","Envelope Attack ms",1,100,8);
  add("release","Envelope Release ms",10,500,90);
  add("tone","Internal Saw Pulse",0,1,0);
+ add("detune","Internal Detune Cents",0,35,0);
+ add("sub","Internal Sub Osc",0,1,0);
  p.push_back(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID{"mode",1},"Carrier Mode",juce::StringArray{"Internal","Sidechain","Left Carrier / Right Voice","Right Carrier / Left Voice"},0));
  for(int i=0;i<24;++i)add("band"+juce::String(i+1),"Band "+juce::String(i+1),0,2,1);
  return {p.begin(),p.end()};
@@ -38,6 +40,8 @@ void VocKitProcessor::processBlock(juce::AudioBuffer<float>& buffer,juce::MidiBu
  const float level=val("level"),input=val("input"),carrierGain=val("carrier"),wet=val("mix");
  voc.setAttackRelease(val("attack"),val("release"));
  voc.setTone(val("tone"));
+ voc.setDetune(val("detune"));
+ voc.setSubLevel(val("sub"));
  voc.setGate(true);
  voc.setWet(1.f);
  voc.setFrequency(440.f*std::pow(2.f,(val("pitch")-69.f)/12.f));
