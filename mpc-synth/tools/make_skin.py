@@ -97,8 +97,8 @@ vocoder={"version":2,"actions":[],"backgroundData":background("ff15222d"),
          "ignoreMousePresses":False,"disableCoarseDataWheel":False,"componentsData":bands}
 filesPage={"version":2,"actions":[],"backgroundData":background("ff15222d"),
 "ignoreMousePresses":False,"disableCoarseDataWheel":False,
-"componentsData":[label("title","VOCKIT / WAV FILE ASSIGNMENT",25,8,980,52,34,"ff72dfea"),
-label("hint","Choose a WAV for each pad with Q-Links or data wheel. Reload plugin to refresh drives.",25,60,1010,38,20,"ffadc3d1")]
+"componentsData":[label("title","VOCKIT / DRIVE  >  FOLDER  >  WAV",25,8,980,52,34,"ff72dfea"),
+label("hint","File menus show DRIVE / FOLDER / FILENAME. Reload to rescan drives.",25,60,1010,38,20,"ffadc3d1")]
 +sum(([label("filelabel"+str(i),"PAD %02d / WAV FILE"%(i+1),25+(i%2)*495,115+(i//2)*125,460,30,22),
 slider("file"+str(i),37+i,25+(i%2)*495,150+(i//2)*125,445,80)] for i in range(8)),[])}
 tui={"pageData":{"version":1,"componentDefinitions":{"version":2,"importFiles":[],"localComponentDefinitions":[]},
