@@ -8,7 +8,7 @@
 
 class VocKitSynth : public mpc::Plugin {
 public:
- enum Params { Level, Source, Loop, Speed, Pitch, Attack, Release, Mix, Tone, Input, NumParams };
+ enum Params { Level, Source, Loop, Speed, Pitch, Attack, Release, Mix, Tone, Input, Preview, PreviewLevel, NumParams };
  static mpc::PluginInfo makeInfo() {
    mpc::PluginInfo i;
    i.name="VocKit Synth";i.vendor="Beats of Things";
@@ -27,6 +27,8 @@ public:
    addParam(mpc::floatParam("mix","Mix",0.f,100.f,100.f,"%",0));
    addParam(mpc::floatParam("tone","Tone",0.f,100.f,0.f,"%",0));
    addParam(mpc::floatParam("input","Input",0.f,200.f,100.f,"%",0));
+   addParam(mpc::boolParam("preview","Preview",true));
+   addParam(mpc::floatParam("previewlevel","Preview Level",0.f,100.f,80.f,"%",0));
  }
  void prepare(double sr,int)override {
    sr_=float(sr);
@@ -39,12 +41,14 @@ public:
  }
  void reset()override {
    voc_.prepare(sr_);
-   playing_=false;position_=0;note_=-1;held_.fill(false);
+   playing_=false;position_=0;note_=-1;held_.fill(false);previewPlaying_=false;previewPosition_=0;lastSource_=getInt(Source);
  }
  void process(mpc::ProcessContext& ctx)override {
    voc_.setWet(1.f);
    voc_.setTone(get(Tone)*.01f);
    voc_.setAttackRelease(get(Attack),get(Release));
+   const int source=getInt(Source);
+   if(source!=lastSource_) { lastSource_=source; previewPosition_=0.f;previewPlaying_=getBool(Preview); }
    int pos=0;
    for(int e=0;e<ctx.numMidiEvents;++e) {
      const auto &ev=ctx.midi[e];
@@ -85,6 +89,16 @@ private:
    voc_.setGate(note_>=0);
    for(int i=from;i<to;++i) {
      float mod=0.f;
+     if(previewPlaying_ && frames>1) {
+       const std::size_t p=std::min<std::size_t>(std::size_t(previewPosition_),frames-1);
+       const std::size_t q=std::min(p+1,frames-1);
+       const float t=previewPosition_-float(p);
+       float raw=w.channels[0][p]*(1.f-t)+w.channels[0][q]*t;
+       if(w.numChannels()>1)raw=.5f*(raw+w.channels[1][p]*(1.f-t)+w.channels[1][q]*t);
+       mod=raw*get(PreviewLevel)*.01f;
+       previewPosition_+=rate;
+       if(previewPosition_>=float(frames))previewPlaying_=false;
+     }
      if(playing_&&frames>1&&position_<float(frames)) {
        std::size_t p=std::min<std::size_t>(std::size_t(position_),frames-1);
        std::size_t q=std::min(p+1,frames-1);
@@ -98,7 +112,9 @@ private:
        }
      }
      float fx=voc_.tick(mod*inputGain);
-     float out=std::tanh((fx*wet+mod*(1.f-wet))*gain);
+     // Preview is audible without MIDI; MIDI notes use the vocoded carrier.
+     const float previewOut=(previewPlaying_ && note_<0)?mod*get(PreviewLevel)*.01f:0.f;
+     float out=std::tanh(((note_>=0?fx*wet+mod*(1.f-wet):previewOut))*gain);
      l[i]=out;if(r)r[i]=out;
    }
  }
@@ -107,6 +123,8 @@ private:
  std::array<bool,128> held_{};
  float sr_=44100.f,position_=0.f;
  int note_=-1;
- bool playing_=false;
+ bool playing_=false,previewPlaying_=false;
+ float previewPosition_=0.f;
+ int lastSource_=0;
 };
 MPC_PLUGIN_ENTRY(VocKitSynth)
