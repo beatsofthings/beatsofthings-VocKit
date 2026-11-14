@@ -45,6 +45,36 @@
       ]
     },
     {
+      "name": "CARRIER",
+      "controls": [
+        {
+          "param": "Pitch",
+          "widget": "knob"
+        },
+        {
+          "param": "Chord",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Tone",
+          "widget": "knob"
+        },
+        {
+          "param": "Detune",
+          "widget": "knob"
+        },
+        {
+          "param": "Sub Osc",
+          "widget": "knob"
+        },
+        {
+          "param": "Carrier",
+          "widget": "fader"
+        }
+      ]
+    },
+    {
       "name": "MIX",
       "controls": [
         {
