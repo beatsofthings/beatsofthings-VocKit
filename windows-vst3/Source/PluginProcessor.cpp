@@ -31,6 +31,57 @@ VocKitProcessor::VocKitProcessor():
   .withInput("Carrier Sidechain",juce::AudioChannelSet::stereo(),false)
   .withOutput("Output",juce::AudioChannelSet::stereo(),true)),
  params(*this,nullptr,"VocKit",makeParams()){}
+
+const juce::String VocKitProcessor::getProgramName(int index){
+ static const char* names[]={"Init","Robot Voice","Clear Rap","Dark Vocoder","Saw Brass","Soft Strings","Aggressive"};
+ return index>=0&&index<7?juce::String(names[index]):juce::String{};
+}
+void VocKitProcessor::applyPreset(int index){
+ auto set=[this](const juce::String& id,float value){
+  if(auto* p=params.getParameter(id)){
+   p->beginChangeGesture();
+   p->setValueNotifyingHost(p->convertTo0to1(value));
+   p->endChangeGesture();
+  }
+ };
+ // Reset the entire sound to a deterministic base before applying a preset.
+ set("mode",0.f);set("level",.8f);set("input",1.f);set("carrier",1.f);
+ set("mix",1.f);set("pitch",48.f);set("attack",8.f);set("release",90.f);
+ set("tone",0.f);set("detune",0.f);set("sub",0.f);set("noise",0.f);
+ set("octave",0.f);set("cutoff",1.f);set("resonance",0.f);
+ set("envAttack",1.f);set("envRelease",5.f);
+ for(int i=1;i<=24;++i)set("band"+juce::String(i),1.f);
+ switch(index){
+ case 1: // Robot Voice
+  set("pitch",48.f);set("attack",5.f);set("release",70.f);break;
+ case 2: // Clear Rap
+  set("pitch",55.f);set("attack",2.f);set("release",35.f);
+  set("mix",.92f);break;
+ case 3: // Dark Vocoder
+  set("pitch",43.f);set("attack",12.f);set("release",130.f);
+  set("tone",.45f);set("sub",.2f);
+  for(int i=18;i<=24;++i)set("band"+juce::String(i),.7f);
+  break;
+ case 4: // Saw Brass
+  set("pitch",48.f);set("detune",7.f);set("sub",.12f);
+  set("cutoff",.95f);break;
+ case 5: // Soft Strings
+  set("pitch",55.f);set("tone",.35f);set("detune",3.f);
+  set("sub",.08f);set("cutoff",.78f);
+  set("attack",18.f);set("release",160.f);break;
+ case 6: // Aggressive
+  set("pitch",48.f);set("tone",.7f);set("detune",15.f);
+  set("sub",.3f);set("noise",.12f);set("resonance",.2f);
+  set("attack",2.f);set("release",45.f);break;
+ default:break;
+ }
+}
+void VocKitProcessor::setCurrentProgram(int index){
+ if(index<0||index>=getNumPrograms())return;
+ currentProgram=index;
+ applyPreset(index);
+ updateHostDisplay(juce::AudioProcessor::ChangeDetails{}.withProgramChanged(true));
+}
 bool VocKitProcessor::isBusesLayoutSupported(const BusesLayout& b) const {
  return b.getMainInputChannelSet()==juce::AudioChannelSet::stereo() &&
  b.getMainOutputChannelSet()==juce::AudioChannelSet::stereo() &&
@@ -78,10 +129,15 @@ void VocKitProcessor::processBlock(juce::AudioBuffer<float>& buffer,juce::MidiBu
  }
 }
 void VocKitProcessor::getStateInformation(juce::MemoryBlock& dst){
- auto xml=params.copyState().createXml();copyXmlToBinary(*xml,dst);
+ auto state=params.copyState();state.setProperty("programIndex",currentProgram,nullptr);
+ auto xml=state.createXml();copyXmlToBinary(*xml,dst);
 }
 void VocKitProcessor::setStateInformation(const void* data,int size){
- if(auto xml=getXmlFromBinary(data,size))if(xml->hasTagName(params.state.getType()))params.replaceState(juce::ValueTree::fromXml(*xml));
+ if(auto xml=getXmlFromBinary(data,size))if(xml->hasTagName(params.state.getType())){
+  auto state=juce::ValueTree::fromXml(*xml);
+  currentProgram=juce::jlimit(0,getNumPrograms()-1,int(state.getProperty("programIndex",0)));
+  params.replaceState(state);
+ }
 }
 juce::AudioProcessorEditor* VocKitProcessor::createEditor(){return new VocKitEditor(*this);}
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter(){return new VocKitProcessor();}
