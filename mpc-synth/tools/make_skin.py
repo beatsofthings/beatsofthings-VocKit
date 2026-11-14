@@ -59,13 +59,40 @@ children += [
 root={"version":2,"actions":[],"backgroundData":background("ff15222d"),"ignoreMousePresses":False,"disableCoarseDataWheel":False,"componentsData":children}
 voice={"version":2,"actions":[],"backgroundData":background("ff15222d"),"ignoreMousePresses":False,"disableCoarseDataWheel":False,
 "componentsData":[label("title","VOCKIT SYNTH  /  CARRIER",30,10,900,55,34,"ff72dfea"),
-knob("pitch",4,25,110),knob("tone",8,265,110),knob("attack",5,505,110),knob("release",6,745,110),
+label("trans_label","TRANSPOSE (SEMITONES)",25,80,210,35,20),knob("pitch",4,25,110),
+label("tone_label","SAW / PULSE BLEND",265,80,210,35,20),knob("tone",8,265,110),
+label("attack_label","VOICE ATTACK (MS)",505,80,210,35,20),knob("attack",5,505,110),
+label("release_label","VOICE RELEASE (MS)",745,80,210,35,20),knob("release",6,745,110),
 slider("mix",7,25,340),slider("level",0,275,340),slider("input",9,525,340)]}
+
+# The 24 bands are actual editable DSP gains, grouped into two pages of 12.
+def band_page(start):
+    nodes=[label("title","24-BAND VOICE ENGINE  /  BANDS %02d-%02d"%(start+1,start+12),25,8,970,48,31,"ff72dfea"),
+           label("explain","Each band controls its synthesis level (0-200%).",25,62,960,34,21,"ff9ab0be")]
+    for j in range(12):
+        x=25+(j%4)*244
+        y=118+(j//4)*156
+        band=start+j
+        nodes.append(label("bandname"+str(band),"BAND %02d"%(band+1),x,y,215,30,23))
+        nodes.append(slider("band"+str(band),13+band,x,y+35,222,89))
+    return {"version":2,"actions":[],"backgroundData":background("ff15222d"),"ignoreMousePresses":False,"disableCoarseDataWheel":False,"componentsData":nodes}
+
+vocoder={"version":2,"actions":[],"backgroundData":background("ff15222d"),"ignoreMousePresses":False,"disableCoarseDataWheel":False,"componentsData":[
+    label("title","24-BAND VOICE ENGINE",30,10,940,55,36,"ff72dfea"),
+    label("description","24 analysis filters  >  envelope followers  >  24 carrier filters",30,75,1000,50,23),
+    label("formant_label","FORMANT SHIFT (SEMITONES)",30,160,480,45,25),
+    slider("formant",12,30,210,420,110),
+    label("attack_label","ENVELOPE ATTACK (MS)",510,160,460,45,25),
+    slider("attack",5,510,210,420,110),
+    label("release_label","ENVELOPE RELEASE (MS)",30,355,460,45,25),
+    slider("release",6,30,410,420,110),
+    label("gain_label","MODULATOR INPUT LEVEL",510,355,460,45,25),
+    slider("input",9,510,410,420,110)]}
 tui={"pageData":{"version":1,"componentDefinitions":{"version":2,"importFiles":[],"localComponentDefinitions":[]},
 "replacementStrings":[{"key":"Parameter 1","value":[f"Pad {i}" for i in range(1,9)]},{"key":"Parameter 2","value":["Off","On"]}],
 "info":{"version":1,"type":"CompleteDescription"},
 "tabs":[{"version":1,"tabName":name,"fnKeyIndex":i,"fnKeySubIndex":0,"componentDefinition":page,"qlinkBoundsData":[]}
-for i,(name,page) in enumerate([("SAMPLES",root),("CARRIER",voice)])]}}
+for i,(name,page) in enumerate([("SAMPLES",root),("CARRIER",voice),("VOCODER",vocoder),("BAND1",band_page(0)),("BAND2",band_page(12))])]}}
 (dest/"TUI.json").write_text(json.dumps(tui,indent=2)+"\n")
 # Map every control to its stable parameter index; unused Q-links are -1.
 qlinks={"version":1,"default":{}}
