@@ -16,3 +16,7 @@ jobs:
         run: g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/filterbank_diagnostics.cpp -o /tmp/vockit-filter-test
       - name: Run filterbank diagnostics
         run: /tmp/vockit-filter-test
+      - name: Compile synthetic vowel spectra test
+        run: g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/vowel_spectra.cpp -o /tmp/vockit-vowels
+      - name: Verify five vowel formant spectra
+        run: /tmp/vockit-vowels
