@@ -69,5 +69,5 @@ void VocKitProcessor::getStateInformation(juce::MemoryBlock& dst){
 void VocKitProcessor::setStateInformation(const void* data,int size){
  if(auto xml=getXmlFromBinary(data,size))if(xml->hasTagName(params.state.getType()))params.replaceState(juce::ValueTree::fromXml(*xml));
 }
-juce::AudioProcessorEditor* VocKitProcessor::createEditor(){return new VocKitEditor(*this);}
+juce::AudioProcessorEditor* VocKitProcessor::createEditor(){return new juce::GenericAudioProcessorEditor(*this);}
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter(){return new VocKitProcessor();}
