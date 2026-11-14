@@ -1,0 +1,14 @@
+name: VocKit DSP checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  dsp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile with warnings
+        run: g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/vocoder_smoke.cpp -o /tmp/vockit-test
+      - name: Run DSP smoke tests
+        run: /tmp/vockit-test
