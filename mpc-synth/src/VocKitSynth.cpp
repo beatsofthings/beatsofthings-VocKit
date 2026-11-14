@@ -95,7 +95,7 @@ private:
        const float t=previewPosition_-float(p);
        float raw=w.channels[0][p]*(1.f-t)+w.channels[0][q]*t;
        if(w.numChannels()>1)raw=.5f*(raw+w.channels[1][p]*(1.f-t)+w.channels[1][q]*t);
-       mod=raw*get(PreviewLevel)*.01f;
+       mod=raw;
        previewPosition_+=rate;
        if(previewPosition_>=float(frames))previewPlaying_=false;
      }
