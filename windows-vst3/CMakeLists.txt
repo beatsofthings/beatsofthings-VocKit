@@ -17,6 +17,7 @@ juce_add_plugin(VocKitFX
     IS_MIDI_EFFECT FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     COPY_PLUGIN_AFTER_BUILD FALSE)
+juce_generate_juce_header(VocKitFX)
 target_sources(VocKitFX PRIVATE Source/PluginProcessor.cpp Source/PluginEditor.cpp)
 target_include_directories(VocKitFX PRIVATE ../src)
 target_compile_definitions(VocKitFX PRIVATE JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_VST3_CAN_REPLACE_VST2=0)
