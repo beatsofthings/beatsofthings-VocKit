@@ -32,7 +32,7 @@ public:
    addParam(mpc::floatParam("formant","Formant Shift",-12.f,12.f,0.f,"st",1));
    for(int i=0;i<24;++i){
      const std::string name="Band "+std::to_string(i+1);
-     addParam(mpc::floatParam("band"+std::to_string(i+1),name.c_str(),0.f,200.f,100.f,"%",0));
+     addParam(mpc::floatParam(("band"+std::to_string(i+1)).c_str(),name.c_str(),0.f,200.f,100.f,"%",0));
    }
  }
  void prepare(double sr,int)override {
