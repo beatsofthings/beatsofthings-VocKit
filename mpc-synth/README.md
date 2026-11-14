@@ -1,7 +1,27 @@
-# VocKit Synth — experimental instrument
+# VocKit Synth — MPC instrument (experimental)
 
-This is a separate **instrument** with UID `BtVS`, alongside VocKit FX (`BtVK`). It accepts MPC MIDI pad notes and uses an internal oscillator as the carrier. Modulator source is one of four WAV slots in the plugin's `Content/Samples/` folder: `sample1.wav` through `sample4.wav`. Missing files produce silence, not a generated voice. Add WAVs to `mpc-synth/Content/Samples/` before the GitHub build, or replace files in the installed plugin's Content folder and restart.
+VocKit Synth is a MIDI-playable 24-band vocoder instrument. It receives MIDI notes from MPC hardware pads, but does **not** receive live mic/audio inputs because the MPC host silences instrument audio inputs.
 
-Current limitations: **monophonic last-note-priority**, no host microphone input (MPC instrument plugins have no guaranteed audio input), no direct browsing of MPC pad sample pool, no in-plugin file browser, no sample recording, and no external carrier routing. WAV playback retriggers on MIDI note-on. `Speed` changes playback rate and duration, not pitch-independent time stretching. Samples load only during prepare, never on the realtime audio thread.
+## Load your own WAV files (new)
 
-Use this as an experimental test build, not a production-ready release. Test on simulator before installing.
+1. Install the latest **VocKit-Synth-install** artifact from GitHub Actions.
+2. Open the installed plugin folder: `Beats of Things - VST - VocKit Synth/Content/User Samples/`.
+3. Copy **up to eight WAV files** into this folder. They may have any filename ending in `.wav` (case-insensitive).
+4. Reload the plugin (or restart the MPC). Files are scanned during `prepare()` and assigned **alphabetically** to the eight on-screen pads.
+5. Tap a sample pad to select and audition it. Play MIDI notes on the MPC hardware pads to vocode it.
+
+If fewer than eight custom files are present, the remaining slots use the eight bundled **synthetic vowel demo WAVs**. WAV decoding supports PCM 8/16/24/32-bit and float32; WAV only, not MP3. The preview does not retrigger when tapping the already-selected pad.
+
+The MPC SDK's scripted plugin skin does not expose a native file-picker API, so importing is done by copying WAV files into the `User Samples` folder. The decorative waveforms on the eight buttons are **not** derived from sample audio. An in-plugin file picker and real waveform visualization remain unsupported in this version.
+
+## UI
+
+- **SAMPLES**: eight touch-selectable WAV pads, Speed, Loop, Preview and Level.
+- **CARRIER**: Transpose, Saw/Pulse Blend, Attack, Release, Mix and Input.
+- **VOCODER**: 24 **vertical** spectral band gains (0–200%), Formant Shift, Attack and Release.
+
+The bars are editable controls, **not live level meters**. The engine is currently monophonic, last-note priority. Sample playback is retriggered by MIDI note-on. Speed changes pitch and duration (not time stretching). WAV loading occurs outside the realtime audio callback.
+
+## Audio In
+
+Live microphone input belongs to the separate **VocKit FX** plugin. The official MPC host does not provide reliable live audio inputs to an instrument plugin, and does not deliver MIDI notes to effect plugins.
