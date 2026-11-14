@@ -3,9 +3,10 @@
 #include "mpc_plugin.h"
 #include "Vocoder.hpp"
 #include <cmath>
+#include <cstdio>
 class VocKit:public mpc::Plugin {
 public:
- enum Param{Level,Pitch,Chord,Attack,Release,Mix,Input,Carrier,Tone,Mode,Detune,Sub,Help,Noise,Octave,Cutoff,Resonance,SynthAttack,SynthRelease,NumParams};
+ enum Param{Level,Pitch,Chord,Attack,Release,Mix,Input,Carrier,Tone,Mode,Detune,Sub,Help,Noise,Octave,Cutoff,Resonance,SynthAttack,SynthRelease,Band01,NumParams};
  static mpc::PluginInfo makeInfo(){
    mpc::PluginInfo i;
    i.name="VocKit";i.vendor="Beats of Things";i.uniqueId=MPC_FOURCC('B','t','V','K');
@@ -32,6 +33,24 @@ public:
    addParam(mpc::floatParam("synthAttack","Synth Attack",1.f,500.f,1.f,"ms",0));
    addParam(mpc::floatParam("synthRelease","Synth Release",5.f,2000.f,5.f,"ms",0));
    addParam(mpc::choiceParam("help","Setup Steps",{"1 Voice: Submix1 Pan R","2 JURA: Submix1 Pan L","3 FX on Submix1 only","4 Mode: L Carrier R Voice","Mic: Audio Input Monitor","Internal: FX on Voice"},0));
+   for(int i=0;i<24;++i){
+     char id[16],name[16];
+     std::snprintf(id,sizeof(id),"band%02d",i+1);
+     std::snprintf(name,sizeof(name),"Band %02d",i+1);
+     addParam(mpc::floatParam(id,name,0.f,200.f,100.f,"%",0));
+   }
+
+   // Factory programs use the exact addParam declaration order (plain values).
+   addProgram("Init", {80.f, 48.f, 0.f, 8.f, 90.f, 100.f, 100.f, 70.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 0.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f});
+   addProgram("Robot Voice", {80.f, 48.f, 0.f, 5.f, 70.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 0.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f});
+   addProgram("Clear Rap", {80.f, 55.f, 0.f, 2.f, 35.f, 92.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 0.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f});
+   addProgram("Dark Vocoder", {80.f, 43.f, 0.f, 12.f, 130.f, 100.f, 100.f, 100.f, 45.f, 0.f, 20.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 0.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 70.f, 70.f, 70.f, 70.f, 70.f, 70.f, 70.f});
+   addProgram("Saw Brass", {80.f, 48.f, 0.f, 8.f, 90.f, 100.f, 100.f, 100.f, 0.f, 7.f, 12.f, 0.f, 0.f, 0.f, 95.f, 0.f, 1.f, 5.f, 0.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f});
+   addProgram("Soft Strings", {80.f, 55.f, 0.f, 18.f, 160.f, 100.f, 100.f, 100.f, 35.f, 3.f, 8.f, 0.f, 0.f, 0.f, 78.f, 0.f, 1.f, 5.f, 0.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f});
+   addProgram("Aggressive", {80.f, 48.f, 0.f, 2.f, 45.f, 100.f, 100.f, 100.f, 70.f, 15.f, 30.f, 0.f, 0.f, 12.f, 100.f, 20.f, 1.f, 5.f, 0.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f});
+   addProgram("Retro Robot", {80.f, 48.f, 0.f, 4.f, 95.f, 100.f, 100.f, 100.f, 25.f, 5.f, 8.f, 0.f, 0.f, 2.f, 96.f, 12.f, 1.f, 5.f, 0.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f});
+   addProgram("JURA L / Voice R", {80.f, 48.f, 0.f, 5.f, 85.f, 100.f, 100.f, 100.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 0.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f});
+   addProgram("JURA R / Voice L", {80.f, 48.f, 0.f, 5.f, 85.f, 100.f, 100.f, 100.f, 0.f, 2.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 0.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f});
  }
  void prepare(double sr,int)override{sr_=float(sr);voc_.prepare(sr_);}
  void reset()override{voc_.prepare(sr_);}
@@ -47,6 +66,7 @@ public:
    voc_.setCarrierFilter(get(Cutoff)*.01f,get(Resonance)*.01f);
    voc_.setSynthEnvelope(get(SynthAttack),get(SynthRelease));
    voc_.setFrequency(440.f*std::pow(2.f,(get(Pitch)-69.f)/12.f));
+   for(int i=0;i<24;++i)voc_.setBandLevel(i,get(Band01+i)*.01f);
    const float* l=ctx.inputs[0];
    const float* r=ctx.numInputs>1?ctx.inputs[1]:l;
    float* ol=ctx.outputs[0];float* orr=ctx.numOutputs>1?ctx.outputs[1]:ol;
