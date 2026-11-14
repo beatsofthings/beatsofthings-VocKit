@@ -5,6 +5,11 @@
       "name": "VOICE",
       "controls": [
         {
+          "param": "Input Mode",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
           "param": "Level",
           "widget": "fader"
         },
@@ -42,6 +47,11 @@
     {
       "name": "MIX",
       "controls": [
+        {
+          "param": "Input Mode",
+          "widget": "slider",
+          "overlay": "menu"
+        },
         {
           "param": "Mix",
           "widget": "fader"
