@@ -5,7 +5,7 @@
 #include <cmath>
 class VocKit:public mpc::Plugin {
 public:
- enum Param{Level,Pitch,Chord,Attack,Release,Mix,Input,Carrier,Tone,NumParams};
+ enum Param{Level,Pitch,Chord,Attack,Release,Mix,Input,Carrier,Tone,Mode,NumParams};
  static mpc::PluginInfo makeInfo(){
    mpc::PluginInfo i;
    i.name="VocKit";i.vendor="Beats of Things";i.uniqueId=MPC_FOURCC('B','t','V','K');
@@ -21,12 +21,14 @@ public:
    addParam(mpc::floatParam("input","Input",0.f,200.f,100.f,"%",0));
    addParam(mpc::floatParam("carrier","Carrier",0.f,100.f,70.f,"%",0));
    addParam(mpc::floatParam("tone","Tone",0.f,100.f,0.f,"%",0));
+   addParam(mpc::choiceParam("mode","Input Mode",{"Internal","L Carrier / R Voice","R Carrier / L Voice"},0));
  }
  void prepare(double sr,int)override{sr_=float(sr);voc_.prepare(sr_);}
  void reset()override{voc_.prepare(sr_);}
  void process(mpc::ProcessContext& ctx)override{
    float level=get(Level)*.01f,wet=get(Mix)*.01f,gain=get(Input)*.01f;
    float carrier=get(Carrier)*.01f;
+   const int mode=getInt(Mode);
    voc_.setAttackRelease(get(Attack),get(Release));
    voc_.setWet(1.f);voc_.setGate(true);voc_.setChord(getInt(Chord));
    voc_.setTone(get(Tone)*.01f);
@@ -36,10 +38,12 @@ public:
    float* ol=ctx.outputs[0];float* orr=ctx.numOutputs>1?ctx.outputs[1]:ol;
    for(int n=0;n<ctx.numFrames;++n){
      float dryL=l[n],dryR=r[n];
-     float mod=.5f*(dryL+dryR)*gain;
-     float fx=voc_.tick(mod)*carrier;
-     float left=std::tanh((dryL*(1.f-wet)+fx*wet)*level);
-     float right=std::tanh((dryR*(1.f-wet)+fx*wet)*level);
+     float mod=(mode==0?.5f*(dryL+dryR):(mode==1?dryR:dryL))*gain;
+     float external=(mode==1?dryL:dryR);
+     float fx=(mode==0?voc_.tick(mod):voc_.tick(mod,external,true))*carrier;
+     const float dry=mode==0?.5f*(dryL+dryR):mod;
+     float left=std::tanh(((mode==0?dryL:dry)*(1.f-wet)+fx*wet)*level);
+     float right=std::tanh(((mode==0?dryR:dry)*(1.f-wet)+fx*wet)*level);
      ol[n]=left;if(orr!=ol)orr[n]=right;
    }
  }
