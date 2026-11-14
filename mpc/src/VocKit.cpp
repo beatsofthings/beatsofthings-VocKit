@@ -5,7 +5,7 @@
 #include <cmath>
 class VocKit:public mpc::Plugin {
 public:
- enum Param{Level,Pitch,Chord,Attack,Release,Mix,Input,Carrier,Tone,Mode,NumParams};
+ enum Param{Level,Pitch,Chord,Attack,Release,Mix,Input,Carrier,Tone,Mode,Detune,Sub,NumParams};
  static mpc::PluginInfo makeInfo(){
    mpc::PluginInfo i;
    i.name="VocKit";i.vendor="Beats of Things";i.uniqueId=MPC_FOURCC('B','t','V','K');
@@ -22,6 +22,8 @@ public:
    addParam(mpc::floatParam("carrier","Carrier",0.f,100.f,70.f,"%",0));
    addParam(mpc::floatParam("tone","Tone",0.f,100.f,0.f,"%",0));
    addParam(mpc::choiceParam("mode","Input Mode",{"Internal","L Carrier / R Voice","R Carrier / L Voice"},0));
+   addParam(mpc::floatParam("detune","Detune",0.f,35.f,0.f,"ct",0));
+   addParam(mpc::floatParam("sub","Sub Osc",0.f,100.f,0.f,"%",0));
  }
  void prepare(double sr,int)override{sr_=float(sr);voc_.prepare(sr_);}
  void reset()override{voc_.prepare(sr_);}
@@ -32,6 +34,7 @@ public:
    voc_.setAttackRelease(get(Attack),get(Release));
    voc_.setWet(1.f);voc_.setGate(true);voc_.setChord(getInt(Chord));
    voc_.setTone(get(Tone)*.01f);
+   voc_.setDetune(get(Detune));voc_.setSubLevel(get(Sub)*.01f);
    voc_.setFrequency(440.f*std::pow(2.f,(get(Pitch)-69.f)/12.f));
    const float* l=ctx.inputs[0];
    const float* r=ctx.numInputs>1?ctx.inputs[1]:l;
