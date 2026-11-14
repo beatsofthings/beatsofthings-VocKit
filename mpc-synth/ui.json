@@ -1,0 +1,56 @@
+{
+  "kit": "cyan",
+  "pages": [
+    {
+      "name": "SOURCE",
+      "controls": [
+        {
+          "param": "Level",
+          "widget": "fader"
+        },
+        {
+          "param": "WAV Source",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Loop",
+          "widget": "switch"
+        },
+        {
+          "param": "Speed",
+          "widget": "knob"
+        },
+        {
+          "param": "Input",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "VOICE",
+      "controls": [
+        {
+          "param": "Transpose",
+          "widget": "knob"
+        },
+        {
+          "param": "Tone",
+          "widget": "knob"
+        },
+        {
+          "param": "Attack",
+          "widget": "knob"
+        },
+        {
+          "param": "Release",
+          "widget": "knob"
+        },
+        {
+          "param": "Mix",
+          "widget": "fader"
+        }
+      ]
+    }
+  ]
+}
