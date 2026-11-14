@@ -54,7 +54,7 @@ for i in range(8):
 children += [
     label("wave","SAMPLE PREVIEW  |  WAV SOURCE",28,351,650,45,25),
     label("note","Waveform display requires host data access; pads show decorative waveforms",28,400,970,34,19,"ff9ab0be"),
-    slider("speed",3,25,464),slider("loop",2,270,464),slider("input",9,515,464),slider("level",0,760,464)
+    slider("speed",3,25,464),slider("loop",2,270,464),slider("preview",10,515,464),slider("level",0,760,464)
 ]
 root={"version":2,"actions":[],"backgroundData":background("ff15222d"),"ignoreMousePresses":False,"disableCoarseDataWheel":False,"componentsData":children}
 voice={"version":2,"actions":[],"backgroundData":background("ff15222d"),"ignoreMousePresses":False,"disableCoarseDataWheel":False,
