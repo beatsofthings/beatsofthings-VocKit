@@ -15,10 +15,10 @@ public:
  bool producesMidi() const override {return false;}
  bool isMidiEffect() const override {return false;}
  double getTailLengthSeconds() const override {return 0.5;}
- int getNumPrograms() override {return 1;}
- int getCurrentProgram() override {return 0;}
- void setCurrentProgram(int) override {}
- const juce::String getProgramName(int) override {return {};}
+ int getNumPrograms() override {return 7;}
+ int getCurrentProgram() override {return currentProgram;}
+ void setCurrentProgram(int) override;
+ const juce::String getProgramName(int) override;
  void changeProgramName(int,const juce::String&) override {}
  void getStateInformation(juce::MemoryBlock&) override;
  void setStateInformation(const void*,int) override;
@@ -26,5 +26,7 @@ public:
 private:
  static juce::AudioProcessorValueTreeState::ParameterLayout makeParams();
  vockit::Vocoder voc;
+ int currentProgram=0;
+ void applyPreset(int);
  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VocKitProcessor)
 };
