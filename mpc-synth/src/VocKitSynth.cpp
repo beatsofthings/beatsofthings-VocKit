@@ -11,11 +11,14 @@
 #include <vector>
 #if !defined(_WIN32)
 #include <dirent.h>
+#include <sys/stat.h>
+#include <fstream>
+#include <set>
 #endif
 
 class VocKitSynth : public mpc::Plugin {
 public:
- enum Params { Level, Source, Loop, Speed, Pitch, Attack, Release, Mix, Tone, Input, Preview, PreviewLevel, Formant, Band01, NumParams=Band01+24 };
+ enum Params { Level, Source, Loop, Speed, Pitch, Attack, Release, Mix, Tone, Input, Preview, PreviewLevel, Formant, Band01, File01=Band01+24, NumParams=File01+8 };
  static mpc::PluginInfo makeInfo() {
    mpc::PluginInfo i;
    i.name="VocKit Synth";i.vendor="Beats of Things";
@@ -24,6 +27,7 @@ public:
    return i;
  }
  VocKitSynth():mpc::Plugin(makeInfo()) {
+   discoverWavs();
    addParam(mpc::floatParam("level","Level",0.f,100.f,80.f,"%",0));
    addParam(mpc::choiceParam("source","WAV Source",{"Pad 1","Pad 2","Pad 3","Pad 4","Pad 5","Pad 6","Pad 7","Pad 8"},0));
    addParam(mpc::boolParam("loop","Loop",true));
@@ -41,30 +45,19 @@ public:
      const std::string name="Band "+std::to_string(i+1);
      addParam(mpc::floatParam(("band"+std::to_string(i+1)).c_str(),name.c_str(),0.f,200.f,100.f,"%",0));
    }
+   for(int i=0;i<8;++i){
+     const std::string name="Pad "+std::to_string(i+1)+" WAV";
+     addParam(mpc::choiceParam(("file"+std::to_string(i+1)).c_str(),name.c_str(),fileNames_,0));
+   }
  }
  void prepare(double sr,int)override {
    sr_=float(sr);
    voc_.prepare(sr_);
-   // Scan user WAVs only during prepare(), never during audio processing.
-   std::vector<std::string> userFiles;
-#if !defined(_WIN32)
-   const std::string folder=mpc::contentPath("User Samples");
-   if(DIR* dir=opendir(folder.c_str())) {
-     while(dirent* ent=readdir(dir)) {
-       const std::string filename=ent->d_name;
-       const auto dot=filename.find_last_of('.');
-       if(dot==std::string::npos)continue;
-       std::string ext=filename.substr(dot);
-       std::transform(ext.begin(),ext.end(),ext.begin(),[](unsigned char x){return char(std::tolower(x));});
-       if(ext==".wav")userFiles.push_back(filename);
-     }
-     closedir(dir);
-   }
-   std::sort(userFiles.begin(),userFiles.end());
-#endif
    for(int i=0;i<8;++i) {
      samples_[i]=dsp::WavData();
-     if(i<int(userFiles.size()))dsp::loadWav(mpc::contentPath("User Samples/"+userFiles[i]),samples_[i]);
+     const int file=getInt(File01+i);
+     if(file>0 && file<int(filePaths_.size()))
+       dsp::loadWav(filePaths_[file],samples_[i]);
      if(samples_[i].numFrames()==0) {
        const std::string demo=mpc::contentPath("Samples/sample"+std::to_string(i+1)+".wav");
        dsp::loadWav(demo,samples_[i]);
@@ -108,6 +101,53 @@ public:
    render(ctx,pos,ctx.numFrames);
  }
 private:
+ void discoverWavs() {
+   filePaths_.push_back("");
+   fileNames_.push_back("Demo");
+#if !defined(_WIN32)
+   std::set<std::string> roots;
+   roots.insert(mpc::contentPath("User Samples"));
+   // Discover attached drives from mounted filesystems, not hard-coded device names.
+   std::ifstream mounts("/proc/mounts");
+   std::string device,mount,type,options;
+   int dump=0,pass=0;
+   while(mounts>>device>>mount>>type>>options>>dump>>pass) {
+     if(device.find("/dev/")==0 && mount!="/" && mount!="/boot" && mount!="/boot/efi")
+       roots.insert(mount);
+   }
+   for(const std::string& root:roots)scanFolder(root,0);
+#endif
+ }
+#if !defined(_WIN32)
+ void scanFolder(const std::string& folder,int depth) {
+   if(depth>5 || filePaths_.size()>=129)return;
+   DIR* dir=opendir(folder.c_str());
+   if(!dir)return;
+   std::vector<std::string> names;
+   while(dirent* ent=readdir(dir)) {
+     if(ent->d_name[0]=='.')continue;
+     names.push_back(ent->d_name);
+     if(names.size()>2000)break;
+   }
+   closedir(dir);
+   std::sort(names.begin(),names.end());
+   for(const auto& name:names) {
+     if(filePaths_.size()>=129)break;
+     const std::string path=folder+"/"+name;
+     struct stat st{};
+     if(lstat(path.c_str(),&st)!=0)continue;
+     if(S_ISDIR(st.st_mode)) {scanFolder(path,depth+1);continue;}
+     if(!S_ISREG(st.st_mode))continue;
+     const auto dot=name.find_last_of('.');
+     if(dot==std::string::npos)continue;
+     std::string ext=name.substr(dot);
+     std::transform(ext.begin(),ext.end(),ext.begin(),[](unsigned char ch){return char(std::tolower(ch));});
+     if(ext!=".wav")continue;
+     filePaths_.push_back(path);
+     fileNames_.push_back(name);
+   }
+ }
+#endif
  void render(mpc::ProcessContext& ctx,int from,int to) {
    float* l=ctx.outputs[0];
    float* r=ctx.numOutputs>1?ctx.outputs[1]:nullptr;
@@ -155,6 +195,7 @@ private:
  }
  vockit::Vocoder voc_;
  std::array<dsp::WavData,8> samples_{};
+ std::vector<std::string> filePaths_,fileNames_;
  std::array<bool,128> held_{};
  float sr_=44100.f,position_=0.f;
  int note_=-1;
