@@ -22,6 +22,8 @@ jobs:
           cp mpc-synth/src/VocKitSynth.cpp src/Vocoder.hpp sdk/plugins/VocKitSynth/src/
           if test -d mpc-synth/Content; then cp -r mpc-synth/Content sdk/plugins/VocKitSynth/; fi
           python mpc-synth/tools/generate_demo_wavs.py sdk/plugins/VocKitSynth/Content/Samples
+          mkdir -p "sdk/plugins/VocKitSynth/Content/User Samples"
+          printf "Copy up to 8 WAV files here, then reload VocKit Synth. Files are assigned alphabetically to pads 1-8.\n" > "sdk/plugins/VocKitSynth/Content/User Samples/README.txt"
       - name: Build and validate
         run: |
           export PATH="$HOME/.local/bin:$PATH"
