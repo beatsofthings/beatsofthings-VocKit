@@ -79,6 +79,22 @@
         {
           "param": "Noise Osc",
           "widget": "knob"
+        },
+        {
+          "param": "Filter Cutoff",
+          "widget": "knob"
+        },
+        {
+          "param": "Resonance",
+          "widget": "knob"
+        },
+        {
+          "param": "Synth Attack",
+          "widget": "knob"
+        },
+        {
+          "param": "Synth Release",
+          "widget": "knob"
         }
       ]
     },
