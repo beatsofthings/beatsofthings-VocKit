@@ -18,6 +18,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout VocKitProcessor::makeParams(
  add("sub","Internal Sub Osc",0,1,0);
  add("noise","Internal Noise",0,1,0);
  add("octave","Internal Octave",-2,2,0);
+ add("cutoff","Synth Filter Cutoff",0,1,1);
+ add("resonance","Synth Resonance",0,0.95f,0);
+ add("envAttack","Synth Attack ms",1,500,1);
+ add("envRelease","Synth Release ms",5,2000,5);
  p.push_back(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID{"mode",1},"Carrier Mode",juce::StringArray{"Internal","Sidechain","Left Carrier / Right Voice","Right Carrier / Left Voice"},0));
  for(int i=0;i<24;++i)add("band"+juce::String(i+1),"Band "+juce::String(i+1),0,2,1);
  return {p.begin(),p.end()};
@@ -46,6 +50,8 @@ void VocKitProcessor::processBlock(juce::AudioBuffer<float>& buffer,juce::MidiBu
  voc.setSubLevel(val("sub"));
  voc.setNoiseLevel(val("noise"));
  voc.setOctave(int(std::round(val("octave"))));
+ voc.setCarrierFilter(val("cutoff"),val("resonance"));
+ voc.setSynthEnvelope(val("envAttack"),val("envRelease"));
  voc.setGate(true);
  voc.setWet(1.f);
  voc.setFrequency(440.f*std::pow(2.f,(val("pitch")-69.f)/12.f));
