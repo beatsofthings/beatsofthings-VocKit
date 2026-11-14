@@ -12,3 +12,7 @@ jobs:
         run: g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/vocoder_smoke.cpp -o /tmp/vockit-test
       - name: Run DSP smoke tests
         run: /tmp/vockit-test
+      - name: Compile filterbank diagnostics
+        run: g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/filterbank_diagnostics.cpp -o /tmp/vockit-filter-test
+      - name: Run filterbank diagnostics
+        run: /tmp/vockit-filter-test
