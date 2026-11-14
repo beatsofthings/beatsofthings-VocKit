@@ -42,8 +42,8 @@ public:
    sr_=std::max(8000.f,sr);
    for(int i=0;i<kBands;++i){
      float hz=100.f*std::pow(8500.f/100.f,(i+.5f)/kBands);
-     ana_[i].configure(hz,sr_,1.55f);
-     syn_[i].configure(hz,sr_,1.55f);
+     ana_[i].configure(hz,sr_,4.0f);
+     syn_[i].configure(hz,sr_,4.0f);
      env_[i].configure(sr_,attack_,release_);
      env_[i].env=0.f;
    }
@@ -68,7 +68,7 @@ public:
    formant_=semitones;
    for(int i=0;i<kBands;++i){
      const float hz=100.f*std::pow(8500.f/100.f,(i+.5f)/kBands);
-     syn_[i].configure(hz*std::pow(2.f,formant_/12.f),sr_,1.55f);
+     syn_[i].configure(hz*std::pow(2.f,formant_/12.f),sr_,4.0f);
    }
  }
  float tick(float input){return tick(input,0.f,false);}
@@ -100,7 +100,7 @@ public:
      const float envelope=env_[i].tick(speech);
      const float synthesized=syn_[i].tick(carrier);
      // Soft knee avoids clipping loud vowels while retaining weak consonants.
-     const float gain=clamp(envelope*26.f,0.f,3.f);
+     const float gain=clamp(envelope*42.f,0.f,3.f);
      sum+=synthesized*gain*bandLevel_[i];
    }
    // Light, speech-gated sibilant passthrough only above the main formants.
@@ -109,7 +109,7 @@ public:
    sibilanceLow_+=0.12f*high;
    sibilanceEnv_=0.995f*sibilanceEnv_+0.005f*std::fabs(high);
    const float articulation=clamp((sibilanceEnv_-.018f)*1.8f,0.f,.12f);
-   const float processed=std::tanh(sum*.85f+high*articulation);
+   const float processed=std::tanh(sum*1.1f+high*articulation);
    return clamp(input*(1.f-wet_)+processed*wet_,-1.f,1.f);
  }
  void process(const float* in,float* out,std::size_t n){
