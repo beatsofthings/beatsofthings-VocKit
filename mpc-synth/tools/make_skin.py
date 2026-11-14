@@ -95,11 +95,17 @@ bands.extend([
     slider("release",6,678,511,275,86)])
 vocoder={"version":2,"actions":[],"backgroundData":background("ff15222d"),
          "ignoreMousePresses":False,"disableCoarseDataWheel":False,"componentsData":bands}
+filesPage={"version":2,"actions":[],"backgroundData":background("ff15222d"),
+"ignoreMousePresses":False,"disableCoarseDataWheel":False,
+"componentsData":[label("title","VOCKIT / WAV FILE ASSIGNMENT",25,8,980,52,34,"ff72dfea"),
+label("hint","Choose a WAV for each pad with Q-Links or data wheel. Reload plugin to refresh drives.",25,60,1010,38,20,"ffadc3d1")]
++sum(([label("filelabel"+str(i),"PAD %02d / WAV FILE"%(i+1),25+(i%2)*495,115+(i//2)*125,460,30,22),
+slider("file"+str(i),37+i,25+(i%2)*495,150+(i//2)*125,445,80)] for i in range(8)),[])}
 tui={"pageData":{"version":1,"componentDefinitions":{"version":2,"importFiles":[],"localComponentDefinitions":[]},
 "replacementStrings":[{"key":"Parameter 1","value":[f"Pad {i}" for i in range(1,9)]},{"key":"Parameter 2","value":["Off","On"]}],
 "info":{"version":1,"type":"CompleteDescription"},
 "tabs":[{"version":1,"tabName":name,"fnKeyIndex":i,"fnKeySubIndex":0,"componentDefinition":page,"qlinkBoundsData":[]}
-for i,(name,page) in enumerate([("SAMPLES",root),("CARRIER",voice),("VOCODER",vocoder)])]}}
+for i,(name,page) in enumerate([("SAMPLES",root),("CARRIER",voice),("VOCODER",vocoder),("FILES",filesPage)])]}}
 (dest/"TUI.json").write_text(json.dumps(tui,indent=2)+"\n")
 # Map every control to its stable parameter index; unused Q-links are -1.
 qlinks={"version":1,"default":{}}
