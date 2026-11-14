@@ -50,6 +50,7 @@ public:
    }
    spectral_.prepare(sr_);
    phase_.fill(0.f);detunePhase_=subPhase_=0.f;
+   filterLow_=filterBand_=synthEnvelope_=0.f;
    sibilanceLow_=0.f; sibilanceEnv_=0.f; noiseState_=0x12345678u;
  }
  void setAttackRelease(float a,float r){
@@ -68,6 +69,8 @@ public:
  void setSubLevel(float amount){subLevel_=clamp(amount,0.f,1.f);}
  void setNoiseLevel(float amount){noiseLevel_=clamp(amount,0.f,1.f);}
  void setOctave(int octave){octave_=std::max(-2,std::min(2,octave));}
+ void setCarrierFilter(float cutoff,float resonance){cutoff_=clamp(cutoff,0.f,1.f);resonance_=clamp(resonance,0.f,.95f);}
+ void setSynthEnvelope(float attack,float release){synthAttack_=clamp(attack,1.f,500.f);synthRelease_=clamp(release,5.f,2000.f);}
  void setBandLevel(int index,float level){if(index>=0&&index<kBands)bandLevel_[index]=clamp(level,0.f,2.f);}
  void setFormant(float semitones){
    semitones=clamp(semitones,-12.f,12.f);
@@ -113,6 +116,27 @@ public:
      const float white=float((noiseState_>>8)&0xffffu)/32767.5f-1.f;
      carrier=carrier*(1.f-.5f*noiseLevel_)+white*.35f*noiseLevel_;
    }
+   // Optional resonant two-pole low-pass; default cutoff=1 bypasses filter.
+   if(!useExternal && cutoff_<.999f){
+     const float hz=80.f*std::pow(160.f,cutoff_);
+     const float f=clamp(2.f*std::sin(pi*hz/sr_),0.f,.8f);
+     const float damp=1.8f-1.65f*resonance_;
+     for(int j=0;j<2;++j){
+       filterLow_+=f*filterBand_*.5f;
+       const float high=carrier-filterLow_-damp*filterBand_;
+       filterBand_+=f*high*.5f;
+     }
+     carrier=filterLow_;
+   }
+   // Voice-triggered carrier envelope. At default attack/release the FFT
+   // envelope remains the main speech modulator, preserving classic sound.
+   if(!useExternal && (synthAttack_>1.f || synthRelease_>5.f)){
+     const float target=gate_?1.f:0.f;
+     const float ms=target>synthEnvelope_?synthAttack_:synthRelease_;
+     const float coeff=std::exp(-1000.f/(sr_*ms));
+     synthEnvelope_=coeff*synthEnvelope_+(1.f-coeff)*target;
+     carrier*=synthEnvelope_;
+   }
    carrier*=.42f;
    if(useExternal)carrier=std::isfinite(externalCarrier)?clamp(externalCarrier,-2.f,2.f):0.f;
    // FFT spectral-envelope transfer, replacing the old bandpass engine.
@@ -125,6 +149,8 @@ public:
 private:
  float sr_=44100.f,freq_=110.f,wet_=1.f,attack_=8.f,release_=90.f,tone_=0.f,formant_=0.f;
  float detune_=0.f,subLevel_=0.f,noiseLevel_=0.f,detunePhase_=0.f,subPhase_=0.f;
+ float cutoff_=1.f,resonance_=0.f,synthAttack_=1.f,synthRelease_=5.f;
+ float filterLow_=0.f,filterBand_=0.f,synthEnvelope_=0.f;
  int octave_=0;
  std::array<float,kBands> bandLevel_=[](){std::array<float,kBands> a{};a.fill(1.f);return a;}();
  bool gate_=false;int chord_=0;
