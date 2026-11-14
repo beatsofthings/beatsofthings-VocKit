@@ -1,7 +1,7 @@
 {
   "name": "VocKit Synth",
   "manufacturer": "Beats of Things",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "format": "vst2",
   "kind": "instrument",
   "uid": "BtVS",
@@ -10,6 +10,6 @@
   "category": "Synth",
   "file32": "VST/vockit-synth-arm32.so",
   "file64": "VST/vockit-synth-arm64.so",
-  "description": "MIDI-playable vocoder with four selectable WAV modulator slots",
+  "description": "MIDI-playable vocoder with eight selectable WAV modulator slots",
   "license": "MIT"
 }
