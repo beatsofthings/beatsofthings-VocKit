@@ -9,6 +9,10 @@
 #include <cctype>
 #include <string>
 #include <vector>
+#include <memory>
+#include <atomic>
+#include <thread>
+#include <chrono>
 #if !defined(_WIN32)
 #include <dirent.h>
 #include <sys/stat.h>
@@ -49,20 +53,15 @@ public:
      const std::string name="Pad "+std::to_string(i+1)+" WAV";
      addParam(mpc::choiceParam(("file"+std::to_string(i+1)).c_str(),name.c_str(),fileNames_,0));
    }
+   for(int i=0;i<8;++i)requested_[i].store(0);
+   worker_=std::thread([this]{loaderLoop();});
  }
+ ~VocKitSynth() override {stopWorker_.store(true);if(worker_.joinable())worker_.join();}
  void prepare(double sr,int)override {
    sr_=float(sr);
    voc_.prepare(sr_);
-   for(int i=0;i<8;++i) {
-     samples_[i]=dsp::WavData();
-     const int file=getInt(File01+i);
-     if(file>0 && file<int(filePaths_.size()))
-       dsp::loadWav(filePaths_[file],samples_[i]);
-     if(samples_[i].numFrames()==0) {
-       const std::string demo=mpc::contentPath("Samples/sample"+std::to_string(i+1)+".wav");
-       dsp::loadWav(demo,samples_[i]);
-     }
-   }
+   for(int i=0;i<8;++i)
+     requested_[i].store(getInt(File01+i),std::memory_order_relaxed);
    reset();
  }
  void reset()override {
@@ -75,6 +74,7 @@ public:
    voc_.setAttackRelease(get(Attack),get(Release));
    voc_.setFormant(get(Formant));
    for(int i=0;i<24;++i)voc_.setBandLevel(i,get(Band01+i)*.01f);
+   for(int i=0;i<8;++i)requested_[i].store(getInt(File01+i),std::memory_order_relaxed);
    const int source=getInt(Source);
    if(source!=lastSource_) { lastSource_=source; previewPosition_=0.f;previewPlaying_=getBool(Preview); }
    int pos=0;
@@ -148,11 +148,34 @@ private:
    }
  }
 #endif
+ void loaderLoop() {
+   std::array<int,8> loaded{};
+   loaded.fill(-1);
+   while(!stopWorker_.load(std::memory_order_relaxed)) {
+     for(int i=0;i<8;++i) {
+       int choice=requested_[i].load(std::memory_order_relaxed);
+       if(choice==loaded[i])continue;
+       auto next=std::make_shared<dsp::WavData>();
+       if(choice>0 && choice<int(filePaths_.size()))
+         dsp::loadWav(filePaths_[choice],*next);
+       if(next->numFrames()==0)
+         dsp::loadWav(mpc::contentPath("Samples/sample"+std::to_string(i+1)+".wav"),*next);
+       std::atomic_store_explicit(&samples_[i],std::shared_ptr<const dsp::WavData>(next),std::memory_order_release);
+       loaded[i]=choice;
+     }
+     std::this_thread::sleep_for(std::chrono::milliseconds(30));
+   }
+ }
  void render(mpc::ProcessContext& ctx,int from,int to) {
    float* l=ctx.outputs[0];
    float* r=ctx.numOutputs>1?ctx.outputs[1]:nullptr;
    int idx=std::max(0,std::min(7,getInt(Source)));
-   const dsp::WavData &w=samples_[idx];
+   const auto current=std::atomic_load_explicit(&samples_[idx],std::memory_order_acquire);
+   if(!current){
+     for(int i=from;i<to;++i){ctx.outputs[0][i]=0.f;if(ctx.numOutputs>1)ctx.outputs[1][i]=0.f;}
+     return;
+   }
+   const dsp::WavData &w=*current;
    const std::size_t frames=w.numFrames();
    const float rate=frames>0?float(w.sampleRate/sr_)*get(Speed)*.01f:0.f;
    const bool looping=getBool(Loop);
@@ -194,7 +217,10 @@ private:
    }
  }
  vockit::Vocoder voc_;
- std::array<dsp::WavData,8> samples_{};
+ std::array<std::shared_ptr<const dsp::WavData>,8> samples_{};
+ std::array<std::atomic<int>,8> requested_{};
+ std::atomic<bool> stopWorker_{false};
+ std::thread worker_;
  std::vector<std::string> filePaths_,fileNames_;
  std::array<bool,128> held_{};
  float sr_=44100.f,position_=0.f;
