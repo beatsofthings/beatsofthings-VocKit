@@ -1,0 +1,30 @@
+name: Build VocKit Windows VST3
+on:
+  push:
+    paths:
+      - 'windows-vst3/**'
+      - 'src/Vocoder.hpp'
+      - '.github/workflows/windows-vst3.yml'
+  workflow_dispatch:
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Configure VST3
+        run: cmake -S windows-vst3 -B windows-vst3/build -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release
+      - name: Compile VST3
+        run: cmake --build windows-vst3/build --config Release --target VocKitFX_VST3 --parallel 4
+      - name: Package VST3
+        shell: pwsh
+        run: |
+          $vst = Get-ChildItem -Path windows-vst3/build -Recurse -Filter "*.vst3" | Where-Object { $_.PSIsContainer } | Select-Object -First 1
+          if (-not $vst) { throw "VST3 bundle not found" }
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item -Recurse $vst.FullName dist/
+          Compress-Archive -Path dist/*.vst3 -DestinationPath VocKit-FX-Windows-VST3.zip -Force
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VocKit-FX-Windows-VST3
+          path: VocKit-FX-Windows-VST3.zip
