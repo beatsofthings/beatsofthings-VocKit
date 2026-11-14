@@ -32,8 +32,8 @@ public:
    sr_=std::max(8000.f,sr);
    for(int i=0;i<kBands;++i){
      float hz=140.f*std::pow(6800.f/140.f,(i+.5f)/kBands);
-     ana_[i].configure(hz,sr_,5.f);
-     syn_[i].configure(hz,sr_,5.f);
+     ana_[i].configure(hz,sr_,2.8f);
+     syn_[i].configure(hz,sr_,2.8f);
      env_[i].configure(sr_,attack_,release_);
    }
    phase_.fill(0.f);
@@ -56,7 +56,7 @@ public:
    formant_=semitones;
    for(int i=0;i<kBands;++i){
      const float hz=140.f*std::pow(6800.f/140.f,(i+.5f)/kBands);
-     syn_[i].configure(hz*std::pow(2.f,formant_/12.f),sr_,5.f);
+     syn_[i].configure(hz*std::pow(2.f,formant_/12.f),sr_,2.8f);
    }
  }
  float tick(float input){return tick(input,0.f,false);}
@@ -79,12 +79,21 @@ public:
    if(!gate_)carrier=0.f;
    carrier*=.42f;
    if(useExternal)carrier=std::isfinite(externalCarrier)?clamp(externalCarrier,-2.f,2.f):0.f;
+   // Preserve consonant transients using a high-frequency unvoiced excitation.
+   const float high=input-sibilanceLow_;
+   sibilanceLow_+=0.10f*high;
+   const float transient=std::fabs(high);
+   sibilanceEnv_=0.97f*sibilanceEnv_+0.03f*transient;
+   noiseState_=noiseState_*1664525u+1013904223u;
+   const float noise=float((noiseState_>>8)&0xffffu)/32767.5f-1.f;
+   const float consonant=clamp(sibilanceEnv_*5.f,0.f,.65f);
    float sum=0.f;
    for(int i=0;i<kBands;++i){
      float amplitude=env_[i].tick(ana_[i].tick(input));
-     sum+=syn_[i].tick(carrier)*clamp(amplitude*8.f,0.f,1.f)*bandLevel_[i];
+     const float excitation=(i>=17)?carrier*(1.f-consonant)+noise*consonant*.55f:carrier;
+     sum+=syn_[i].tick(excitation)*clamp(amplitude*12.f,0.f,1.f)*bandLevel_[i];
    }
-   float processed=std::tanh(sum*.8f);
+   float processed=std::tanh(sum*1.1f);
    return clamp(input*(1.f-wet_)+processed*wet_,-1.f,1.f);
  }
  void process(const float* in,float* out,std::size_t n){
@@ -94,6 +103,8 @@ private:
  float sr_=44100.f,freq_=110.f,wet_=1.f,attack_=8.f,release_=90.f,tone_=0.f,formant_=0.f;
  std::array<float,kBands> bandLevel_=[](){std::array<float,kBands> a{};a.fill(1.f);return a;}();
  bool gate_=false;int chord_=0;
+ float sibilanceLow_=0.f,sibilanceEnv_=0.f;
+ unsigned int noiseState_=0x12345678u;
  std::array<float,3> phase_{};
  std::array<Bandpass,kBands> ana_{},syn_{};
  std::array<Follower,kBands> env_{};
