@@ -95,7 +95,13 @@ public:
      const float excitation=(i>=17 && gate_)?carrier*(1.f-consonant)+noise*consonant*.55f:carrier;
      sum+=syn_[i].tick(excitation)*clamp(amplitude*12.f,0.f,1.f)*bandLevel_[i];
    }
-   float processed=std::tanh(sum*1.1f);
+   // Restore a controlled amount of the modulator high-frequency transients
+   // (s, f, t, k) that a voiced saw/pulse carrier cannot reproduce.
+   // The high-pass contribution is gated by detected transient energy,
+   // avoiding a full dry-voice leak in sustained vowels.
+   const float articulation=clamp((sibilanceEnv_-.006f)*14.f,0.f,.32f);
+   const float consonants=high*articulation;
+   float processed=std::tanh(sum*1.1f+consonants);
    return clamp(input*(1.f-wet_)+processed*wet_,-1.f,1.f);
  }
  void process(const float* in,float* out,std::size_t n){
