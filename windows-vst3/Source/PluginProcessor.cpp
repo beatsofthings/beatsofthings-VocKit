@@ -44,7 +44,8 @@ void VocKitProcessor::processBlock(juce::AudioBuffer<float>& buffer,juce::MidiBu
  for(int i=0;i<24;++i)voc.setBandLevel(i,val(("band"+juce::String(i+1)).toRawUTF8()));
  const float* inL=buffer.getReadPointer(0);
  const float* inR=buffer.getReadPointer(1);
- const int sideStart=getChannelIndexInProcessBlockBuffer(true,1,0);
+ const int sideStart=(getBusCount(true)>1 && getChannelCountOfBus(true,1)==2)
+  ? getChannelIndexInProcessBlockBuffer(true,1,0) : -1;
  const bool sideAvailable=mode==1 && getBusCount(true)>1 &&
  getChannelCountOfBus(true,1)==2 && sideStart>=0 && sideStart+1<buffer.getNumChannels();
  const float* sideL=sideAvailable?buffer.getReadPointer(sideStart):nullptr;
