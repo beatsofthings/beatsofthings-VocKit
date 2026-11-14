@@ -49,6 +49,16 @@ public:
  void setGate(bool v){gate_=v;}
  void setChord(int v){chord_=std::max(0,std::min(4,v));}
  void setTone(float v){tone_=clamp(v,0.f,1.f);}
+ void setBandLevel(int index,float level){if(index>=0&&index<kBands)bandLevel_[index]=clamp(level,0.f,2.f);}
+ void setFormant(float semitones){
+   semitones=clamp(semitones,-12.f,12.f);
+   if(semitones==formant_)return;
+   formant_=semitones;
+   for(int i=0;i<kBands;++i){
+     const float hz=140.f*std::pow(6800.f/140.f,(i+.5f)/kBands);
+     syn_[i].configure(hz*std::pow(2.f,formant_/12.f),sr_,5.f);
+   }
+ }
  float tick(float input){
    if(!std::isfinite(input))input=0.f;
    // Oscillator pitch ratios: unison / octave / fifth / minor / major.
@@ -70,7 +80,7 @@ public:
    float sum=0.f;
    for(int i=0;i<kBands;++i){
      float amplitude=env_[i].tick(ana_[i].tick(input));
-     sum+=syn_[i].tick(carrier)*clamp(amplitude*8.f,0.f,1.f);
+     sum+=syn_[i].tick(carrier)*clamp(amplitude*8.f,0.f,1.f)*bandLevel_[i];
    }
    float processed=std::tanh(sum*.8f);
    return clamp(input*(1.f-wet_)+processed*wet_,-1.f,1.f);
@@ -79,7 +89,8 @@ public:
    for(std::size_t i=0;i<n;++i)out[i]=tick(in?in[i]:0.f);
  }
 private:
- float sr_=44100.f,freq_=110.f,wet_=1.f,attack_=8.f,release_=90.f,tone_=0.f;
+ float sr_=44100.f,freq_=110.f,wet_=1.f,attack_=8.f,release_=90.f,tone_=0.f,formant_=0.f;
+ std::array<float,kBands> bandLevel_=[](){std::array<float,kBands> a{};a.fill(1.f);return a;}();
  bool gate_=false;int chord_=0;
  std::array<float,3> phase_{};
  std::array<Bandpass,kBands> ana_{},syn_{};
