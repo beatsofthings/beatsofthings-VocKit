@@ -99,6 +99,25 @@
           "widget": "knob"
         }
       ]
+    },
+    {
+      "name": "HELP",
+      "controls": [
+        {
+          "param": "Setup Steps",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Input Mode",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Mix",
+          "widget": "fader"
+        }
+      ]
     }
   ]
 }
