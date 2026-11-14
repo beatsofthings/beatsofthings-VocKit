@@ -3,6 +3,7 @@
 #include <array>
 #include <cmath>
 #include <cstddef>
+#include "SpectralVocoder.hpp"
 namespace vockit {
 constexpr int kBands=24;
 constexpr float pi=3.14159265358979323846f;
@@ -47,6 +48,7 @@ public:
      env_[i].configure(sr_,attack_,release_);
      env_[i].env=0.f;
    }
+   spectral_.prepare(sr_);
    phase_.fill(0.f);
    sibilanceLow_=0.f; sibilanceEnv_=0.f; noiseState_=0x12345678u;
  }
@@ -54,6 +56,7 @@ public:
    a=clamp(a,.1f,200.f);r=clamp(r,2.f,1000.f);
    if(a==attack_&&r==release_)return;
    attack_=a;release_=r;
+   spectral_.setAttackRelease(a,r);
    for(auto &e:env_)e.configure(sr_,attack_,release_);
  }
  void setWet(float v){wet_=clamp(v,0.f,1.f);}
@@ -91,25 +94,8 @@ public:
    if(!gate_)carrier=0.f;
    carrier*=.42f;
    if(useExternal)carrier=std::isfinite(externalCarrier)?clamp(externalCarrier,-2.f,2.f):0.f;
-   // True spectral-envelope transfer: each analysis band independently
-   // controls its matching synthesis band. No broadband noise generator.
-   // This preserves formant contrasts instead of producing a noise wash.
-   float sum=0.f;
-   for(int i=0;i<kBands;++i){
-     const float speech=ana_[i].tick(input);
-     const float envelope=env_[i].tick(speech);
-     const float synthesized=syn_[i].tick(carrier);
-     // Soft knee avoids clipping loud vowels while retaining weak consonants.
-     const float gain=clamp(envelope*42.f,0.f,3.f);
-     sum+=synthesized*gain*bandLevel_[i];
-   }
-   // Light, speech-gated sibilant passthrough only above the main formants.
-   // The input highpass is never fed into the carrier or noise source.
-   const float high=input-sibilanceLow_;
-   sibilanceLow_+=0.12f*high;
-   sibilanceEnv_=0.995f*sibilanceEnv_+0.005f*std::fabs(high);
-   const float articulation=clamp((sibilanceEnv_-.018f)*1.8f,0.f,.12f);
-   const float processed=std::tanh(sum*1.1f+high*articulation);
+   // FFT spectral-envelope transfer, replacing the old bandpass engine.
+   const float processed=spectral_.tick(input,carrier,bandLevel_);
    return clamp(input*(1.f-wet_)+processed*wet_,-1.f,1.f);
  }
  void process(const float* in,float* out,std::size_t n){
@@ -121,6 +107,7 @@ private:
  bool gate_=false;int chord_=0;
  float sibilanceLow_=0.f,sibilanceEnv_=0.f;
  unsigned int noiseState_=0x12345678u;
+ SpectralVocoder spectral_{};
  std::array<float,3> phase_{};
  std::array<Bandpass,kBands> ana_{},syn_{};
  std::array<Follower,kBands> env_{};
