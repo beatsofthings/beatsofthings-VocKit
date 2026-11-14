@@ -2,7 +2,7 @@
   "kit": "cyan",
   "pages": [
     {
-      "name": "VOCODER",
+      "name": "VOICE",
       "controls": [
         {
           "param": "Level",
@@ -10,6 +10,15 @@
         },
         {
           "param": "Pitch",
+          "widget": "knob"
+        },
+        {
+          "param": "Chord",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Tone",
           "widget": "knob"
         },
         {
@@ -21,7 +30,24 @@
           "widget": "knob"
         },
         {
+          "param": "Input",
+          "widget": "knob"
+        },
+        {
+          "param": "Carrier",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "MIX",
+      "controls": [
+        {
           "param": "Mix",
+          "widget": "fader"
+        },
+        {
+          "param": "Level",
           "widget": "fader"
         },
         {
