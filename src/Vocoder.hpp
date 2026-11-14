@@ -96,7 +96,7 @@ public:
    if(!gate_)carrier=0.f;
    // Additional detuned saw voice and sub octave for a richer internal carrier.
    // Only active in internal mode; external JURA audio is never altered here.
-   if(!useExternal && gate_){
+   if(!useExternal && gate_ && (detune_>0.f || subLevel_>0.f)){
      detunePhase_+=freq_*std::pow(2.f,detune_/1200.f)/sr_;
      if(detunePhase_>=1.f)detunePhase_-=1.f;
      subPhase_+=freq_*.5f/sr_;
