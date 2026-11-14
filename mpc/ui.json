@@ -99,6 +99,117 @@
       ]
     },
     {
+      "name": "BANDS 1-8",
+      "controls": [
+        {
+          "param": "Band 01",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 02",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 03",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 04",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 05",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 06",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 07",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 08",
+          "widget": "fader"
+        }
+      ]
+    },
+    {
+      "name": "BANDS 9-16",
+      "controls": [
+        {
+          "param": "Band 09",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 10",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 11",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 12",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 13",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 14",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 15",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 16",
+          "widget": "fader"
+        }
+      ]
+    },
+    {
+      "name": "BANDS 17-24",
+      "controls": [
+        {
+          "param": "Band 17",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 18",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 19",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 20",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 21",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 22",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 23",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 24",
+          "widget": "fader"
+        }
+      ]
+    },
+    {
       "name": "MIX",
       "controls": [
         {
