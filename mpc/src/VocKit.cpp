@@ -5,7 +5,7 @@
 #include <cmath>
 class VocKit:public mpc::Plugin {
 public:
- enum Param{Level,Pitch,Chord,Attack,Release,Mix,Input,Carrier,Tone,Mode,Detune,Sub,NumParams};
+ enum Param{Level,Pitch,Chord,Attack,Release,Mix,Input,Carrier,Tone,Mode,Detune,Sub,Help,NumParams};
  static mpc::PluginInfo makeInfo(){
    mpc::PluginInfo i;
    i.name="VocKit";i.vendor="Beats of Things";i.uniqueId=MPC_FOURCC('B','t','V','K');
@@ -24,6 +24,8 @@ public:
    addParam(mpc::choiceParam("mode","Input Mode",{"Internal","L Carrier / R Voice","R Carrier / L Voice"},0));
    addParam(mpc::floatParam("detune","Detune",0.f,35.f,0.f,"ct",0));
    addParam(mpc::floatParam("sub","Sub Osc",0.f,100.f,0.f,"%",0));
+   // Non-audio help menu: setup instructions available on the touchscreen.
+   addParam(mpc::choiceParam("help","Setup Steps",{"1 Voice: Submix1 Pan R","2 JURA: Submix1 Pan L","3 FX on Submix1 only","4 Mode: L Carrier R Voice","Mic: Audio Input Monitor","Internal: FX on Voice"},0));
  }
  void prepare(double sr,int)override{sr_=float(sr);voc_.prepare(sr_);}
  void reset()override{voc_.prepare(sr_);}
