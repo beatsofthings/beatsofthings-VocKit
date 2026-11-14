@@ -8,14 +8,24 @@ constexpr int kBands=24;
 constexpr float pi=3.14159265358979323846f;
 constexpr float kPi=pi; // Retain API compatibility with DSP regression tests.
 inline float clamp(float v,float lo,float hi){return std::max(lo,std::min(v,hi));}
+// Stable RBJ biquad: constant 0 dB peak band-pass, direct form II transposed.
+// The old state-variable filter's resonance dominated the speech spectrum.
 struct Bandpass {
- float low=0,band=0,f=0,q=0;
+ float b0=0.f,b2=0.f,a1=0.f,a2=0.f,z1=0.f,z2=0.f;
  void configure(float hz,float sr,float quality){
-   f=2.f*std::sin(pi*clamp(hz,10.f,sr*.22f)/sr);q=1.f/quality;low=band=0;
+   const float w=2.f*pi*clamp(hz,40.f,sr*.45f)/sr;
+   const float sn=std::sin(w),co=std::cos(w);
+   const float alpha=sn/(2.f*std::max(.5f,quality));
+   const float inv=1.f/(1.f+alpha);
+   b0=alpha*inv;b2=-b0;
+   a1=-2.f*co*inv;a2=(1.f-alpha)*inv;
+   z1=z2=0.f;
  }
  float tick(float x){
-   for(int j=0;j<2;++j){low+=f*band*.5f;float hi=x-low-q*band;band+=f*hi*.5f;}
-   return band;
+   const float y=b0*x+z1;
+   z1=z2-a1*y;
+   z2=b2*x-a2*y;
+   return y;
  }
 };
 struct Follower {
@@ -31,9 +41,9 @@ public:
  void prepare(float sr){
    sr_=std::max(8000.f,sr);
    for(int i=0;i<kBands;++i){
-     float hz=140.f*std::pow(6800.f/140.f,(i+.5f)/kBands);
-     ana_[i].configure(hz,sr_,2.8f);
-     syn_[i].configure(hz,sr_,2.8f);
+     float hz=100.f*std::pow(8500.f/100.f,(i+.5f)/kBands);
+     ana_[i].configure(hz,sr_,1.55f);
+     syn_[i].configure(hz,sr_,1.55f);
      env_[i].configure(sr_,attack_,release_);
      env_[i].env=0.f;
    }
@@ -58,7 +68,7 @@ public:
    formant_=semitones;
    for(int i=0;i<kBands;++i){
      const float hz=140.f*std::pow(6800.f/140.f,(i+.5f)/kBands);
-     syn_[i].configure(hz*std::pow(2.f,formant_/12.f),sr_,2.8f);
+     syn_[i].configure(hz*std::pow(2.f,formant_/12.f),sr_,1.55f);
    }
  }
  float tick(float input){return tick(input,0.f,false);}
@@ -81,27 +91,25 @@ public:
    if(!gate_)carrier=0.f;
    carrier*=.42f;
    if(useExternal)carrier=std::isfinite(externalCarrier)?clamp(externalCarrier,-2.f,2.f):0.f;
-   // Preserve consonant transients using a high-frequency unvoiced excitation.
-   const float high=input-sibilanceLow_;
-   sibilanceLow_+=0.10f*high;
-   const float transient=std::fabs(high);
-   sibilanceEnv_=0.97f*sibilanceEnv_+0.03f*transient;
-   noiseState_=noiseState_*1664525u+1013904223u;
-   const float noise=float((noiseState_>>8)&0xffffu)/32767.5f-1.f;
-   const float consonant=gate_?clamp(sibilanceEnv_*5.f,0.f,.65f):0.f;
+   // True spectral-envelope transfer: each analysis band independently
+   // controls its matching synthesis band. No broadband noise generator.
+   // This preserves formant contrasts instead of producing a noise wash.
    float sum=0.f;
    for(int i=0;i<kBands;++i){
-     float amplitude=env_[i].tick(ana_[i].tick(input));
-     const float excitation=(i>=17 && gate_)?carrier*(1.f-consonant)+noise*consonant*.55f:carrier;
-     sum+=syn_[i].tick(excitation)*clamp(amplitude*12.f,0.f,1.f)*bandLevel_[i];
+     const float speech=ana_[i].tick(input);
+     const float envelope=env_[i].tick(speech);
+     const float synthesized=syn_[i].tick(carrier);
+     // Soft knee avoids clipping loud vowels while retaining weak consonants.
+     const float gain=envelope/(envelope+.035f);
+     sum+=synthesized*gain*bandLevel_[i];
    }
-   // Restore a controlled amount of the modulator high-frequency transients
-   // (s, f, t, k) that a voiced saw/pulse carrier cannot reproduce.
-   // The high-pass contribution is gated by detected transient energy,
-   // avoiding a full dry-voice leak in sustained vowels.
-   const float articulation=clamp((sibilanceEnv_-.006f)*14.f,0.f,.32f);
-   const float consonants=high*articulation;
-   float processed=std::tanh(sum*1.1f+consonants);
+   // Light, speech-gated sibilant passthrough only above the main formants.
+   // The input highpass is never fed into the carrier or noise source.
+   const float high=input-sibilanceLow_;
+   sibilanceLow_+=0.12f*high;
+   sibilanceEnv_=0.995f*sibilanceEnv_+0.005f*std::fabs(high);
+   const float articulation=clamp((sibilanceEnv_-.018f)*1.8f,0.f,.12f);
+   const float processed=std::tanh(sum*2.4f+high*articulation);
    return clamp(input*(1.f-wet_)+processed*wet_,-1.f,1.f);
  }
  void process(const float* in,float* out,std::size_t n){
