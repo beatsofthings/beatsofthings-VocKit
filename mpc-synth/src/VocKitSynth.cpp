@@ -18,7 +18,7 @@ public:
  }
  VocKitSynth():mpc::Plugin(makeInfo()) {
    addParam(mpc::floatParam("level","Level",0.f,100.f,80.f,"%",0));
-   addParam(mpc::choiceParam("source","WAV Source",{"Sample 1","Sample 2","Sample 3","Sample 4"},0));
+   addParam(mpc::choiceParam("source","WAV Source",{"Pad 1","Pad 2","Pad 3","Pad 4","Pad 5","Pad 6","Pad 7","Pad 8"},0));
    addParam(mpc::boolParam("loop","Loop",true));
    addParam(mpc::floatParam("speed","Speed",25.f,200.f,100.f,"%",0));
    addParam(mpc::intParam("pitch","Transpose",-24,24,0,"st"));
@@ -31,7 +31,7 @@ public:
  void prepare(double sr,int)override {
    sr_=float(sr);
    voc_.prepare(sr_);
-   for(int i=0;i<4;++i) {
+   for(int i=0;i<8;++i) {
      const std::string path=mpc::contentPath("Samples/sample"+std::to_string(i+1)+".wav");
      dsp::loadWav(path,samples_[i]);
    }
@@ -72,7 +72,7 @@ private:
  void render(mpc::ProcessContext& ctx,int from,int to) {
    float* l=ctx.outputs[0];
    float* r=ctx.numOutputs>1?ctx.outputs[1]:nullptr;
-   int idx=std::max(0,std::min(3,getInt(Source)));
+   int idx=std::max(0,std::min(7,getInt(Source)));
    const dsp::WavData &w=samples_[idx];
    const std::size_t frames=w.numFrames();
    const float rate=frames>0?float(w.sampleRate/sr_)*get(Speed)*.01f:0.f;
@@ -103,7 +103,7 @@ private:
    }
  }
  vockit::Vocoder voc_;
- std::array<dsp::WavData,4> samples_{};
+ std::array<dsp::WavData,8> samples_{};
  std::array<bool,128> held_{};
  float sr_=44100.f,position_=0.f;
  int note_=-1;
