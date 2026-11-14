@@ -5,7 +5,7 @@
 #include <cmath>
 class VocKit:public mpc::Plugin {
 public:
- enum Param{Level,Pitch,Chord,Attack,Release,Mix,Input,Carrier,Tone,Mode,Detune,Sub,Help,Noise,Octave,NumParams};
+ enum Param{Level,Pitch,Chord,Attack,Release,Mix,Input,Carrier,Tone,Mode,Detune,Sub,Help,Noise,Octave,Cutoff,Resonance,SynthAttack,SynthRelease,NumParams};
  static mpc::PluginInfo makeInfo(){
    mpc::PluginInfo i;
    i.name="VocKit";i.vendor="Beats of Things";i.uniqueId=MPC_FOURCC('B','t','V','K');
@@ -27,6 +27,10 @@ public:
    // Non-audio help menu: setup instructions available on the touchscreen.
    addParam(mpc::floatParam("noise","Noise Osc",0.f,100.f,0.f,"%",0));
    addParam(mpc::floatParam("octave","Octave",-2.f,2.f,0.f,"",0));
+   addParam(mpc::floatParam("cutoff","Filter Cutoff",0.f,100.f,100.f,"%",0));
+   addParam(mpc::floatParam("resonance","Resonance",0.f,95.f,0.f,"%",0));
+   addParam(mpc::floatParam("synthAttack","Synth Attack",1.f,500.f,1.f,"ms",0));
+   addParam(mpc::floatParam("synthRelease","Synth Release",5.f,2000.f,5.f,"ms",0));
    addParam(mpc::choiceParam("help","Setup Steps",{"1 Voice: Submix1 Pan R","2 JURA: Submix1 Pan L","3 FX on Submix1 only","4 Mode: L Carrier R Voice","Mic: Audio Input Monitor","Internal: FX on Voice"},0));
  }
  void prepare(double sr,int)override{sr_=float(sr);voc_.prepare(sr_);}
@@ -40,6 +44,8 @@ public:
    voc_.setTone(get(Tone)*.01f);
    voc_.setDetune(get(Detune));voc_.setSubLevel(get(Sub)*.01f);
    voc_.setNoiseLevel(get(Noise)*.01f);voc_.setOctave(int(std::round(get(Octave))));
+   voc_.setCarrierFilter(get(Cutoff)*.01f,get(Resonance)*.01f);
+   voc_.setSynthEnvelope(get(SynthAttack),get(SynthRelease));
    voc_.setFrequency(440.f*std::pow(2.f,(get(Pitch)-69.f)/12.f));
    const float* l=ctx.inputs[0];
    const float* r=ctx.numInputs>1?ctx.inputs[1]:l;
