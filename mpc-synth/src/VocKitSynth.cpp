@@ -5,6 +5,13 @@
 #include "Vocoder.hpp"
 #include <array>
 #include <cmath>
+#include <algorithm>
+#include <cctype>
+#include <string>
+#include <vector>
+#if !defined(_WIN32)
+#include <dirent.h>
+#endif
 
 class VocKitSynth : public mpc::Plugin {
 public:
@@ -38,9 +45,30 @@ public:
  void prepare(double sr,int)override {
    sr_=float(sr);
    voc_.prepare(sr_);
+   // Scan user WAVs only during prepare(), never during audio processing.
+   std::vector<std::string> userFiles;
+#if !defined(_WIN32)
+   const std::string folder=mpc::contentPath("User Samples");
+   if(DIR* dir=opendir(folder.c_str())) {
+     while(dirent* ent=readdir(dir)) {
+       const std::string filename=ent->d_name;
+       const auto dot=filename.find_last_of('.');
+       if(dot==std::string::npos)continue;
+       std::string ext=filename.substr(dot);
+       std::transform(ext.begin(),ext.end(),ext.begin(),[](unsigned char x){return char(std::tolower(x));});
+       if(ext==".wav")userFiles.push_back(filename);
+     }
+     closedir(dir);
+   }
+   std::sort(userFiles.begin(),userFiles.end());
+#endif
    for(int i=0;i<8;++i) {
-     const std::string path=mpc::contentPath("Samples/sample"+std::to_string(i+1)+".wav");
-     dsp::loadWav(path,samples_[i]);
+     samples_[i]=dsp::WavData();
+     if(i<int(userFiles.size()))dsp::loadWav(mpc::contentPath("User Samples/"+userFiles[i]),samples_[i]);
+     if(samples_[i].numFrames()==0) {
+       const std::string demo=mpc::contentPath("Samples/sample"+std::to_string(i+1)+".wav");
+       dsp::loadWav(demo,samples_[i]);
+     }
    }
    reset();
  }
