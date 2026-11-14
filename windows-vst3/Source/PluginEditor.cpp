@@ -39,6 +39,13 @@ void VocKitEditor::paint(juce::Graphics& g){
   g.setColour(juce::Colours::white);g.setFont(juce::Font(juce::FontOptions(15.f,juce::Font::bold)));
   g.drawText(tabs[i],rect.toNearestInt(),juce::Justification::centred);
  }
+ const char* presets[]={ "ROBOT", "CLEAR RAP", "DARK", "SAW BRASS", "SOFT STRINGS", "AGGRESSIVE" };
+ for(int i=0;i<6;++i){
+  auto r=juce::Rectangle<float>(24.f+i*168.f,116.f,157.f,24.f);
+  g.setColour(juce::Colour::fromRGB(42,66,79));g.fillRoundedRectangle(r,4.f);
+  g.setColour(juce::Colours::white);g.setFont(juce::Font(juce::FontOptions(12.f)));
+  g.drawText(presets[i],r.toNearestInt(),juce::Justification::centred);
+ }
  for(const auto& ctrl:controls){
   auto* p=processor.params.getParameter(ctrl.id);
   if(!p)continue;
@@ -70,6 +77,7 @@ void VocKitEditor::paint(juce::Graphics& g){
   g.drawFittedText("INTERNAL: VocKit on voice track. MIC: Audio track, input monitoring ON, headphones.",30,410,990,24,juce::Justification::centredLeft,1);
   g.drawFittedText("JURA: JURA -> Submix 1 pan LEFT; Voice -> Submix 1 pan RIGHT; VocKit only on Submix 1.",30,441,990,24,juce::Justification::centredLeft,1);
   g.drawFittedText("Set Carrier Mode to L Carrier / R Voice. Verify stereo separation before the effect.",30,472,990,24,juce::Justification::centredLeft,1);
+  g.drawFittedText("TIPS: bright saw carrier, no reverb before VocKit; 100% Wet for testing; shorter release for fast rap.",30,501,990,24,juce::Justification::centredLeft,1);
  }
 }
 void VocKitEditor::setControl(int index,float normalized){
@@ -80,6 +88,32 @@ void VocKitEditor::setControl(int index,float normalized){
 }
 void VocKitEditor::mouseDown(const juce::MouseEvent& e){
  const auto pt=e.position;
+ if(pt.y>=116.f&&pt.y<140.f){
+  const int preset=int((pt.x-24.f)/168.f);
+  if(pt.x>=24.f&&preset>=0&&preset<6){
+   auto set=[this](const char* id,float value){
+    if(auto* p=processor.params.getParameter(id)){
+     p->beginChangeGesture();p->setValueNotifyingHost(p->convertTo0to1(value));p->endChangeGesture();
+    }
+   };
+   if(preset<3){
+    const float wet[]={1.f,.85f,1.f};
+    const float atk[]={5.f,2.f,12.f};
+    const float rel[]={70.f,35.f,130.f};
+    set("mix",wet[preset]);set("attack",atk[preset]);set("release",rel[preset]);
+    for(int b=0;b<24;++b)set(("band"+juce::String(b+1)).toRawUTF8(),preset==2&&b>16?.65f:1.f);
+   }else{
+    const int s=preset-3;
+    const float tone[]={0.f,.35f,.7f};
+    const float detune[]={7.f,3.f,15.f};
+    const float sub[]={.12f,.08f,.3f};
+    const float noise[]={0.f,0.f,.12f};
+    set("tone",tone[s]);set("detune",detune[s]);set("sub",sub[s]);set("noise",noise[s]);
+    set("cutoff",s==1?.78f:1.f);set("resonance",s==2?.2f:0.f);
+   }
+   repaint();return;
+  }
+ }
  if(pt.y>=72.f&&pt.y<114.f){
   for(int i=0;i<3;++i)if(pt.x>=24.f+i*335.f&&pt.x<344.f+i*335.f){page=i;rebuild();repaint();return;}
  }
