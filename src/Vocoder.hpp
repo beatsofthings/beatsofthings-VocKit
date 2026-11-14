@@ -66,6 +66,8 @@ public:
  void setTone(float v){tone_=clamp(v,0.f,1.f);}
  void setDetune(float cents){detune_=clamp(cents,0.f,35.f);}
  void setSubLevel(float amount){subLevel_=clamp(amount,0.f,1.f);}
+ void setNoiseLevel(float amount){noiseLevel_=clamp(amount,0.f,1.f);}
+ void setOctave(int octave){octave_=std::max(-2,std::min(2,octave));}
  void setBandLevel(int index,float level){if(index>=0&&index<kBands)bandLevel_[index]=clamp(level,0.f,2.f);}
  void setFormant(float semitones){
    semitones=clamp(semitones,-12.f,12.f);
@@ -84,10 +86,11 @@ public:
    constexpr float major[]={1.f,1.259921f,1.4983071f};
    const float* ratios=chord_==3?minor:major;
    int voices=(chord_==0)?1:(chord_==1||chord_==2)?2:3;
+   const float oscillatorFrequency=freq_*std::pow(2.f,float(octave_));
    float carrier=0.f;
    for(int i=0;i<voices;++i){
      float ratio=i==0?1.f:(chord_==1?2.f:(chord_==2?1.4983071f:ratios[i]));
-     phase_[i]+=freq_*ratio/sr_;
+     phase_[i]+=oscillatorFrequency*ratio/sr_;
      if(phase_[i]>=1.f)phase_[i]-=1.f;
      float saw=2.f*phase_[i]-1.f;
      float pulse=phase_[i]<.45f?1.f:-1.f;
@@ -97,13 +100,18 @@ public:
    // Additional detuned saw voice and sub octave for a richer internal carrier.
    // Only active in internal mode; external JURA audio is never altered here.
    if(!useExternal && gate_ && (detune_>0.f || subLevel_>0.f)){
-     detunePhase_+=freq_*std::pow(2.f,detune_/1200.f)/sr_;
+     detunePhase_+=oscillatorFrequency*std::pow(2.f,detune_/1200.f)/sr_;
      if(detunePhase_>=1.f)detunePhase_-=1.f;
-     subPhase_+=freq_*.5f/sr_;
+     subPhase_+=oscillatorFrequency*.5f/sr_;
      if(subPhase_>=1.f)subPhase_-=1.f;
      const float detunedSaw=2.f*detunePhase_-1.f;
      const float subSaw=2.f*subPhase_-1.f;
      carrier=.65f*carrier+.35f*detunedSaw+.30f*subLevel_*subSaw;
+   }
+   if(!useExternal && gate_ && noiseLevel_>0.f){
+     noiseState_=noiseState_*1664525u+1013904223u;
+     const float white=float((noiseState_>>8)&0xffffu)/32767.5f-1.f;
+     carrier=carrier*(1.f-.5f*noiseLevel_)+white*.35f*noiseLevel_;
    }
    carrier*=.42f;
    if(useExternal)carrier=std::isfinite(externalCarrier)?clamp(externalCarrier,-2.f,2.f):0.f;
@@ -116,7 +124,8 @@ public:
  }
 private:
  float sr_=44100.f,freq_=110.f,wet_=1.f,attack_=8.f,release_=90.f,tone_=0.f,formant_=0.f;
- float detune_=0.f,subLevel_=0.f,detunePhase_=0.f,subPhase_=0.f;
+ float detune_=0.f,subLevel_=0.f,noiseLevel_=0.f,detunePhase_=0.f,subPhase_=0.f;
+ int octave_=0;
  std::array<float,kBands> bandLevel_=[](){std::array<float,kBands> a{};a.fill(1.f);return a;}();
  bool gate_=false;int chord_=0;
  float sibilanceLow_=0.f,sibilanceEnv_=0.f;
