@@ -49,7 +49,7 @@ public:
      env_[i].env=0.f;
    }
    spectral_.prepare(sr_);
-   phase_.fill(0.f);
+   phase_.fill(0.f);detunePhase_=subPhase_=0.f;
    sibilanceLow_=0.f; sibilanceEnv_=0.f; noiseState_=0x12345678u;
  }
  void setAttackRelease(float a,float r){
@@ -64,6 +64,8 @@ public:
  void setGate(bool v){gate_=v;}
  void setChord(int v){chord_=std::max(0,std::min(4,v));}
  void setTone(float v){tone_=clamp(v,0.f,1.f);}
+ void setDetune(float cents){detune_=clamp(cents,0.f,35.f);}
+ void setSubLevel(float amount){subLevel_=clamp(amount,0.f,1.f);}
  void setBandLevel(int index,float level){if(index>=0&&index<kBands)bandLevel_[index]=clamp(level,0.f,2.f);}
  void setFormant(float semitones){
    semitones=clamp(semitones,-12.f,12.f);
@@ -92,6 +94,17 @@ public:
      carrier+=(saw*(1.f-tone_)+pulse*tone_)/voices;
    }
    if(!gate_)carrier=0.f;
+   // Additional detuned saw voice and sub octave for a richer internal carrier.
+   // Only active in internal mode; external JURA audio is never altered here.
+   if(!useExternal && gate_){
+     detunePhase_+=freq_*std::pow(2.f,detune_/1200.f)/sr_;
+     if(detunePhase_>=1.f)detunePhase_-=1.f;
+     subPhase_+=freq_*.5f/sr_;
+     if(subPhase_>=1.f)subPhase_-=1.f;
+     const float detunedSaw=2.f*detunePhase_-1.f;
+     const float subSaw=2.f*subPhase_-1.f;
+     carrier=.65f*carrier+.35f*detunedSaw+.30f*subLevel_*subSaw;
+   }
    carrier*=.42f;
    if(useExternal)carrier=std::isfinite(externalCarrier)?clamp(externalCarrier,-2.f,2.f):0.f;
    // FFT spectral-envelope transfer, replacing the old bandpass engine.
@@ -103,6 +116,7 @@ public:
  }
 private:
  float sr_=44100.f,freq_=110.f,wet_=1.f,attack_=8.f,release_=90.f,tone_=0.f,formant_=0.f;
+ float detune_=0.f,subLevel_=0.f,detunePhase_=0.f,subPhase_=0.f;
  std::array<float,kBands> bandLevel_=[](){std::array<float,kBands> a{};a.fill(1.f);return a;}();
  bool gate_=false;int chord_=0;
  float sibilanceLow_=0.f,sibilanceEnv_=0.f;
