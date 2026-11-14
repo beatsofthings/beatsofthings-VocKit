@@ -1,4 +1,4 @@
-name: Build VocKit for MPC
+name: Build and test VocKit for MPC
 on:
   workflow_dispatch:
   push:
@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Get official SDK
         run: git clone --depth 1 https://github.com/inmusic-software/mpc-plugin-builder-sdk.git sdk
-      - name: Install toolchains
+      - name: Install toolchain
         run: python -m pip install ziglang
       - name: Install VocKit source into SDK
         run: |
@@ -26,8 +26,26 @@ jobs:
           python sdk/tools/build.py sdk/plugins/VocKit --target all
       - name: Validate
         run: python sdk/tools/validate.py sdk/plugins/VocKit
+      - name: Run host simulator
+        run: |
+          set -euo pipefail
+          SIM=sdk/.sdk-tools/host_sim
+          NATIVE=$(find sdk/plugins/VocKit/build/native -maxdepth 1 -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) | head -n 1)
+          test -n "$NATIVE"
+          "$SIM" "$NATIVE" test --seconds 3 --wav sdk/plugins/VocKit/build/test.wav
+      - name: Prepare installable plugin archive
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          find sdk/plugins/VocKit/build -name 'version.xml' -print
+          PLUGIN=$(find sdk/plugins/VocKit/build -type f -name version.xml -printf '%h\n' | head -n 1)
+          test -n "$PLUGIN"
+          test -f "$PLUGIN/plugin.json"
+          test -d "$PLUGIN/VST"
+          test -d "$PLUGIN/Plugin Skins"
+          (cd "$(dirname "$PLUGIN")" && zip -qr "$GITHUB_WORKSPACE/dist/VocKit-MPC-install.zip" "$(basename "$PLUGIN")")
       - uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: VocKit-MPC
-          path: sdk/plugins/VocKit/build/
+          name: VocKit-MPC-install
+          path: dist/VocKit-MPC-install.zip
