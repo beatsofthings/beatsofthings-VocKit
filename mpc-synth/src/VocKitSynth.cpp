@@ -151,6 +151,7 @@ private:
  void loaderLoop() {
    std::array<int,8> loaded{};
    loaded.fill(-1);
+   std::vector<std::shared_ptr<const dsp::WavData>> retired;
    while(!stopWorker_.load(std::memory_order_relaxed)) {
      for(int i=0;i<8;++i) {
        int choice=requested_[i].load(std::memory_order_relaxed);
@@ -160,9 +161,11 @@ private:
          dsp::loadWav(filePaths_[choice],*next);
        if(next->numFrames()==0)
          dsp::loadWav(mpc::contentPath("Samples/sample"+std::to_string(i+1)+".wav"),*next);
-       std::atomic_store_explicit(&samples_[i],std::shared_ptr<const dsp::WavData>(next),std::memory_order_release);
+       auto previous=std::atomic_exchange_explicit(&samples_[i],std::shared_ptr<const dsp::WavData>(next),std::memory_order_acq_rel);
+       if(previous)retired.push_back(std::move(previous));
        loaded[i]=choice;
      }
+     retired.erase(std::remove_if(retired.begin(),retired.end(),[](const auto& p){return p.use_count()==1;}),retired.end());
      std::this_thread::sleep_for(std::chrono::milliseconds(30));
    }
  }
