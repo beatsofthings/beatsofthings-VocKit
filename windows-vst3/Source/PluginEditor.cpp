@@ -16,9 +16,9 @@ void VocKitEditor::rebuild(){
   const char* names[]={"WET / DRY","VOICE INPUT","CARRIER","ATTACK","RELEASE","OUTPUT"};
   for(int i=0;i<6;++i)add(ids[i],names[i],30.f+i*170.f,454.f,150.f,50.f);
  }else if(page==1){
-  const char* ids[]={"pitch","octave","tone","detune","sub","noise","carrier","level"};
-  const char* names[]={"PITCH (MIDI)","OCTAVE","SAW / PULSE","DETUNE (CENTS)","SUB OSC","NOISE OSC","CARRIER GAIN","OUTPUT"};
-  for(int i=0;i<8;++i)add(ids[i],names[i],35.f+(i%4)*250.f,145.f+(i/4)*145.f,215.f,95.f);
+  const char* ids[]={"pitch","octave","tone","detune","sub","noise","cutoff","resonance","envAttack","envRelease","carrier","level"};
+  const char* names[]={"PITCH (MIDI)","OCTAVE","SAW / PULSE","DETUNE (CENTS)","SUB OSC","NOISE OSC","FILTER CUTOFF","RESONANCE","SYNTH ATTACK","SYNTH RELEASE","CARRIER GAIN","OUTPUT"};
+  for(int i=0;i<12;++i)add(ids[i],names[i],35.f+(i%4)*250.f,130.f+(i/4)*116.f,215.f,87.f);
  }else{
   add("mode","CARRIER MODE",35.f,150.f,970.f,95.f);
   add("input","VOICE INPUT",35.f,290.f,300.f,95.f);
@@ -31,7 +31,7 @@ void VocKitEditor::paint(juce::Graphics& g){
  g.setColour(juce::Colours::white);
  g.setFont(juce::Font(juce::FontOptions(28.f,juce::Font::bold)));
  g.drawText("VOCKIT  /  SPECTRAL VOCODER",24,12,740,45,juce::Justification::centredLeft);
- const char* tabs[]={"VOCODER · 24 BANDS","INTERNAL SYNTH","ROUTING / HELP"};
+ const char* tabs[]={"VOCODER - 24 BANDS","INTERNAL SYNTH","ROUTING / HELP"};
  for(int i=0;i<3;++i){
   auto rect=juce::Rectangle<float>(24.f+i*335.f,72.f,320.f,42.f);
   g.setColour(i==page?juce::Colour::fromRGB(27,133,155):juce::Colour::fromRGB(34,49,64));
@@ -60,7 +60,9 @@ void VocKitEditor::paint(juce::Graphics& g){
    g.setColour(juce::Colour::fromRGB(66,86,101));g.fillRoundedRectangle(x,y,w,9.f,4.f);
    g.setColour(juce::Colour::fromRGB(38,202,205));g.fillRoundedRectangle(x,y,std::max(1.f,w*v),9.f,4.f);
    g.setColour(juce::Colours::white);
-   g.drawText(p->getCurrentValueAsText(),int(x),int(y-24),int(w),22,juce::Justification::centredRight);
+   const float actual=p->convertFrom0to1(v);
+   const juce::String value=ctrl.id=="mode"?p->getCurrentValueAsText():juce::String(actual,1);
+   g.drawText(value,int(x),int(y-24),int(w),22,juce::Justification::centredRight);
   }
  }
  if(page==2){
