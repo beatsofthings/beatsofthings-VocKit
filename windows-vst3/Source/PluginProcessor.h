@@ -15,7 +15,7 @@ public:
  bool producesMidi() const override {return false;}
  bool isMidiEffect() const override {return false;}
  double getTailLengthSeconds() const override {return 0.5;}
- int getNumPrograms() override {return 7;}
+ int getNumPrograms() override {return 10;}
  int getCurrentProgram() override {return currentProgram;}
  void setCurrentProgram(int) override;
  const juce::String getProgramName(int) override;
