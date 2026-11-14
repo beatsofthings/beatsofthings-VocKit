@@ -100,7 +100,7 @@ public:
      const float envelope=env_[i].tick(speech);
      const float synthesized=syn_[i].tick(carrier);
      // Soft knee avoids clipping loud vowels while retaining weak consonants.
-     const float gain=envelope/(envelope+.035f);
+     const float gain=clamp(envelope*26.f,0.f,3.f);
      sum+=synthesized*gain*bandLevel_[i];
    }
    // Light, speech-gated sibilant passthrough only above the main formants.
