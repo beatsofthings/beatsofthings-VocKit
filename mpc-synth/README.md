@@ -25,3 +25,9 @@ The bars are editable controls, **not live level meters**. The engine is current
 ## Audio In
 
 Live microphone input belongs to the separate **VocKit FX** plugin. The official MPC host does not provide reliable live audio inputs to an instrument plugin, and does not deliver MIDI notes to effect plugins.
+
+## Experimental drive-wide WAV selection
+
+On the **FILES** page there are eight `Pad N WAV` parameters. At plugin construction the scanner reads mounted filesystems listed in `/proc/mounts` (plus `Content/User Samples`) and indexes up to 128 WAV files, at most five directory levels deep. It does not scan the root OS filesystem. Drives not exposed as a `/dev/` mount, including some USB/SD mounts, may not be discovered. Filename-only labels can be ambiguous; this is a prototype, not a full folder browser.
+
+**Important limitation:** changing a WAV selection does not immediately load the file. The plugin currently loads selected WAVs in `prepare()`, so the plugin must be reinitialized to hear a new selection. Some hosts restore parameters after prepare, which can also delay selection until the next reload. A realtime-safe asynchronous loader and proper navigable browser are still needed. This is not yet the seamless drive browser requested.
