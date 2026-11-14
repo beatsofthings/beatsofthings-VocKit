@@ -33,8 +33,8 @@ VocKitProcessor::VocKitProcessor():
  params(*this,nullptr,"VocKit",makeParams()){}
 
 const juce::String VocKitProcessor::getProgramName(int index){
- static const char* names[]={"Init","Robot Voice","Clear Rap","Dark Vocoder","Saw Brass","Soft Strings","Aggressive"};
- return index>=0&&index<7?juce::String(names[index]):juce::String{};
+ static const char* names[]={"Init","Robot Voice","Clear Rap","Dark Vocoder","Saw Brass","Soft Strings","Aggressive","Retro Robot","JURA Carrier L / Voice R","JURA Carrier R / Voice L"};
+ return index>=0&&index<10?juce::String(names[index]):juce::String{};
 }
 void VocKitProcessor::applyPreset(int index){
  auto set=[this](const juce::String& id,float value){
@@ -73,6 +73,17 @@ void VocKitProcessor::applyPreset(int index){
   set("pitch",48.f);set("tone",.7f);set("detune",15.f);
   set("sub",.3f);set("noise",.12f);set("resonance",.2f);
   set("attack",2.f);set("release",45.f);break;
+ case 7: // Retro Robot: vintage synthpop-style, original sound design
+  set("pitch",48.f);set("tone",.25f);set("detune",5.f);
+  set("sub",.08f);set("noise",.02f);set("cutoff",.96f);
+  set("resonance",.12f);set("attack",4.f);set("release",95.f);
+  set("mix",1.f);break;
+ case 8: // External JURA carrier on left, voice on right
+  set("mode",2.f);set("mix",1.f);set("input",1.f);
+  set("carrier",1.f);set("attack",5.f);set("release",85.f);break;
+ case 9: // External JURA carrier on right, voice on left
+  set("mode",3.f);set("mix",1.f);set("input",1.f);
+  set("carrier",1.f);set("attack",5.f);set("release",85.f);break;
  default:break;
  }
 }
