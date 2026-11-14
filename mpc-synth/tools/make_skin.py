@@ -53,7 +53,7 @@ for i in range(8):
     children.append(entry(f"pad{i+1}","Button",{"version":2,"onImage":f"pad{i+1}_on.png","offImage":f"pad{i+1}_off.png","buttonId":i,"numButtonsInGroup":8,"handleName":"Data","gestureBehaviour":"Instant"},x,y,218,104,1,"Yes"))
 children += [
     label("wave","SAMPLE PREVIEW  |  WAV SOURCE",28,351,650,45,25),
-    label("note","Waveform display requires host data access; pads show decorative waveforms",28,400,970,34,19,"ff9ab0be"),
+    label("note","YOUR WAVS: Content/User Samples  |  8 FILES, SORTED A-Z  |  RELOAD PLUGIN",28,400,970,34,19,"ff9ab0be"),
     slider("speed",3,25,464),slider("loop",2,270,464),slider("preview",10,515,464),slider("level",0,760,464)
 ]
 root={"version":2,"actions":[],"backgroundData":background("ff15222d"),"ignoreMousePresses":False,"disableCoarseDataWheel":False,"componentsData":children}
@@ -65,34 +65,41 @@ label("attack_label","VOICE ATTACK (MS)",505,80,210,35,20),knob("attack",5,505,1
 label("release_label","VOICE RELEASE (MS)",745,80,210,35,20),knob("release",6,745,110),
 slider("mix",7,25,340),slider("level",0,275,340),slider("input",9,525,340)]}
 
-# The 24 bands are actual editable DSP gains, grouped into two pages of 12.
-def band_page(start):
-    nodes=[label("title","24-BAND VOICE ENGINE  /  BANDS %02d-%02d"%(start+1,start+12),25,8,970,48,31,"ff72dfea"),
-           label("explain","Each band controls its synthesis level (0-200%).",25,62,960,34,21,"ff9ab0be")]
-    for j in range(12):
-        x=25+(j%4)*244
-        y=118+(j//4)*156
-        band=start+j
-        nodes.append(label("bandname"+str(band),"BAND %02d"%(band+1),x,y,215,30,23))
-        nodes.append(slider("band"+str(band),13+band,x,y+35,222,89))
-    return {"version":2,"actions":[],"backgroundData":background("ff15222d"),"ignoreMousePresses":False,"disableCoarseDataWheel":False,"componentsData":nodes}
+# All 24 editable synthesis bands in one portrait-oriented equalizer.
+# The bars are real MPC ColourBar sliders, not a static illustration.
+def vertical_band(index):
+    x=26+index*40
+    hue="ff32cce3" if index<12 else "ffffba5b"
+    return [
+        label("freq"+str(index),"%02d"%(index+1),x,142,38,26,18,"ffb9d3de"),
+        entry("band"+str(index),"Slider",{
+            "version":2,"sliderType":"ColourBar","direction":"Vertical",
+            "backgroundColour":"ff263a46","outlineColour":"ff48606d",
+            "valueColour":hue,"isBipolar":False,"handleName":"Data"
+        },x,180,30,265,13+index,"Yes")
+    ]
 
-vocoder={"version":2,"actions":[],"backgroundData":background("ff15222d"),"ignoreMousePresses":False,"disableCoarseDataWheel":False,"componentsData":[
-    label("title","24-BAND VOICE ENGINE",30,10,940,55,36,"ff72dfea"),
-    label("description","24 analysis filters  >  envelope followers  >  24 carrier filters",30,75,1000,50,23),
-    label("formant_label","FORMANT SHIFT (SEMITONES)",30,160,480,45,25),
-    slider("formant",12,30,210,420,110),
-    label("attack_label","ENVELOPE ATTACK (MS)",510,160,460,45,25),
-    slider("attack",5,510,210,420,110),
-    label("release_label","ENVELOPE RELEASE (MS)",30,355,460,45,25),
-    slider("release",6,30,410,420,110),
-    label("gain_label","MODULATOR INPUT LEVEL",510,355,460,45,25),
-    slider("input",9,510,410,420,110)]}
+bands=[label("title","VOCKIT  /  24-BAND VOICE ENGINE",25,7,1000,52,34,"ff72dfea"),
+       label("subtitle","SPECTRAL SHAPING  -  DRAG VERTICAL BARS",25,65,1000,38,21,"ffadc3d1"),
+       label("low","LOW  140 Hz",25,105,300,30,21,"ff4dd8e9"),
+       label("mid","MID",444,105,120,30,21,"ffb9d3de"),
+       label("high","HIGH  6.8 kHz",780,105,230,30,21,"ffffba5b")]
+for i in range(24):
+    bands.extend(vertical_band(i))
+bands.extend([
+    label("formant_label","FORMANT SHIFT",25,474,300,34,21),
+    slider("formant",12,25,511,285,86),
+    label("attack_label","ATTACK",355,474,220,34,21),
+    slider("attack",5,355,511,275,86),
+    label("release_label","RELEASE",678,474,220,34,21),
+    slider("release",6,678,511,275,86)])
+vocoder={"version":2,"actions":[],"backgroundData":background("ff15222d"),
+         "ignoreMousePresses":False,"disableCoarseDataWheel":False,"componentsData":bands}
 tui={"pageData":{"version":1,"componentDefinitions":{"version":2,"importFiles":[],"localComponentDefinitions":[]},
 "replacementStrings":[{"key":"Parameter 1","value":[f"Pad {i}" for i in range(1,9)]},{"key":"Parameter 2","value":["Off","On"]}],
 "info":{"version":1,"type":"CompleteDescription"},
 "tabs":[{"version":1,"tabName":name,"fnKeyIndex":i,"fnKeySubIndex":0,"componentDefinition":page,"qlinkBoundsData":[]}
-for i,(name,page) in enumerate([("SAMPLES",root),("CARRIER",voice),("VOCODER",vocoder),("BAND1",band_page(0)),("BAND2",band_page(12))])]}}
+for i,(name,page) in enumerate([("SAMPLES",root),("CARRIER",voice),("VOCODER",vocoder)])]}}
 (dest/"TUI.json").write_text(json.dumps(tui,indent=2)+"\n")
 # Map every control to its stable parameter index; unused Q-links are -1.
 qlinks={"version":1,"default":{}}
