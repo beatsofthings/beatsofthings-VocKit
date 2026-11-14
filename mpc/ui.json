@@ -1,0 +1,38 @@
+{
+  "kit": "cyan",
+  "pages": [
+    {
+      "name": "VOCODER",
+      "controls": [
+        {
+          "param": "Level",
+          "widget": "fader"
+        },
+        {
+          "param": "Pitch",
+          "widget": "knob"
+        },
+        {
+          "param": "Attack",
+          "widget": "knob"
+        },
+        {
+          "param": "Release",
+          "widget": "knob"
+        },
+        {
+          "param": "Mix",
+          "widget": "fader"
+        },
+        {
+          "param": "Input",
+          "widget": "knob"
+        },
+        {
+          "param": "Carrier",
+          "widget": "knob"
+        }
+      ]
+    }
+  ]
+}

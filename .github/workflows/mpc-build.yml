@@ -1,0 +1,33 @@
+name: Build VocKit for MPC
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'mpc/**'
+      - 'src/**'
+      - '.github/workflows/mpc-build.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get official SDK
+        run: git clone --depth 1 https://github.com/inmusic-software/mpc-plugin-builder-sdk.git sdk
+      - name: Install toolchains
+        run: python -m pip install ziglang
+      - name: Install VocKit source into SDK
+        run: |
+          mkdir -p sdk/plugins/VocKit/src
+          cp mpc/plugin.json mpc/ui.json mpc/README.md sdk/plugins/VocKit/
+          cp mpc/src/VocKit.cpp src/Vocoder.hpp sdk/plugins/VocKit/src/
+      - name: Build ARM and native
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          python sdk/tools/build.py sdk/plugins/VocKit --target all
+      - name: Validate
+        run: python sdk/tools/validate.py sdk/plugins/VocKit
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: VocKit-MPC
+          path: sdk/plugins/VocKit/build/

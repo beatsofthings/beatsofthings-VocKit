@@ -1,0 +1,15 @@
+{
+  "name": "VocKit",
+  "manufacturer": "Beats of Things",
+  "version": "0.1.0",
+  "format": "vst2",
+  "kind": "effect",
+  "uid": "BtVK",
+  "numInputs": 2,
+  "numOutputs": 2,
+  "category": "Effect",
+  "file32": "VST/vockit-arm32.so",
+  "file64": "VST/vockit-arm64.so",
+  "description": "24-band vocoder effect with internal saw carrier",
+  "license": "MIT"
+}
