@@ -19,3 +19,10 @@
 
 ## Safe fallback
 A separate offline diagnostics tool can render 24 bands from captured test audio, but that is not an MPC live spectrum and should not be advertised as such.
+
+## Prototype status — internal audio-thread integration
+- `src/SpectrumSnapshot.hpp` is a non-persistent 24-atomic-bin buffer.
+- `mpc/src/VocKit.cpp` now publishes `voc_.spectrum()` once per non-monitor audio block into `spectrumSnapshot_`.
+- No VST parameter is added, no host callback is made, and no skin is pretending to be a live analyzer.
+- Snapshot publication has no consumer on MPC yet. Its atomic fields protect against data races, but a concurrent reader can see bins from two adjacent blocks; this is acceptable for a visual display.
+- Next gate: identify an official MPC plugin SDK UI extension that can read the instance's snapshot. Until then, do not ship fake live visualization or expose telemetry as persisted parameters.
