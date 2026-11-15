@@ -149,35 +149,35 @@
         },
         {
           "param": "Band 01",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 02",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 03",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 04",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 05",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 06",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 07",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 08",
-          "widget": "fader"
+          "widget": "knob"
         }
       ]
     },
@@ -190,35 +190,35 @@
         },
         {
           "param": "Band 09",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 10",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 11",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 12",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 13",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 14",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 15",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 16",
-          "widget": "fader"
+          "widget": "knob"
         }
       ]
     },
@@ -231,35 +231,35 @@
         },
         {
           "param": "Band 17",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 18",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 19",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 20",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 21",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 22",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 23",
-          "widget": "fader"
+          "widget": "knob"
         },
         {
           "param": "Band 24",
-          "widget": "fader"
+          "widget": "knob"
         }
       ]
     },
