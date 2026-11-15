@@ -28,26 +28,26 @@ injection=r'''
                   ("direction", "Vertical"), ("backgroundColour", "ff263443"),
                   ("outlineColour", "ff718096"), ("valueColour", "ffffb84d"),
                   ("isBipolar", False), ("handleName", "Data")),
-              "28 36 38 266", "No", "Show", "Always"),
+              "26 30 38 145", "No", "Show", "Always"),
         entry("name", "Label", label_data("Name", "ffffb84d", 20.0, "horizontallyCentred verticallyCentred"),
-              "0 0 95 30", "No", "Show", "Always"),
+              "0 0 95 28", "No", "Show", "Always"),
         entry("value", "Label", label_data("Value", "fff2f5fa", 20.0, "horizontallyCentred verticallyCentred"),
-              "0 310 95 30", "No", "Show", "Always")
+              "0 180 95 25", "No", "Show", "Always")
     ]
     defs.append(("vockitVerticalBand", vertical))
     for tab in tabs:
         name = kv(tab, "tabName")
         if name.startswith("BAND") and name[-1] in "123":
             n = int(name[-1])
-            start = 19 + (n - 1) * 8
+            start = 19 + (n - 1) * 12
             children = []
             children.append(entry("heading", "Label",
                 label_data("Text", "ffffb84d", 32.0, "left", "VOCKIT / 24-BAND SPECTRAL MIXER"),
                 "45 12 1160 55", "No", "Show", "Always"))
-            for i in range(8):
-                children.append(entry("Band %02d" % ((n - 1) * 8 + i + 1),
+            for i in range(12):
+                children.append(entry("Band %02d" % ((n - 1) * 12 + i + 1),
                     "vockitVerticalBand", obj(("version", 1), ("handleName", "Data")),
-                    "%d 116 95 340" % (35 + i * 150),
+                    "%d %d 95 210" % (35 + (i % 6) * 198, 110 + (i // 6) * 242),
                     "Yes", "Hide", "Always",
                     remap=[("Data", "Parameter %d" % (start + i))]))
             put(kv(tab, "componentDefinition"), "componentsData", children)
