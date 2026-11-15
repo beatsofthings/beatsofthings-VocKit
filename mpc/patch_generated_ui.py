@@ -37,27 +37,18 @@ injection=r'''
     defs.append(("vockitVerticalBand", vertical))
     for tab in tabs:
         name = kv(tab, "tabName")
-        if name in ("OSC", "FILTER"):
+        if name == "OSC":
             children = kv(kv(tab, "componentDefinition"), "componentsData")
-            bg = "osc_panels.png" if name == "OSC" else "filter_panels.png"
-            children.insert(0, entry("module background", "Image",
+            children.insert(0, entry("osc background", "Image",
                 obj(("version", 2), ("imageType", "Regular"),
-                    ("colour", "0"), ("image", bg)),
+                    ("colour", "0"), ("image", "osc_panels.png")),
                 "0 0 1280 628", "No", "Show", "Always"))
-            if name == "OSC":
-                for title, y in (("OSC 1 / MAIN CARRIER + LFO", 11),
-                                 ("OSC 2 / SECOND CARRIER", 471)):
-                    children.append(entry("module heading " + title, "Label",
-                        label_data("Text", "ffffb84d", 22.0, "left", title),
-                        "42 %d 850 28" % y, "No", "Show", "Always",
-                        remap=[("Data", "Parameter 0")]))
-            else:
-                for title, x in (("FILTER / CUTOFF + RESONANCE", 42),
-                                 ("ENVELOPES / SYNTH + VOCODER", 664)):
-                    children.append(entry("module heading " + title, "Label",
-                        label_data("Text", "ffffb84d", 21.0, "left", title),
-                        "%d 11 550 28" % x, "No", "Show", "Always",
-                        remap=[("Data", "Parameter 0")]))
+            for title, y in (("OSC 1 / MAIN CARRIER + LFO", 11),
+                             ("OSC 2 / SECOND CARRIER", 471)):
+                children.append(entry("osc heading " + title, "Label",
+                    label_data("Text", "ffffb84d", 22.0, "left", title),
+                    "42 %d 850 28" % y, "No", "Show", "Always",
+                    remap=[("Data", "Parameter 0")]))
         if name.startswith("BAND") and name[-1] in "123":
             n = int(name[-1])
             start = 19 + (n - 1) * 12
@@ -74,19 +65,30 @@ injection=r'''
             put(kv(tab, "componentDefinition"), "componentsData", children)
             put(tab, "qlinkBoundsData", ["0 0 0 0"] * 4)
         elif name == "FILTER":
-            children = kv(kv(tab, "componentDefinition"), "componentsData")
-            # Two combined schematic diagrams. A single filmstrip cannot show
-            # the combined effect of two independent parameters correctly.
-            for title, filename, x in (
-                ("FILTER RESPONSE  /  CUTOFF + RESONANCE", "filter_response.png", 25),
-                ("SYNTH ENVELOPE  /  ATTACK + RELEASE", "synth_envelope.png", 650)):
-                children.append(entry("diagram title " + title, "Label",
-                    label_data("Text", "ffffb84d", 20.0, "left", title),
-                    "%d 443 595 28" % x, "No", "Show", "Always"))
-                children.append(entry("diagram " + title, "Image",
-                    obj(("version", 2), ("imageType", "Regular"),
-                        ("colour", "0"), ("image", filename)),
-                    "%d 477 585 140" % x, "No", "Show", "Always"))
+            # The generator's 4x4 layout mixes filter and envelope controls.
+            # Rebuild only this tab using the SDK's proven control components,
+            # with explicit parameter binding and grouped rows.
+            children = []
+            def section(title, y):
+                children.append(entry("section " + title, "Label",
+                    label_data("Text", "ffffb84d", 27.0, "left", title),
+                    "45 %d 1140 40" % y, "No", "Show", "Always",
+                    remap=[("Data", "Parameter 0")]))
+            def knob(label, param, x, y):
+                children.append(entry(label, "knob uni",
+                    obj(("version", 1), ("handleName", "Data")),
+                    "%d %d 278 107" % (x, y), "Yes", "Hide", "Always",
+                    remap=[("Data", "Parameter %d" % param)]))
+            section("FILTER  /  CUTOFF + RESONANCE", 15)
+            knob("Filter Cutoff", 15, 110, 68)
+            knob("Resonance", 16, 670, 68)
+            section("SYNTH ENVELOPE  /  CARRIER SHAPE", 212)
+            knob("Synth Attack", 17, 110, 265)
+            knob("Synth Release", 18, 670, 265)
+            section("VOCODER ENVELOPE  /  SPEECH TRACKING", 420)
+            knob("Attack", 3, 110, 475)
+            knob("Release", 4, 670, 475)
+            put(kv(tab, "componentDefinition"), "componentsData", children)
         elif name == "OSC":
             children = kv(kv(tab, "componentDefinition"), "componentsData")
             children.append(entry("lfo caption", "Label",
