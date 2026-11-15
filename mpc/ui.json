@@ -144,40 +144,36 @@
       "name": "BAND1",
       "controls": [
         {
-          "widget": "text",
-          "text": "VOCODER BANDS 1-8"
-        },
-        {
           "param": "Band 01",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 02",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 03",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 04",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 05",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 06",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 07",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 08",
-          "widget": "knob"
+          "widget": "fader"
         }
       ]
     },
@@ -185,40 +181,36 @@
       "name": "BAND2",
       "controls": [
         {
-          "widget": "text",
-          "text": "VOCODER BANDS 9-16"
-        },
-        {
           "param": "Band 09",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 10",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 11",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 12",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 13",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 14",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 15",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 16",
-          "widget": "knob"
+          "widget": "fader"
         }
       ]
     },
@@ -226,40 +218,36 @@
       "name": "BAND3",
       "controls": [
         {
-          "widget": "text",
-          "text": "VOCODER BANDS 17-24"
-        },
-        {
           "param": "Band 17",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 18",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 19",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 20",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 21",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 22",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 23",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Band 24",
-          "widget": "knob"
+          "widget": "fader"
         }
       ]
     },
@@ -329,6 +317,76 @@
         {
           "param": "Carrier",
           "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "TIPS",
+      "controls": [
+        {
+          "widget": "text",
+          "text": "VOCKIT FX / QUICK START"
+        },
+        {
+          "widget": "text",
+          "text": "INTERNAL: FX ON VOICE TRACK"
+        },
+        {
+          "widget": "text",
+          "text": "JURA: CARRIER PAN LEFT"
+        },
+        {
+          "widget": "text",
+          "text": "VOICE / MIC: PAN RIGHT"
+        },
+        {
+          "widget": "text",
+          "text": "BOTH TO SUBMIX 1"
+        },
+        {
+          "widget": "text",
+          "text": "FX ONLY ON SUBMIX 1"
+        },
+        {
+          "widget": "text",
+          "text": "SET L CARRIER / R VOICE"
+        },
+        {
+          "widget": "text",
+          "text": "START AT 100% WET"
+        },
+        {
+          "widget": "text",
+          "text": "BRIGHT SAW FOR CLEAR WORDS"
+        },
+        {
+          "widget": "text",
+          "text": "SHORT RELEASE FOR FAST RAP"
+        },
+        {
+          "widget": "text",
+          "text": "MIC: ENABLE INPUT MONITOR"
+        },
+        {
+          "widget": "text",
+          "text": "USE HEADPHONES WITH MIC"
+        },
+        {
+          "widget": "text",
+          "text": "NO REVERB BEFORE VOCKIT"
+        },
+        {
+          "widget": "text",
+          "text": "PRESETS: TOP MPC MENU"
+        },
+        {
+          "widget": "text",
+          "text": "GUIDES: MPCTOOLKIT.COM"
+        },
+        {
+          "param": "Setup Steps",
+          "widget": "slider",
+          "overlay": "menu"
         }
       ]
     }
