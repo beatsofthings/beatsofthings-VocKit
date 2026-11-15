@@ -77,7 +77,7 @@ injection=r'''
                 label_data("Text", "ffffb84d", 21.0, "left",
                            "LIVE LEVEL HISTORY  /  INPUT (CYAN) + VOCODER OUT (AMBER)"),
                 "35 474 1200 31", "No", "Show", "Always"))
-            for title, index, colour in (("input", 47, "ff28c9d4"), ("output", 48, "ffffb84d")):
+            for title, index, colour, xpos in (("input", 47, "ff28c9d4", 35), ("output", 48, "ffffb84d", 645)):
                 children.append(entry("scope " + title, "Plotter",
                     obj(("version", 2), ("backgroundColour", "ff142434"),
                         ("drawLine", True), ("lineDirection", "Up"),
@@ -90,7 +90,7 @@ injection=r'''
                         ("drawHistory", True), ("historyDirection", "Left"),
                         ("historyColour1", colour), ("historyColour2", colour),
                         ("historyTime", 4.0), ("historySkipFrames", 1)),
-                    "35 508 1190 93", "No", "Show", "Always",
+                    "%d 508 575 93" % xpos, "No", "Show", "Always",
                     remap=[("Data", "Parameter %d" % index)]))
         elif name == "HELP":
             lines = [
