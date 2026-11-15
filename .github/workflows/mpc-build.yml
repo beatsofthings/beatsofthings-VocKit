@@ -19,7 +19,7 @@ jobs:
         run: |
           mkdir -p sdk/plugins/VocKit/src
           cp mpc/plugin.json mpc/ui.json mpc/README.md sdk/plugins/VocKit/
-          cp mpc/src/VocKit.cpp src/Vocoder.hpp src/SpectralVocoder.hpp sdk/plugins/VocKit/src/
+          cp mpc/src/VocKit.cpp src/Vocoder.hpp src/SpectralVocoder.hpp src/PostFx.hpp sdk/plugins/VocKit/src/
           # Safety rollback: the custom TUI produced a blank MPC screen.
           # Keep custom skin sources in Git, but use the proven ui.json generator.
       - name: Patch SDK UI generator (vertical bands + English help)
@@ -35,7 +35,7 @@ jobs:
           assert programs, "No factory programs"
           for index, program in enumerate(programs):
               values=[v.strip() for v in program.split(",")]
-              assert len(values)==54, (index, len(values))
+              assert len(values)==58, (index, len(values))
               assert all(re.fullmatch(r'-?(?:\d+\.?\d*|\.\d+)f',v) for v in values), index
           print("Validated",len(programs),"complete factory programs")
           PY
