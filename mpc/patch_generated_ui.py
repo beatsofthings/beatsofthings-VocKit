@@ -37,6 +37,27 @@ injection=r'''
     defs.append(("vockitVerticalBand", vertical))
     for tab in tabs:
         name = kv(tab, "tabName")
+        if name in ("OSC", "FILTER"):
+            children = kv(kv(tab, "componentDefinition"), "componentsData")
+            bg = "osc_panels.png" if name == "OSC" else "filter_panels.png"
+            children.insert(0, entry("module background", "Image",
+                obj(("version", 2), ("imageType", "Regular"),
+                    ("colour", "0"), ("image", bg)),
+                "0 0 1280 628", "No", "Show", "Always"))
+            if name == "OSC":
+                for title, y in (("OSC 1 / MAIN CARRIER + LFO", 11),
+                                 ("OSC 2 / SECOND CARRIER", 471)):
+                    children.append(entry("module heading " + title, "Label",
+                        label_data("Text", "ffffb84d", 22.0, "left", title),
+                        "42 %d 850 28" % y, "No", "Show", "Always",
+                        remap=[("Data", "Parameter 0")]))
+            else:
+                for title, x in (("FILTER / CUTOFF + RESONANCE", 42),
+                                 ("ENVELOPES / SYNTH + VOCODER", 664)):
+                    children.append(entry("module heading " + title, "Label",
+                        label_data("Text", "ffffb84d", 21.0, "left", title),
+                        "%d 11 550 28" % x, "No", "Show", "Always",
+                        remap=[("Data", "Parameter 0")]))
         if name.startswith("BAND") and name[-1] in "123":
             n = int(name[-1])
             start = 19 + (n - 1) * 12
