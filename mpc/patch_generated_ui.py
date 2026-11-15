@@ -37,6 +37,13 @@ injection=r'''
     defs.append(("vockitVerticalBand", vertical))
     for tab in tabs:
         name = kv(tab, "tabName")
+        # Underlay: independent original vintage-synth inspired background.
+        # Insert first, so native controls and their focus overlays stay visible.
+        tab_children = kv(kv(tab, "componentDefinition"), "componentsData")
+        tab_children.insert(0, entry("VocKit vintage background", "Image",
+            obj(("version", 2), ("imageType", "Regular"),
+                ("colour", "0"), ("image", "vockit_vintage_background.png")),
+            "0 0 1280 628", "No", "Show", "Always"))
         if name == "VOICE":
             children = kv(kv(tab, "componentDefinition"), "componentsData")
             children.insert(0, entry("VocKit BeatsOfThings logo", "Image",
@@ -79,7 +86,11 @@ injection=r'''
             # Rebuild only this tab using the SDK's proven control components,
             # with explicit parameter binding and grouped rows.
             originals = kv(kv(tab, "componentDefinition"), "componentsData")
-            children = [entry("filter panel background", "Image",
+            children = [entry("vintage background", "Image",
+                obj(("version", 2), ("imageType", "Regular"),
+                    ("colour", "0"), ("image", "vockit_vintage_background.png")),
+                "0 0 1280 628", "No", "Show", "Always"),
+                entry("filter panel background", "Image",
                 obj(("version", 2), ("imageType", "Regular"),
                     ("colour", "0"), ("image", "filter_sections.png")),
                 "0 0 1280 628", "No", "Show", "Always")]
@@ -158,7 +169,11 @@ injection=r'''
                     "Sub Osc 15-30; lower Cutoff",
                     "Guides: mpctoolkit.com"])
             ]
-            children = [entry("help panel background", "Image",
+            children = [entry("vintage background", "Image",
+                obj(("version", 2), ("imageType", "Regular"),
+                    ("colour", "0"), ("image", "vockit_vintage_background.png")),
+                "0 0 1280 628", "No", "Show", "Always"),
+                entry("help panel background", "Image",
                 obj(("version", 2), ("imageType", "Regular"),
                     ("colour", "0"), ("image", "help_columns.png")),
                 "0 0 1280 628", "No", "Show", "Always")]
