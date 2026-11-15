@@ -2,7 +2,7 @@
 24-band FFT vocoder effect for MPC OS 3.10.1+ using the official plugin SDK.
 
 ## Factory programs and band pages
-The official SDK built-in program API provides 10 presets in the MPC native preset selector: Init, Robot Voice, Clear Rap, Dark Vocoder, Saw Brass, Soft Strings, Aggressive, Retro Robot, JURA L / Voice R, JURA R / Voice L. The 24 FFT bands are individually adjustable in three pages: BANDS 1-8, BANDS 9-16 and BANDS 17-24. Presets are stored by the SDK as host programs, not custom buttons. The JURA presets only configure the plugin; physical mixer routing remains manual.
+The official SDK built-in program API provides 16 presets in the MPC native preset selector: Init, Robot Voice, Clear Rap, Dark Vocoder, Saw Brass, Soft Strings, Aggressive, Retro Robot, JURA L / Voice R, JURA R / Voice L, Electric Choir, Neon Talkbox, Space Transmission, Analog Whisper, Dark Machine, Funky Pulse. The 24 FFT bands are individually adjustable in three pages: BANDS 1-8, BANDS 9-16 and BANDS 17-24. Presets are stored by the SDK as host programs, not custom buttons. The JURA presets only configure the plugin; physical mixer routing remains manual.
 
 ## On-device controls
 - **VOICE:** Input Mode, Level, Pitch, Chord, Tone, Attack, Release, Input, Carrier
@@ -21,3 +21,6 @@ See repository `VOCODER_SETUP_GUIDE.md` for complete desktop, hardware and troub
 
 ## Platform UI limitation
 MPC standalone uses the official SDK JSON-based touchscreen pages. The Windows JUCE custom editor cannot be copied directly to MPC standalone. The audio engine and sound parameters are shared; visual parity is not yet complete. Hardware MIDI notes cannot directly enter the FX plugin, so JURA must be played as a separate MIDI instrument and routed into the effect as audio.
+
+## Graphical filter and envelope displays
+The FILTER tab uses four 48-frame image displays bound to the actual Filter Cutoff, Resonance, Synth Attack, and Synth Release parameters. They change with the corresponding knob, including preset recall. Each image is a single-parameter schematic; it is not a measured frequency response or combined ADSR graph. The LFO is a real pitch modulator with waveform, rate and depth controls; the oscilloscope remains future work.
