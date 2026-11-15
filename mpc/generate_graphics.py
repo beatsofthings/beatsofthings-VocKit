@@ -125,3 +125,12 @@ for x in range(0,1280,26):
 # Warm left rail reminiscent of classic analog synthesizer panel graphics.
 d.rounded_rectangle((8,42,15,582),radius=3,fill=(183,114,59,165))
 im.save(out/"vockit_vintage_background.png",optimize=True)
+
+# Dedicated FX modules: saturation, stereo chorus, and voice shaping.
+im=Image.new("RGBA",(1280,628),(0,0,0,0))
+d=ImageDraw.Draw(im)
+for left,right in ((18,392),(405,860),(873,1262)):
+    d.rounded_rectangle((left,22,right,608),radius=14,
+        fill=(21,36,53,230),outline=(75,96,113,255),width=2)
+    d.line((left+17,72,right-17,72),fill=(220,142,71,170),width=2)
+im.save(out/"fx_sections.png",optimize=True)
