@@ -22,6 +22,8 @@ jobs:
           cp mpc/src/VocKit.cpp src/Vocoder.hpp src/SpectralVocoder.hpp sdk/plugins/VocKit/src/
           # Safety rollback: the custom TUI produced a blank MPC screen.
           # Keep custom skin sources in Git, but use the proven ui.json generator.
+      - name: Patch SDK UI generator (vertical bands + English help)
+        run: python mpc/patch_generated_ui.py sdk/tools/gen_ui.py
       - name: Build ARM and native
         run: |
           export PATH="$HOME/.local/bin:$PATH"
