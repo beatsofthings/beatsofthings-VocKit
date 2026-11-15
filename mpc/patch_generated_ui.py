@@ -69,7 +69,10 @@ injection=r'''
             # Rebuild only this tab using the SDK's proven control components,
             # with explicit parameter binding and grouped rows.
             originals = kv(kv(tab, "componentDefinition"), "componentsData")
-            children = []
+            children = [entry("filter panel background", "Image",
+                obj(("version", 2), ("imageType", "Regular"),
+                    ("colour", "0"), ("image", "filter_sections.png")),
+                "0 0 1280 628", "No", "Show", "Always")]
             def section(title, y):
                 children.append(entry("section " + title, "Label",
                     label_data("Text", "ffffb84d", 27.0, "left", title),
@@ -99,31 +102,68 @@ injection=r'''
                            "LFO: SINE / TRIANGLE / SQUARE - RATE + PITCH DEPTH"),
                 "45 545 1160 35", "No", "Show", "Always"))
         elif name == "HELP":
-            lines = [
-                "VOCKIT FX  /  SETUP AND TIPS",
-                "DIAG: Audio Monitor -> Listen Left / Listen Right",
-                "Normal mode restores VocKit processing",
-                "INTERNAL: Insert VocKit FX on the vocal audio track",
-                "Select Internal carrier mode and set Mix to 100%",
-                "JURA: Send synth and voice tracks to Submix 1",
-                "Pan JURA hard LEFT and voice hard RIGHT",
-                "Insert VocKit only on Submix 1",
-                "Select L Carrier / R Voice in Input Mode",
-                "MIC: Enable input monitoring; use headphones",
-                "Bright saw carrier improves word clarity",
-                "Short release works well for fast rap",
-                "Avoid reverb before the vocoder",
-                "Save and load presets from the MPC preset menu",
-                "GUIDES: https://mpctoolkit.com"
+            # Three independent reading columns; all labels bind to an existing
+            # valid handle because unbound SDK text labels can render blank.
+            columns = [
+                ("SETUP / ROUTING", [
+                    "INTERNAL CARRIER:",
+                    "Insert VocKit on the vocal track",
+                    "Input Mode: Internal",
+                    "Mix 100% - adjust Carrier level",
+                    "EXTERNAL JURA:",
+                    "Route voice + JURA to Submix 1",
+                    "JURA LEFT, voice RIGHT:",
+                    "Mode: L Carrier / R Voice",
+                    "Voice LEFT, JURA RIGHT:",
+                    "Mode: R Carrier / L Voice",
+                    "DIAG: Audio Monitor L / R",
+                    "Return Monitor to Normal",
+                    "Use headphones for microphone"]),
+                ("24-BAND SPECTRAL MIXER", [
+                    "Each slider shapes one frequency",
+                    "band of the vocoded output",
+                    "01-08: bass / warmth / body",
+                    "09-16: vowels / intelligibility",
+                    "17-24: brightness / presence",
+                    "100 = neutral band level",
+                    "0 = remove that frequency band",
+                    "200 = boost that band",
+                    "Raise mids for clearer vowels",
+                    "Lower lows to reduce muddiness",
+                    "Use high bands for brightness",
+                    "Bands are NOT a dry vocal EQ",
+                    "BAND1: 01-12; BAND2: 13-24"]),
+                ("SYNTH / SOUND RECIPES", [
+                    "CLASSIC ROBOT:",
+                    "Saw/Pulse; Single; short Attack",
+                    "Release 70-120; bright carrier",
+                    "ELECTRO FUNK:",
+                    "Saw + OSC2 Square at 20-40%",
+                    "Detune OSC2 5-12 cents",
+                    "SOFT CHOIR:",
+                    "Triangle; Major chord",
+                    "Slow Synth Attack + Release",
+                    "DEEP MACHINE:",
+                    "Formant Shift -4 to -8",
+                    "Sub Osc 15-30; lower Cutoff",
+                    "Guides: mpctoolkit.com"])
             ]
-            children = [
-                entry("help %d" % i, "Label",
-                      label_data("Text", "ffffb84d" if i in (0, 12) else "fff2f5fa",
-                                 29.0 if i == 0 else 23.0, "left", line),
-                      "44 %d 1160 39" % (15 + i * 44), "No", "Show", "Always",
-                      remap=[("Data", "Parameter 0")])
-                for i, line in enumerate(lines)
-            ]
+            children = [entry("help panel background", "Image",
+                obj(("version", 2), ("imageType", "Regular"),
+                    ("colour", "0"), ("image", "help_columns.png")),
+                "0 0 1280 628", "No", "Show", "Always")]
+            for col, (heading, lines) in enumerate(columns):
+                x = 34 + col * 420
+                children.append(entry("help heading %d" % col, "Label",
+                    label_data("Text", "ffffb84d", 22.0, "left", heading),
+                    "%d 27 375 34" % x, "No", "Show", "Always",
+                    remap=[("Data", "Parameter 0")]))
+                for i, line in enumerate(lines):
+                    children.append(entry("help %d %d" % (col, i), "Label",
+                        label_data("Text", "fff2f5fa", 18.0, "left", line),
+                        "%d %d 375 31" % (x, 83 + i * 38),
+                        "No", "Show", "Always",
+                        remap=[("Data", "Parameter 0")]))
             put(kv(tab, "componentDefinition"), "componentsData", children)
 '''
 s=s.replace(needle,injection+"\n"+needle)
