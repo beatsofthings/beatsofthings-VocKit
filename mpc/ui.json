@@ -1,5 +1,8 @@
 {
-  "kit": "cyan",
+  "kit": {
+    "theme": "amber",
+    "accent": "FFFFB84D"
+  },
   "pages": [
     {
       "name": "VOICE",
@@ -10,21 +13,16 @@
           "overlay": "menu"
         },
         {
-          "param": "Level",
+          "param": "Input",
+          "widget": "knob"
+        },
+        {
+          "param": "Carrier",
+          "widget": "knob"
+        },
+        {
+          "param": "Mix",
           "widget": "fader"
-        },
-        {
-          "param": "Pitch",
-          "widget": "knob"
-        },
-        {
-          "param": "Chord",
-          "widget": "slider",
-          "overlay": "menu"
-        },
-        {
-          "param": "Tone",
-          "widget": "knob"
         },
         {
           "param": "Attack",
@@ -35,18 +33,22 @@
           "widget": "knob"
         },
         {
-          "param": "Input",
-          "widget": "knob"
+          "param": "Level",
+          "widget": "fader"
         },
         {
-          "param": "Carrier",
-          "widget": "knob"
+          "widget": "text",
+          "text": "VOICE / MODULATOR"
         }
       ]
     },
     {
-      "name": "CARRIER",
+      "name": "OSC",
       "controls": [
+        {
+          "widget": "text",
+          "text": "OSCILLATORS"
+        },
         {
           "param": "Pitch",
           "widget": "knob"
@@ -70,15 +72,28 @@
         },
         {
           "param": "Sub Osc",
-          "widget": "knob"
-        },
-        {
-          "param": "Carrier",
           "widget": "fader"
         },
         {
           "param": "Noise Osc",
-          "widget": "knob"
+          "widget": "fader"
+        },
+        {
+          "widget": "text",
+          "text": "CARRIER LEVEL"
+        },
+        {
+          "param": "Carrier",
+          "widget": "fader"
+        }
+      ]
+    },
+    {
+      "name": "FILTER",
+      "controls": [
+        {
+          "widget": "text",
+          "text": "ANALOG FILTER"
         },
         {
           "param": "Filter Cutoff",
@@ -89,18 +104,49 @@
           "widget": "knob"
         },
         {
+          "widget": "empty"
+        },
+        {
+          "widget": "text",
+          "text": "SYNTH ENVELOPE"
+        },
+        {
           "param": "Synth Attack",
-          "widget": "knob"
+          "widget": "fader"
         },
         {
           "param": "Synth Release",
-          "widget": "knob"
+          "widget": "fader"
+        },
+        {
+          "param": "Carrier",
+          "widget": "fader"
+        },
+        {
+          "widget": "text",
+          "text": "VOCODER ENVELOPE"
+        },
+        {
+          "param": "Attack",
+          "widget": "fader"
+        },
+        {
+          "param": "Release",
+          "widget": "fader"
+        },
+        {
+          "param": "Level",
+          "widget": "fader"
         }
       ]
     },
     {
-      "name": "BANDS 1-8",
+      "name": "BAND1",
       "controls": [
+        {
+          "widget": "text",
+          "text": "VOCODER BANDS 1-8"
+        },
         {
           "param": "Band 01",
           "widget": "fader"
@@ -136,8 +182,12 @@
       ]
     },
     {
-      "name": "BANDS 9-16",
+      "name": "BAND2",
       "controls": [
+        {
+          "widget": "text",
+          "text": "VOCODER BANDS 9-16"
+        },
         {
           "param": "Band 09",
           "widget": "fader"
@@ -173,8 +223,12 @@
       ]
     },
     {
-      "name": "BANDS 17-24",
+      "name": "BAND3",
       "controls": [
+        {
+          "widget": "text",
+          "text": "VOCODER BANDS 17-24"
+        },
         {
           "param": "Band 17",
           "widget": "fader"
@@ -232,12 +286,24 @@
         {
           "param": "Carrier",
           "widget": "knob"
+        },
+        {
+          "param": "Attack",
+          "widget": "knob"
+        },
+        {
+          "param": "Release",
+          "widget": "knob"
         }
       ]
     },
     {
-      "name": "HELP",
+      "name": "ROUTING",
       "controls": [
+        {
+          "widget": "text",
+          "text": "MPC AUDIO ROUTING"
+        },
         {
           "param": "Setup Steps",
           "widget": "slider",
@@ -251,8 +317,26 @@
         {
           "param": "Mix",
           "widget": "fader"
+        },
+        {
+          "widget": "text",
+          "text": "VOICE RIGHT / JURA LEFT"
+        },
+        {
+          "param": "Input",
+          "widget": "knob"
+        },
+        {
+          "param": "Carrier",
+          "widget": "knob"
         }
       ]
     }
-  ]
+  ],
+  "style": {
+    "background": "ff111a25",
+    "accent": "ffffb84d",
+    "text": "fff1f5f9",
+    "muted": "ff9fb0c3"
+  }
 }
