@@ -49,7 +49,7 @@ public:
      env_[i].env=0.f;
    }
    spectral_.prepare(sr_);
-   phase_.fill(0.f);detunePhase_=subPhase_=lfoPhase_=0.f;
+   phase_.fill(0.f);detunePhase_=subPhase_=lfoPhase_=osc2Phase_=0.f;
    filterLow_=filterBand_=synthEnvelope_=0.f;
    sibilanceLow_=0.f; sibilanceEnv_=0.f; noiseState_=0x12345678u;
  }
@@ -67,6 +67,8 @@ public:
  void setTone(float v){tone_=clamp(v,0.f,1.f);}
  void setWaveform(int shape){waveform_=std::max(0,std::min(3,shape));}
  void setLfo(int shape,float rateHz,float depthCents){lfoShape_=std::max(0,std::min(2,shape));lfoRate_=clamp(rateHz,0.f,20.f);lfoDepth_=clamp(depthCents,0.f,100.f);}
+ void setOsc2(int shape,float level,float semitones,float cents){osc2Shape_=std::max(0,std::min(3,shape));osc2Level_=clamp(level,0.f,1.f);osc2Semi_=clamp(semitones,-24.f,24.f);osc2Cents_=clamp(cents,-50.f,50.f);}
+ void setSibilance(float amount){sibilance_=clamp(amount,0.f,1.f);}
  void setDetune(float cents){detune_=clamp(cents,0.f,35.f);}
  void setSubLevel(float amount){subLevel_=clamp(amount,0.f,1.f);}
  void setNoiseLevel(float amount){noiseLevel_=clamp(amount,0.f,1.f);}
@@ -108,6 +110,17 @@ public:
      carrier+=wave/voices;
    }
    if(!gate_)carrier=0.f;
+   if(!useExternal && gate_ && osc2Level_>0.f){
+     const float hz=oscillatorFrequency*std::pow(2.f,osc2Semi_/12.f+osc2Cents_/1200.f);
+     osc2Phase_+=hz/sr_;
+     if(osc2Phase_>=1.f)osc2Phase_-=std::floor(osc2Phase_);
+     const float saw=2.f*osc2Phase_-1.f;
+     const float triangle=1.f-4.f*std::fabs(osc2Phase_-.5f);
+     const float sine=std::sin(2.f*pi*osc2Phase_);
+     const float square=osc2Phase_<.5f?1.f:-1.f;
+     const float wave=osc2Shape_==1?triangle:(osc2Shape_==2?sine:(osc2Shape_==3?square:saw));
+     carrier=(carrier+osc2Level_*wave)/(1.f+osc2Level_);
+   }
    // Additional detuned saw voice and sub octave for a richer internal carrier.
    // Only active in internal mode; external JURA audio is never altered here.
    if(!useExternal && gate_ && (detune_>0.f || subLevel_>0.f)){
@@ -149,7 +162,15 @@ public:
    if(useExternal)carrier=std::isfinite(externalCarrier)?clamp(externalCarrier,-2.f,2.f):0.f;
    // FFT spectral-envelope transfer, replacing the old bandpass engine.
    const float processed=spectral_.tick(input,carrier,bandLevel_);
-   return clamp(input*(1.f-wet_)+processed*wet_,-1.f,1.f);
+   // Optional unvoiced consonant path: high-passed speech blended into wet output.
+   // Default zero retains the established FFT vocoder sound unchanged.
+   float unvoiced=0.f;
+   if(sibilance_>0.f){
+     const float a=std::exp(-2.f*pi*3500.f/sr_);
+     sibilanceLow_=a*sibilanceLow_+(1.f-a)*input;
+     unvoiced=(input-sibilanceLow_)*sibilance_*.35f;
+   }
+   return clamp(input*(1.f-wet_)+(processed+unvoiced)*wet_,-1.f,1.f);
  }
  void process(const float* in,float* out,std::size_t n){
    for(std::size_t i=0;i<n;++i)out[i]=tick(in?in[i]:0.f);
@@ -157,6 +178,8 @@ public:
 private:
  float sr_=44100.f,freq_=110.f,wet_=1.f,attack_=8.f,release_=90.f,tone_=0.f,formant_=0.f;
  float detune_=0.f,subLevel_=0.f,noiseLevel_=0.f,detunePhase_=0.f,subPhase_=0.f;
+ float osc2Phase_=0.f,osc2Level_=0.f,osc2Semi_=0.f,osc2Cents_=0.f,sibilance_=0.f;
+ int osc2Shape_=0;
  float cutoff_=1.f,resonance_=0.f,synthAttack_=1.f,synthRelease_=5.f;
  float filterLow_=0.f,filterBand_=0.f,synthEnvelope_=0.f;
  int octave_=0,waveform_=0,lfoShape_=0;
