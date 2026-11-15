@@ -68,26 +68,29 @@ injection=r'''
             # The generator's 4x4 layout mixes filter and envelope controls.
             # Rebuild only this tab using the SDK's proven control components,
             # with explicit parameter binding and grouped rows.
+            originals = kv(kv(tab, "componentDefinition"), "componentsData")
             children = []
             def section(title, y):
                 children.append(entry("section " + title, "Label",
                     label_data("Text", "ffffb84d", 27.0, "left", title),
                     "45 %d 1140 40" % y, "No", "Show", "Always",
                     remap=[("Data", "Parameter 0")]))
-            def knob(label, param, x, y):
-                children.append(entry(label, "knob uni",
-                    obj(("version", 1), ("handleName", "Data")),
-                    "%d %d 278 107" % (x, y), "Yes", "Hide", "Always",
-                    remap=[("Data", "Parameter %d" % param)]))
+            def control(label, x, y):
+                original = next((item for item in originals
+                    if kv(kv(item, "componentData"), "name") == label), None)
+                if original is None:
+                    raise ValueError("Missing SDK-generated FILTER control: " + label)
+                put(kv(original, "bounds"), "bounds", "%d %d 278 107" % (x, y))
+                children.append(original)
             section("FILTER  /  CUTOFF + RESONANCE", 15)
-            knob("Filter Cutoff", 15, 110, 68)
-            knob("Resonance", 16, 670, 68)
+            control("Filter Cutoff", 110, 68)
+            control("Resonance", 670, 68)
             section("SYNTH ENVELOPE  /  CARRIER SHAPE", 212)
-            knob("Synth Attack", 17, 110, 265)
-            knob("Synth Release", 18, 670, 265)
+            control("Synth Attack", 110, 265)
+            control("Synth Release", 670, 265)
             section("VOCODER ENVELOPE  /  SPEECH TRACKING", 420)
-            knob("Attack", 3, 110, 475)
-            knob("Release", 4, 670, 475)
+            control("Attack", 110, 475)
+            control("Release", 670, 475)
             put(kv(tab, "componentDefinition"), "componentsData", children)
         elif name == "OSC":
             children = kv(kv(tab, "componentDefinition"), "componentsData")
