@@ -54,3 +54,8 @@ VocKit — BeatsOfThings. Unofficial third-party MPC plugin; not affiliated with
 - **Profile Amount:** blends from manual band values (0%) to the selected profile (100%).
 - **Voice Character:** subtle formant-lowering and band tilt for voice coloration; 0% preserves existing sound. It is not a guaranteed voice-anonymisation feature.
 - If your preset sounds different after upgrading, first set Saturation, Chorus Mix and Voice Character to 0%, and Band Profile to Manual.
+
+## Ring Modulator (FX page)
+- **Ring Mix** blends the vocoder output with a metallic, amplitude-modulated version; 0% is bypass.
+- **Ring Frequency** sets the modulation oscillator from 10 to 1000 Hz. Try 50–120 Hz for a vintage robot texture, or higher values for metallic effects.
+- Ring modulation is not pitch correction and can reduce speech intelligibility at high mix settings.
