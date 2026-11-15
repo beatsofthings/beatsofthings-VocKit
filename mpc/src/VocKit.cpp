@@ -3,6 +3,7 @@
 #include "mpc_plugin.h"
 #include "Vocoder.hpp"
 #include "PostFx.hpp"
+#include "SpectrumSnapshot.hpp"
 #include <cmath>
 #include <cstdio>
 class VocKit:public mpc::Plugin {
@@ -151,8 +152,13 @@ public:
      post_.process(left,right,get(Saturation)*.01f,get(ChorusMix)*.01f,get(ChorusRate),get(ChorusDepth)*.01f);
      ol[n]=left;if(orr!=ol)orr[n]=right;
    }
+   // Publish measured FFT bins only once per process block, never as
+   // VST parameters. The future UI adapter can read this snapshot safely.
+   if(monitor==0 && ctx.numFrames>0) spectrumSnapshot_.publish(voc_.spectrum());
  }
 private:
- vockit::Vocoder voc_;vockit::PostFx post_;float sr_=44100.f;
+ vockit::Vocoder voc_;vockit::PostFx post_;
+ vockit::SpectrumSnapshot spectrumSnapshot_;
+ float sr_=44100.f;
 };
 MPC_PLUGIN_ENTRY(VocKit)
