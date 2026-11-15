@@ -174,12 +174,7 @@
         {
           "param": "Band 08",
           "widget": "fader"
-        }
-      ]
-    },
-    {
-      "name": "BAND2",
-      "controls": [
+        },
         {
           "param": "Band 09",
           "widget": "fader"
@@ -195,7 +190,12 @@
         {
           "param": "Band 12",
           "widget": "fader"
-        },
+        }
+      ]
+    },
+    {
+      "name": "BAND2",
+      "controls": [
         {
           "param": "Band 13",
           "widget": "fader"
@@ -211,12 +211,7 @@
         {
           "param": "Band 16",
           "widget": "fader"
-        }
-      ]
-    },
-    {
-      "name": "BAND3",
-      "controls": [
+        },
         {
           "param": "Band 17",
           "widget": "fader"
@@ -252,80 +247,11 @@
       ]
     },
     {
-      "name": "MIX",
-      "controls": [
-        {
-          "param": "Input Mode",
-          "widget": "slider",
-          "overlay": "menu"
-        },
-        {
-          "param": "Mix",
-          "widget": "fader"
-        },
-        {
-          "param": "Level",
-          "widget": "fader"
-        },
-        {
-          "param": "Input",
-          "widget": "knob"
-        },
-        {
-          "param": "Carrier",
-          "widget": "knob"
-        },
-        {
-          "param": "Attack",
-          "widget": "knob"
-        },
-        {
-          "param": "Release",
-          "widget": "knob"
-        }
-      ]
-    },
-    {
-      "name": "ROUTING",
-      "controls": [
-        {
-          "widget": "text",
-          "text": "MPC AUDIO ROUTING"
-        },
-        {
-          "param": "Setup Steps",
-          "widget": "slider",
-          "overlay": "menu"
-        },
-        {
-          "param": "Input Mode",
-          "widget": "slider",
-          "overlay": "menu"
-        },
-        {
-          "param": "Mix",
-          "widget": "fader"
-        },
-        {
-          "widget": "text",
-          "text": "VOICE RIGHT / JURA LEFT"
-        },
-        {
-          "param": "Input",
-          "widget": "knob"
-        },
-        {
-          "param": "Carrier",
-          "widget": "knob"
-        }
-      ]
-    },
-    {
       "name": "HELP",
       "controls": [
         {
           "widget": "text",
-          "text": "VOCKIT FX - SETUP GUIDE"
+          "text": "VOCKIT FX / SETUP GUIDE"
         },
         {
           "widget": "text",
