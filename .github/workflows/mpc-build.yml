@@ -19,7 +19,7 @@ jobs:
         run: |
           mkdir -p sdk/plugins/VocKit/src
           cp mpc/plugin.json mpc/ui.json mpc/README.md sdk/plugins/VocKit/
-          cp mpc/src/VocKit.cpp src/Vocoder.hpp src/SpectralVocoder.hpp src/PostFx.hpp sdk/plugins/VocKit/src/
+          cp mpc/src/VocKit.cpp src/Vocoder.hpp src/SpectralVocoder.hpp src/PostFx.hpp src/SpectrumSnapshot.hpp sdk/plugins/VocKit/src/
           # Safety rollback: the custom TUI produced a blank MPC screen.
           # Keep custom skin sources in Git, but use the proven ui.json generator.
       - name: Patch SDK UI generator (vertical bands + English help)
