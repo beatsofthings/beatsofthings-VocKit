@@ -73,10 +73,25 @@ injection=r'''
                     remap=[("Data", "Parameter %d" % param)]))
         elif name == "OSC":
             children = kv(kv(tab, "componentDefinition"), "componentsData")
-            children.append(entry("lfo diagram caption", "Label",
-                label_data("Text", "ffffb84d", 23.0, "left",
-                           "LFO: SINE / TRIANGLE / SQUARE  -  RATE + PITCH DEPTH"),
-                "45 540 1140 44", "No", "Show", "Always"))
+            children.append(entry("scope heading", "Label",
+                label_data("Text", "ffffb84d", 21.0, "left",
+                           "LIVE LEVEL HISTORY  /  INPUT (CYAN) + VOCODER OUT (AMBER)"),
+                "35 474 1200 31", "No", "Show", "Always"))
+            for title, index, colour in (("input", 47, "ff28c9d4"), ("output", 48, "ffffb84d")):
+                children.append(entry("scope " + title, "Plotter",
+                    obj(("version", 2), ("backgroundColour", "ff142434"),
+                        ("drawLine", True), ("lineDirection", "Up"),
+                        ("tightClip", True), ("lineColourStart", colour),
+                        ("lineColourEnd", colour), ("horizLineGradient", False),
+                        ("lineWidth", 3.0), ("fillColourStart", "00111a25"),
+                        ("fillColourEnd", "00111a25"), ("horizFillGradient", False),
+                        ("fillZero", 0.0), ("dataHandle", "Data"),
+                        ("dataMin", 0.0), ("dataMax", 1.0),
+                        ("drawHistory", True), ("historyDirection", "Left"),
+                        ("historyColour1", colour), ("historyColour2", colour),
+                        ("historyTime", 4.0), ("historySkipFrames", 1)),
+                    "35 508 1190 93", "No", "Show", "Always",
+                    remap=[("Data", "Parameter %d" % index)]))
         elif name == "HELP":
             lines = [
                 "VOCKIT FX  /  SETUP AND TIPS",
