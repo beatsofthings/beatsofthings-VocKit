@@ -287,6 +287,35 @@
       ]
     },
     {
+      "name": "FX",
+      "controls": [
+        {
+          "widget": "text",
+          "text": "POST VOCODER EFFECTS"
+        },
+        {
+          "param": "Saturation",
+          "widget": "knob"
+        },
+        {
+          "param": "Chorus Mix",
+          "widget": "fader"
+        },
+        {
+          "param": "Chorus Rate",
+          "widget": "knob"
+        },
+        {
+          "param": "Chorus Depth",
+          "widget": "knob"
+        },
+        {
+          "widget": "text",
+          "text": "ZERO MIX = ORIGINAL SOUND"
+        }
+      ]
+    },
+    {
       "name": "HELP",
       "controls": [
         {
