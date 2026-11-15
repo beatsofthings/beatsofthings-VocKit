@@ -113,7 +113,9 @@ jobs:
           test -f "$PLUGIN/Plugin Skins/TUI.json"
           test -f "$PLUGIN/Plugin Skins/Q-Links.json"
           cp mpc/INSTALL_EN.md "$PLUGIN/INSTALL_EN.md"
+          cp mpc/FACTORY_SOUNDS_EN.md "$PLUGIN/FACTORY_SOUNDS_EN.md"
           test -s "$PLUGIN/INSTALL_EN.md"
+          test -s "$PLUGIN/FACTORY_SOUNDS_EN.md"
           test -s "$PLUGIN/Plugin Skins/vockit_vintage_background.png"
           # Verify that generated skin files are included in the install archive.
           (cd "$(dirname "$PLUGIN")" && zip -qr "$GITHUB_WORKSPACE/dist/VocKit-MPC-install.zip" "$(basename "$PLUGIN")")
