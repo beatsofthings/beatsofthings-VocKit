@@ -35,7 +35,7 @@ jobs:
           assert programs, "No factory programs"
           for index, program in enumerate(programs):
               values=[v.strip() for v in program.split(",")]
-              assert len(values)==61, (index, len(values))
+              assert len(values)==63, (index, len(values))
               assert all(re.fullmatch(r'-?(?:\d+\.?\d*|\.\d+)f',v) for v in values), index
           print("Validated",len(programs),"complete factory programs")
           PY
@@ -82,7 +82,7 @@ jobs:
           assert any("SYNTH / SOUND RECIPES" in x for x in texts), texts
           fx_controls=tabs["FX"]["componentDefinition"]["componentsData"]
           fx_names=[x["componentData"]["name"] for x in fx_controls]
-          for name in ("Saturation","Chorus Mix","Chorus Rate","Chorus Depth","Band Profile","Profile Amount","Voice Character"):
+          for name in ("Saturation","Chorus Mix","Chorus Rate","Chorus Depth","Band Profile","Profile Amount","Voice Character","Ring Mix","Ring Frequency"):
               assert name in fx_names, "Missing grouped FX control: "+name
           assert any(x["componentData"]["data"].get("image")=="fx_sections.png" for x in fx_controls if x["componentData"]["type"]=="Image"), "FX panel background missing"
           filter_controls=tabs["FILTER"]["componentDefinition"]["componentsData"]
