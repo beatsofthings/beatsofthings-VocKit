@@ -54,23 +54,18 @@ injection=r'''
             put(tab, "qlinkBoundsData", ["0 0 0 0"] * 4)
         elif name == "FILTER":
             children = kv(kv(tab, "componentDefinition"), "componentsData")
-            # Filmstrip images follow their bound parameter values (48 frames).
-            # These are separate single-parameter diagrams, not a combined filter simulation.
-            for i, (title, filename, param) in enumerate((
-                ("FILTER CUTOFF", "filter_cutoff.png", 15),
-                ("FILTER RESONANCE", "filter_resonance.png", 16),
-                ("ENVELOPE ATTACK", "env_attack.png", 17),
-                ("ENVELOPE RELEASE", "env_release.png", 18))):
-                x = 25 + i * 310
-                children.append(entry("graph label " + title, "Label",
+            # Two combined schematic diagrams. A single filmstrip cannot show
+            # the combined effect of two independent parameters correctly.
+            for title, filename, x in (
+                ("FILTER RESPONSE  /  CUTOFF + RESONANCE", "filter_response.png", 25),
+                ("SYNTH ENVELOPE  /  ATTACK + RELEASE", "synth_envelope.png", 650)):
+                children.append(entry("diagram title " + title, "Label",
                     label_data("Text", "ffffb84d", 20.0, "left", title),
-                    "%d 467 280 27" % x, "No", "Show", "Always"))
-                children.append(entry("graph " + title, "Image",
-                    obj(("version", 2), ("imageType", "FilmStrip"),
-                        ("colour", "0"), ("image", filename),
-                        ("numFrames", 48), ("handleName", "Data")),
-                    "%d 496 278 96" % x, "No", "Show", "Always",
-                    remap=[("Data", "Parameter %d" % param)]))
+                    "%d 443 595 28" % x, "No", "Show", "Always"))
+                children.append(entry("diagram " + title, "Image",
+                    obj(("version", 2), ("imageType", "Regular"),
+                        ("colour", "0"), ("image", filename)),
+                    "%d 477 585 140" % x, "No", "Show", "Always"))
         elif name == "OSC":
             children = kv(kv(tab, "componentDefinition"), "componentsData")
             children.append(entry("lfo caption", "Label",
