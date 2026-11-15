@@ -45,6 +45,10 @@ jobs:
           test -f "$PLUGIN/plugin.json"
           test -d "$PLUGIN/VST"
           test -d "$PLUGIN/Plugin Skins"
+          test -f "$PLUGIN/Plugin Skins/TUI.json"
+          test -f "$PLUGIN/Plugin Skins/Q-Links.json"
+          cmp mpc/skins/TUI.json "$PLUGIN/Plugin Skins/TUI.json"
+          cmp mpc/skins/Q-Links.json "$PLUGIN/Plugin Skins/Q-Links.json"
           (cd "$(dirname "$PLUGIN")" && zip -qr "$GITHUB_WORKSPACE/dist/VocKit-MPC-install.zip" "$(basename "$PLUGIN")")
       - uses: actions/upload-artifact@v4
         if: success()
