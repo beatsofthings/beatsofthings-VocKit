@@ -46,8 +46,9 @@
       "name": "OSC",
       "controls": [
         {
-          "widget": "text",
-          "text": "OSCILLATORS"
+          "param": "Waveform",
+          "widget": "slider",
+          "overlay": "menu"
         },
         {
           "param": "Pitch",
@@ -79,8 +80,17 @@
           "widget": "fader"
         },
         {
-          "widget": "text",
-          "text": "CARRIER LEVEL"
+          "param": "LFO Shape",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "LFO Rate",
+          "widget": "knob"
+        },
+        {
+          "param": "LFO Depth",
+          "widget": "knob"
         },
         {
           "param": "Carrier",
