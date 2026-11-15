@@ -32,7 +32,7 @@ injection=r'''
         entry("name", "Label", label_data("Name", "ffffb84d", 20.0, "horizontallyCentred verticallyCentred"),
               "0 0 64 28", "No", "Show", "Always"),
         entry("value", "Label", label_data("Value", "fff2f5fa", 20.0, "horizontallyCentred verticallyCentred"),
-              "0 440 64 30", "No", "Show", "Always")
+              "0 466 64 30", "No", "Show", "Always")
     ]
     defs.append(("vockitVerticalBand", vertical))
     for tab in tabs:
@@ -47,19 +47,43 @@ injection=r'''
             for i in range(12):
                 children.append(entry("Band %02d" % ((n - 1) * 12 + i + 1),
                     "vockitVerticalBand", obj(("version", 1), ("handleName", "Data")),
-                    "%d 78 64 500" % (28 + i * 102),
+                    "%d 60 64 520" % (28 + i * 102),
                     "Yes", "Hide", "Always",
                     remap=[("Data", "Parameter %d" % (start + i))]))
             put(kv(tab, "componentDefinition"), "componentsData", children)
             put(tab, "qlinkBoundsData", ["0 0 0 0"] * 4)
-        elif name == "FILTER":
+        elif name in ("FILTER", "OSC"):
             children = kv(kv(tab, "componentDefinition"), "componentsData")
-            children.append(entry("filter title", "Label",
-                label_data("Text", "ffffb84d", 27.0, "left", "FILTER RESPONSE / LOW PASS"),
-                "45 8 620 45", "No", "Show", "Always"))
-            children.append(entry("envelope title", "Label",
-                label_data("Text", "ffffb84d", 24.0, "left", "SYNTH ENVELOPE  /  ATTACK + RELEASE"),
-                "45 310 1100 40", "No", "Show", "Always"))
+            # Static schematic guides, not live modulation readouts.
+            def line(x, y, w, h, vertical=False):
+                return entry("graphic %d" % len(children), "Separator",
+                    obj(("version", 1), ("colour", "ffffb84d"),
+                        ("separatorType", 0 if vertical else 1)),
+                    "%d %d %d %d" % (x, y, w, h), "No", "Show", "Always")
+            if name == "FILTER":
+                children.append(entry("filter curve title", "Label",
+                    label_data("Text", "ffffb84d", 22.0, "left", "FILTER RESPONSE"),
+                    "45 465 490 32", "No", "Show", "Always"))
+                children.append(entry("envelope title", "Label",
+                    label_data("Text", "ffffb84d", 22.0, "left", "ENVELOPE SHAPE"),
+                    "660 465 500 32", "No", "Show", "Always"))
+                # Low-pass slope, with resonance peak.
+                points = [(60,525),(160,525),(240,520),(300,495),(320,510),(360,535),(430,558),(530,570)]
+                # Attack, sustain and release envelope silhouette.
+                env_points = [(670,580),(710,505),(790,505),(840,530),(970,530),(1080,580),(1170,580)]
+                for pts in (points, env_points):
+                    for (x1,y1),(x2,y2) in zip(pts,pts[1:]):
+                        children.append(line(x1,y1,max(2,x2-x1),3))
+                        children.append(line(x2,min(y1,y2),3,max(2,abs(y2-y1)),True))
+            else:
+                children.append(entry("lfo title", "Label",
+                    label_data("Text", "ffffb84d", 22.0, "left", "LFO WAVEFORM / PITCH MODULATION"),
+                    "55 468 1120 30", "No", "Show", "Always"))
+                # Simple stepped triangular LFO graphic, static.
+                points=[(80,565),(160,510),(240,565),(320,510),(400,565),(480,510)]
+                for (x1,y1),(x2,y2) in zip(points,points[1:]):
+                    children.append(line(x1,y1,max(2,x2-x1),3))
+                    children.append(line(x2,min(y1,y2),3,max(2,abs(y2-y1)),True))
         elif name == "HELP":
             lines = [
                 "VOCKIT FX  /  SETUP AND TIPS",
