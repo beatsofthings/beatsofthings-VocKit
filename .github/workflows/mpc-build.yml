@@ -34,7 +34,7 @@ jobs:
           SKIN=$(find sdk/plugins/VocKit/build -type f -name TUI.json -printf '%h\n' | grep 'Plugin Skins' | head -n 1)
           test -n "$SKIN"
           python mpc/generate_graphics.py "$SKIN"
-          for file in osc_panels.png filter_sections.png help_columns.png; do test -s "$SKIN/$file"; done
+          for file in osc_panels.png filter_sections.png help_columns.png vockit_logo.png; do test -s "$SKIN/$file"; done
       - name: Validate
         run: python sdk/tools/validate.py sdk/plugins/VocKit
       - name: Verify visible vertical bands and English help in generated TUI
