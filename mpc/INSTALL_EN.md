@@ -45,3 +45,12 @@
 
 Support and documentation: https://mpctoolkit.com
 VocKit — BeatsOfThings. Unofficial third-party MPC plugin; not affiliated with Akai or Oberheim.
+
+## FX page — new sound controls
+- **Saturation:** adds harmonic warmth after the vocoder; 0% is a true bypass.
+- **Chorus Mix:** controls the stereo modulation return; 0% bypasses chorus.
+- **Chorus Rate / Depth:** speed and intensity of the stereo chorus.
+- **Band Profile:** Manual, Warm, Clear, Radio or Airy. Profiles are applied non-destructively to the 24 saved band values.
+- **Profile Amount:** blends from manual band values (0%) to the selected profile (100%).
+- **Voice Character:** subtle formant-lowering and band tilt for voice coloration; 0% preserves existing sound. It is not a guaranteed voice-anonymisation feature.
+- If your preset sounds different after upgrading, first set Saturation, Chorus Mix and Voice Character to 0%, and Band Profile to Manual.
