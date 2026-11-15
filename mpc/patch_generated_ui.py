@@ -104,12 +104,14 @@ injection=r'''
             put(kv(tab, "componentDefinition"), "componentsData", children)
 '''
 s=s.replace(needle,injection+"\n"+needle)
-s=s.replace('    if not quiet:\\n        n_controls = sum(1 for pg in pages for c in pg.controls if c.param is not None)\\n',
-'''    import subprocess
-    subprocess.run([sys.executable, str(Path(__file__).resolve().parent.parent / "mpc" / "generate_graphics.py"), out_dir], check=True)
-    if not quiet:
-        n_controls = sum(1 for pg in pages for c in pg.controls if c.param is not None)
-''')
+# The SDK generator writes skins before build.py validates them. Generate PNGs
+# at that exact point, not in a later GitHub Actions step.
+marker='    tui_path = os.path.join(out_dir, "TUI.json")'
+assert s.count(marker)==1, "SDK generator output point changed"
+s=s.replace(marker,
+    '    import subprocess\\n'
+    '    subprocess.run([sys.executable, str(Path(__file__).resolve().parents[2] / "mpc" / "generate_graphics.py"), out_dir], check=True)\\n'
+    +marker)
 
 p.write_text(s)
 print("Patched official generator with vertical VocKit band controls and one English HELP page")
