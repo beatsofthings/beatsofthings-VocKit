@@ -109,7 +109,7 @@ s=s.replace(needle,injection+"\n"+needle)
 marker='    tui_path = os.path.join(out_dir, "TUI.json")'
 assert s.count(marker)==1, "SDK generator output point changed"
 s=s.replace(marker,
-    '    import subprocess\n'
+    '    import subprocess\n    from pathlib import Path\n'
     '    subprocess.run([sys.executable, str(Path(__file__).resolve().parents[2] / "mpc" / "generate_graphics.py"), out_dir], check=True)\n'
     +marker)
 
