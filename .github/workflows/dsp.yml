@@ -20,3 +20,7 @@ jobs:
         run: g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/vowel_spectra.cpp -o /tmp/vockit-vowels
       - name: Verify five vowel formant spectra
         run: /tmp/vockit-vowels
+      - name: Compile and test post-vocoder FX
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/postfx_smoke.cpp -o /tmp/vockit-postfx
+          /tmp/vockit-postfx
