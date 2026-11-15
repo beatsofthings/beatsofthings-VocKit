@@ -44,6 +44,10 @@
         {
           "widget": "text",
           "text": "VOICE / MODULATOR"
+        },
+        {
+          "param": "Consonant Clarity",
+          "widget": "knob"
         }
       ]
     },
@@ -100,6 +104,23 @@
         {
           "param": "Carrier",
           "widget": "fader"
+        },
+        {
+          "param": "OSC 2 Wave",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "OSC 2 Level",
+          "widget": "fader"
+        },
+        {
+          "param": "OSC 2 Semitone",
+          "widget": "knob"
+        },
+        {
+          "param": "OSC 2 Detune",
+          "widget": "knob"
         }
       ]
     },
