@@ -49,7 +49,7 @@ jobs:
           SKIN=$(find sdk/plugins/VocKit/build -type f -name TUI.json -printf '%h\n' | grep 'Plugin Skins' | head -n 1)
           test -n "$SKIN"
           python mpc/generate_graphics.py "$SKIN"
-          for file in osc_panels.png filter_sections.png help_columns.png vockit_logo.png; do test -s "$SKIN/$file"; done
+          for file in osc_panels.png filter_sections.png help_columns.png vockit_logo.png vockit_vintage_background.png; do test -s "$SKIN/$file"; done
       - name: Validate
         run: python sdk/tools/validate.py sdk/plugins/VocKit
       - name: Verify visible vertical bands and English help in generated TUI
@@ -107,6 +107,9 @@ jobs:
           test -d "$PLUGIN/Plugin Skins"
           test -f "$PLUGIN/Plugin Skins/TUI.json"
           test -f "$PLUGIN/Plugin Skins/Q-Links.json"
+          cp mpc/INSTALL_EN.md "$PLUGIN/INSTALL_EN.md"
+          test -s "$PLUGIN/INSTALL_EN.md"
+          test -s "$PLUGIN/Plugin Skins/vockit_vintage_background.png"
           # Verify that generated skin files are included in the install archive.
           (cd "$(dirname "$PLUGIN")" && zip -qr "$GITHUB_WORKSPACE/dist/VocKit-MPC-install.zip" "$(basename "$PLUGIN")")
       - uses: actions/upload-artifact@v4
