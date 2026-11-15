@@ -12,7 +12,7 @@ class SpectralVocoder {
  std::array<float,N> voice_{},carrier_{},window_{};
  std::array<float,R> ola_{};
  std::array<C,N> a_{},b_{};
- std::array<float,B> smooth_{};
+ std::array<float,B> smooth_{},spectrum_{};
  std::array<int,N/2+1> bins_{};
  int cursor_=0,clock_=0;
  float sr_=44100.f,attack_=8.f,release_=90.f,formantShift_=0.f;
@@ -65,6 +65,8 @@ class SpectralVocoder {
    const float rel=std::exp(-float(H)*1000.f/(sr_*std::max(2.f,release_)));
    const float coeff=v>smooth_[j]?atk:rel;
    smooth_[j]=coeff*smooth_[j]+(1.f-coeff)*v;
+   // Measured per-band voice energy, no host parameter updates.
+   spectrum_[j]=smooth_[j];
    envelope[j]=smooth_[j];
    // Zero shift follows the original gain path bit-for-bit.
    gain[j]=std::min(12.f,smooth_[j]/std::max(.002f,c))*
@@ -102,7 +104,7 @@ class SpectralVocoder {
 public:
  void prepare(float sr){
   sr_=std::max(8000.f,sr);voice_.fill(0);carrier_.fill(0);
-  ola_.fill(0);smooth_.fill(0);cursor_=clock_=0;
+  ola_.fill(0);smooth_.fill(0);spectrum_.fill(0);cursor_=clock_=0;
   for(int j=0;j<N;++j)window_[j]=.5f-.5f*std::cos(2.f*3.14159265358979323846f*j/N);
   for(int k=0;k<=N/2;++k){
    const float hz=std::max(80.f,float(k)*sr_/N);
@@ -110,6 +112,7 @@ public:
    bins_[k]=std::max(0,std::min(B-1,int(position)));
   }
  }
+ const std::array<float,B>& spectrum()const noexcept{return spectrum_;}
  void setAttackRelease(float a,float r){attack_=a;release_=r;}
  void setFormantShift(float semitones){formantShift_=std::max(-12.f,std::min(12.f,semitones));}
  float tick(float voice,float carrier,const std::array<float,B>& levels){
