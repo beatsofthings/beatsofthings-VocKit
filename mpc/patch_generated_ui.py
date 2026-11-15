@@ -80,7 +80,8 @@ injection=r'''
                 entry("help %d" % i, "Label",
                       label_data("Text", "ffffb84d" if i in (0, 12) else "fff2f5fa",
                                  29.0 if i == 0 else 23.0, "left", line),
-                      "44 %d 1160 39" % (15 + i * 44), "No", "Show", "Always")
+                      "44 %d 1160 39" % (15 + i * 44), "No", "Show", "Always",
+                      remap=[("Data", "Parameter 0")])
                 for i, line in enumerate(lines)
             ]
             put(kv(tab, "componentDefinition"), "componentsData", children)
