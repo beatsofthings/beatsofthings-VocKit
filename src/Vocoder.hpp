@@ -53,6 +53,7 @@ public:
    filterLow_=filterBand_=synthEnvelope_=0.f;
    sibilanceLow_=0.f; sibilanceEnv_=0.f; noiseState_=0x12345678u;
  }
+ const std::array<float,kBands>& spectrum()const noexcept{return spectral_.spectrum();}
  void setAttackRelease(float a,float r){
    a=clamp(a,.1f,200.f);r=clamp(r,2.f,1000.f);
    if(a==attack_&&r==release_)return;
