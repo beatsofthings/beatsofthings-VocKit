@@ -57,3 +57,14 @@ schematic("filter_response.png","FILTER RESPONSE  /  SCHEMATIC",
 schematic("synth_envelope.png","SYNTH ENVELOPE  /  SCHEMATIC",
     [(24,137),(135,47),(370,47),(555,137)],
     [(70,112,"ATTACK"),(445,112,"RELEASE")])
+
+# Subtle transparent panel graphics placed BEHIND the SDK-generated controls.
+def panel_background(filename,sections):
+    im=Image.new("RGBA",(1280,628),(0,0,0,0))
+    d=ImageDraw.Draw(im)
+    for x0,y0,x1,y1 in sections:
+        d.rounded_rectangle((x0,y0,x1,y1),radius=14,fill=(20,35,52,115),outline=(55,82,103,200),width=2)
+        d.line((x0+16,y0+34,x1-16,y0+34),fill=(255,184,77,95),width=2)
+    im.save(out/filename,optimize=True)
+panel_background("osc_panels.png",[(18,8,1260,462),(18,469,1260,618)])
+panel_background("filter_panels.png",[(18,8,625,438),(645,8,1260,438)])
