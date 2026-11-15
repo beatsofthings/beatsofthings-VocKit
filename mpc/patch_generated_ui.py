@@ -28,7 +28,7 @@ injection=r'''
                   ("direction", "Vertical"), ("backgroundColour", "ff263443"),
                   ("outlineColour", "ff718096"), ("valueColour", "ffffb84d"),
                   ("isBipolar", False), ("handleName", "Data")),
-              "26 30 38 145", "No", "Show", "Always"),
+              "19 34 34 420", "No", "Show", "Always"),
         entry("name", "Label", label_data("Name", "ffffb84d", 20.0, "horizontallyCentred verticallyCentred"),
               "0 0 64 28", "No", "Show", "Always"),
         entry("value", "Label", label_data("Value", "fff2f5fa", 20.0, "horizontallyCentred verticallyCentred"),
@@ -57,10 +57,10 @@ injection=r'''
             # Filmstrip images follow their bound parameter values (48 frames).
             # These are separate single-parameter diagrams, not a combined filter simulation.
             for i, (title, filename, param) in enumerate((
-                ("CUTOFF", "filter_cutoff.png", 15),
-                ("RESONANCE", "filter_resonance.png", 16),
-                ("SYNTH ATTACK", "env_attack.png", 17),
-                ("SYNTH RELEASE", "env_release.png", 18))):
+                ("FILTER CUTOFF", "filter_cutoff.png", 15),
+                ("FILTER RESONANCE", "filter_resonance.png", 16),
+                ("ENVELOPE ATTACK", "env_attack.png", 17),
+                ("ENVELOPE RELEASE", "env_release.png", 18))):
                 x = 25 + i * 310
                 children.append(entry("graph label " + title, "Label",
                     label_data("Text", "ffffb84d", 20.0, "left", title),
