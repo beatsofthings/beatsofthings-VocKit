@@ -62,12 +62,15 @@ jobs:
               assert [mapping["Q-Link "+str(i)] for i in range(1,13)]==list(range(first,first+12)), page
           help_controls=tabs["HELP"]["componentDefinition"]["componentsData"]
           texts=[x["componentData"]["data"].get("text","") for x in help_controls]
-          assert len(texts)>=39 and any("mpctoolkit.com" in x for x in texts), texts\n          assert any("24-BAND SPECTRAL MIXER" in x for x in texts), texts\n          assert any("SYNTH / SOUND RECIPES" in x for x in texts), texts
+          assert len(texts)>=39 and any("mpctoolkit.com" in x for x in texts), texts
+          assert any("24-BAND SPECTRAL MIXER" in x for x in texts), texts
+          assert any("SYNTH / SOUND RECIPES" in x for x in texts), texts
           filter_controls=tabs["FILTER"]["componentDefinition"]["componentsData"]
           names=[x["componentData"]["name"] for x in filter_controls]
           for name in ("Filter Cutoff","Resonance","Synth Attack","Synth Release","Attack","Release"):
               assert name in names, "Missing filter/envelope control: "+name
-          assert any(x["componentData"]["data"].get("image")=="filter_sections.png" for x in filter_controls if x["componentData"]["type"]=="Image"), "Filter section background missing"\n          assert not any(x["componentData"]["data"].get("image") in ("filter_response.png","synth_envelope.png") for x in filter_controls if x["componentData"]["type"]=="Image"), "Old static diagrams remain"
+          assert any(x["componentData"]["data"].get("image")=="filter_sections.png" for x in filter_controls if x["componentData"]["type"]=="Image"), "Filter section background missing"
+          assert not any(x["componentData"]["data"].get("image") in ("filter_response.png","synth_envelope.png") for x in filter_controls if x["componentData"]["type"]=="Image"), "Old static diagrams remain"
           print("Band layouts, HELP and grouped filter/envelope controls verified")
           PY
       - name: Run host simulator
