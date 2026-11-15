@@ -96,7 +96,18 @@ logo=base64.b64decode(source.read_text().strip(), validate=True)
 from io import BytesIO
 check=Image.open(BytesIO(logo))
 check.verify()
-(out / "vockit_logo.png").write_bytes(logo)
+# Crop the large transparent margins in the uploaded PNG. The MPC Image
+# widget scales the full canvas; margins previously made the logo microscopic.
+art=Image.open(BytesIO(logo)).convert("RGBA")
+alpha=art.getchannel("A")
+bbox=alpha.point(lambda x: 255 if x>24 else 0).getbbox()
+if not bbox:
+    raise ValueError("VocKit logo has no visible pixels")
+art=art.crop(bbox)
+# Keep aspect ratio and avoid a huge texture.
+art.thumbnail((800,220),Image.Resampling.LANCZOS)
+art.save(out / "vockit_logo.png",optimize=True)
+print("Cropped uploaded logo to",art.size)
 
 # Original vintage-poly-synth-inspired background: charcoal chassis, warm
 # copper/cream accent stripes and subtle grain; no third-party artwork.
