@@ -75,6 +75,8 @@ injection=r'''
         elif name == "HELP":
             lines = [
                 "VOCKIT FX  /  SETUP AND TIPS",
+                "DIAG: Audio Monitor -> Listen Left / Listen Right",
+                "Normal mode restores VocKit processing",
                 "INTERNAL: Insert VocKit FX on the vocal audio track",
                 "Select Internal carrier mode and set Mix to 100%",
                 "JURA: Send synth and voice tracks to Submix 1",
