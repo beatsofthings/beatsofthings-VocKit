@@ -37,6 +37,12 @@ injection=r'''
     defs.append(("vockitVerticalBand", vertical))
     for tab in tabs:
         name = kv(tab, "tabName")
+        if name == "VOICE":
+            children = kv(kv(tab, "componentDefinition"), "componentsData")
+            children.insert(0, entry("VocKit BeatsOfThings logo", "Image",
+                obj(("version", 2), ("imageType", "Regular"),
+                    ("colour", "0"), ("image", "vockit_logo.png")),
+                "795 508 430 79", "No", "Show", "Always"))
         if name == "OSC":
             children = kv(kv(tab, "componentDefinition"), "componentsData")
             children.insert(0, entry("osc background", "Image",
@@ -62,6 +68,10 @@ injection=r'''
                     "%d 60 64 520" % (28 + i * 102),
                     "Yes", "Hide", "Always",
                     remap=[("Data", "Parameter %d" % (start + i))]))
+            children.insert(1, entry("VocKit band page logo", "Image",
+                obj(("version", 2), ("imageType", "Regular"),
+                    ("colour", "0"), ("image", "vockit_logo.png")),
+                "890 3 340 62", "No", "Show", "Always"))
             put(kv(tab, "componentDefinition"), "componentsData", children)
             put(tab, "qlinkBoundsData", ["0 0 0 0"] * 4)
         elif name == "FILTER":
