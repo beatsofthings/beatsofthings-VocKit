@@ -47,6 +47,10 @@ jobs:
           assert t, "Packaged TUI missing"
           tabs={x["tabName"]:x for x in t["pageData"]["tabs"]}
           assert "HELP" in tabs and "BAND1" in tabs and "BAND2" in tabs
+          voice=tabs["VOICE"]["componentDefinition"]["componentsData"]
+          assert any("Audio Monitor" in str(item) for item in voice), "Audio Monitor missing from VOICE UI"
+          params=json.loads(pathlib.Path("sdk/plugins/VocKit/build/params.json").read_text())
+          assert "Audio Monitor" in str(params), "Audio Monitor parameter missing from binary"
           for name in ("BAND1","BAND2"):
               controls=tabs[name]["componentDefinition"]["componentsData"]
               assert sum(x["componentData"]["type"]=="vockitVerticalBand" for x in controls)==12, name
