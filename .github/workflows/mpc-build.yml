@@ -24,6 +24,21 @@ jobs:
           # Keep custom skin sources in Git, but use the proven ui.json generator.
       - name: Patch SDK UI generator (vertical bands + English help)
         run: python mpc/patch_generated_ui.py sdk/tools/gen_ui.py
+      - name: Check factory preset numeric literals
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          source=Path("mpc/src/VocKit.cpp").read_text()
+          assert "NaNf" not in source, "Factory preset contains invalid NaNf literal"
+          programs=re.findall(r'addProgram\("[^"]+", \{([^}]*)\}\);', source)
+          assert programs, "No factory programs"
+          for index, program in enumerate(programs):
+              values=[v.strip() for v in program.split(",")]
+              assert len(values)==54, (index, len(values))
+              assert all(re.fullmatch(r'-?(?:\d+\.?\d*|\.\d+)f',v) for v in values), index
+          print("Validated",len(programs),"complete factory programs")
+          PY
       - name: Build ARM and native
         run: |
           export PATH="$HOME/.local/bin:$PATH"
