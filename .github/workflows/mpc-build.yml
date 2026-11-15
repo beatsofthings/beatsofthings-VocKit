@@ -20,6 +20,8 @@ jobs:
           mkdir -p sdk/plugins/VocKit/src
           cp mpc/plugin.json mpc/ui.json mpc/README.md sdk/plugins/VocKit/
           cp mpc/src/VocKit.cpp src/Vocoder.hpp src/SpectralVocoder.hpp sdk/plugins/VocKit/src/
+          mkdir -p sdk/plugins/VocKit/skins
+          cp mpc/skins/TUI.json mpc/skins/Q-Links.json sdk/plugins/VocKit/skins/
       - name: Build ARM and native
         run: |
           export PATH="$HOME/.local/bin:$PATH"
