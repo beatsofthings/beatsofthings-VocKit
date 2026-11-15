@@ -8,7 +8,7 @@ int main(){
  constexpr int sr=48000,seconds=120;
  vockit::Vocoder voc;vockit::PostFx fx;
  voc.prepare(sr);fx.prepare(sr);voc.setGate(true);
- voc.setMix(1.f);voc.setCarrierLevel(.7f);
+ voc.setWet(1.f);
  const auto start=std::chrono::steady_clock::now();
  double energy=0.;
  for(int i=0;i<sr*seconds;++i){
