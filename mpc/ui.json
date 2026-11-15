@@ -48,6 +48,10 @@
         {
           "param": "Consonant Clarity",
           "widget": "knob"
+        },
+        {
+          "param": "Formant Shift",
+          "widget": "knob"
         }
       ]
     },
