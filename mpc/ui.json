@@ -8,6 +8,11 @@
       "name": "VOICE",
       "controls": [
         {
+          "param": "Audio Monitor",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
           "param": "Input Mode",
           "widget": "slider",
           "overlay": "menu"
