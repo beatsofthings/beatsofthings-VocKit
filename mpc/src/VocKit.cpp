@@ -6,7 +6,7 @@
 #include <cstdio>
 class VocKit:public mpc::Plugin {
 public:
- enum Param{Level,Pitch,Chord,Attack,Release,Mix,Input,Carrier,Tone,Mode,Detune,Sub,Help,Noise,Octave,Cutoff,Resonance,SynthAttack,SynthRelease,Band01,Waveform=Band01+24,LfoShape,LfoRate,LfoDepth,NumParams};
+ enum Param{Level,Pitch,Chord,Attack,Release,Mix,Input,Carrier,Tone,Mode,Detune,Sub,Help,Noise,Octave,Cutoff,Resonance,SynthAttack,SynthRelease,Band01,Waveform=Band01+24,LfoShape,LfoRate,LfoDepth,ScopeInput,ScopeOutput,NumParams};
  static mpc::PluginInfo makeInfo(){
    mpc::PluginInfo i;
    i.name="VocKit";i.vendor="Beats of Things";i.uniqueId=MPC_FOURCC('B','t','V','K');
@@ -44,24 +44,26 @@ public:
    addParam(mpc::choiceParam("lfoShape","LFO Shape",{"Sine","Triangle","Square"},0));
    addParam(mpc::floatParam("lfoRate","LFO Rate",0.f,20.f,0.f,"Hz",1));
    addParam(mpc::floatParam("lfoDepth","LFO Depth",0.f,100.f,0.f,"ct",1));
+   addParam(mpc::floatParam("scopeInput","Input Scope Level",0.f,1.f,0.f,"",3));
+   addParam(mpc::floatParam("scopeOutput","Output Scope Level",0.f,1.f,0.f,"",3));
    // Plain values, exact parameter order; 24 band gains follow setup help.
-   addProgram("Init", {80.f, 48.f, 0.f, 8.f, 90.f, 100.f, 100.f, 70.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f});
-   addProgram("Robot Voice", {80.f, 48.f, 0.f, 5.f, 70.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f});
-   addProgram("Clear Rap", {80.f, 55.f, 0.f, 2.f, 35.f, 92.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f});
-   addProgram("Dark Vocoder", {80.f, 43.f, 0.f, 12.f, 130.f, 100.f, 100.f, 100.f, 45.f, 0.f, 0.f, 20.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 70.f, 70.f, 70.f, 70.f, 70.f, 70.f, 70.f, 0.f, 0.f, 0.f, 0.f});
-   addProgram("Saw Brass", {80.f, 48.f, 0.f, 8.f, 90.f, 100.f, 100.f, 100.f, 0.f, 0.f, 7.f, 12.f, 0.f, 0.f, 0.f, 95.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f});
-   addProgram("Soft Strings", {80.f, 55.f, 0.f, 18.f, 160.f, 100.f, 100.f, 100.f, 35.f, 0.f, 3.f, 8.f, 0.f, 0.f, 0.f, 78.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f});
-   addProgram("Aggressive", {80.f, 48.f, 0.f, 2.f, 45.f, 100.f, 100.f, 100.f, 70.f, 0.f, 15.f, 30.f, 0.f, 12.f, 0.f, 100.f, 20.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f});
-   addProgram("Retro Robot", {80.f, 48.f, 0.f, 4.f, 95.f, 100.f, 100.f, 100.f, 25.f, 0.f, 5.f, 8.f, 0.f, 2.f, 0.f, 96.f, 12.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f});
-   addProgram("JURA L / Voice R", {80.f, 48.f, 0.f, 5.f, 85.f, 100.f, 100.f, 100.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f});
-   addProgram("JURA R / Voice L", {80.f, 48.f, 0.f, 5.f, 85.f, 100.f, 100.f, 100.f, 0.f, 2.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f});
+   addProgram("Init", {80.f, 48.f, 0.f, 8.f, 90.f, 100.f, 100.f, 70.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f});
+   addProgram("Robot Voice", {80.f, 48.f, 0.f, 5.f, 70.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f});
+   addProgram("Clear Rap", {80.f, 55.f, 0.f, 2.f, 35.f, 92.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f});
+   addProgram("Dark Vocoder", {80.f, 43.f, 0.f, 12.f, 130.f, 100.f, 100.f, 100.f, 45.f, 0.f, 0.f, 20.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 70.f, 70.f, 70.f, 70.f, 70.f, 70.f, 70.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f});
+   addProgram("Saw Brass", {80.f, 48.f, 0.f, 8.f, 90.f, 100.f, 100.f, 100.f, 0.f, 0.f, 7.f, 12.f, 0.f, 0.f, 0.f, 95.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f});
+   addProgram("Soft Strings", {80.f, 55.f, 0.f, 18.f, 160.f, 100.f, 100.f, 100.f, 35.f, 0.f, 3.f, 8.f, 0.f, 0.f, 0.f, 78.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f});
+   addProgram("Aggressive", {80.f, 48.f, 0.f, 2.f, 45.f, 100.f, 100.f, 100.f, 70.f, 0.f, 15.f, 30.f, 0.f, 12.f, 0.f, 100.f, 20.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f});
+   addProgram("Retro Robot", {80.f, 48.f, 0.f, 4.f, 95.f, 100.f, 100.f, 100.f, 25.f, 0.f, 5.f, 8.f, 0.f, 2.f, 0.f, 96.f, 12.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f});
+   addProgram("JURA L / Voice R", {80.f, 48.f, 0.f, 5.f, 85.f, 100.f, 100.f, 100.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f});
+   addProgram("JURA R / Voice L", {80.f, 48.f, 0.f, 5.f, 85.f, 100.f, 100.f, 100.f, 0.f, 2.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f});
    // Additional factory sounds: full plain-value lists preserve native MPC program recall.
-   addProgram("Electric Choir", {80.f, 52.f, 4.f, 20.f, 180.f, 100.f, 100.f, 70.f, 30.f, 0.f, 9.f, 12.f, 0.f, 0.f, 0.f, 82.f, 10.f, 80.f, 380.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 1.f, 0.f, 0.35f, 12.f});
-   addProgram("Neon Talkbox", {80.f, 60.f, 0.f, 3.f, 60.f, 100.f, 100.f, 70.f, 10.f, 0.f, 3.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 3.f, 0.f, 5.f, 7.f});
-   addProgram("Space Transmission", {80.f, 43.f, 0.f, 12.f, 210.f, 100.f, 100.f, 70.f, 55.f, 0.f, 0.f, 22.f, 0.f, 8.f, 0.f, 62.f, 35.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 1.f, 1.8f, 24.f});
-   addProgram("Analog Whisper", {80.f, 57.f, 0.f, 4.f, 95.f, 100.f, 100.f, 70.f, 10.f, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f, 90.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 2.f, 0.f, 0.f, 0.f});
-   addProgram("Dark Machine", {80.f, 40.f, 2.f, 6.f, 110.f, 100.f, 100.f, 70.f, 70.f, 0.f, 18.f, 32.f, 0.f, 8.f, -1.f, 64.f, 28.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 2.f, 3.2f, 18.f});
-   addProgram("Funky Pulse", {80.f, 55.f, 2.f, 2.f, 55.f, 100.f, 100.f, 70.f, 80.f, 0.f, 6.f, 15.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 3.f, 1.f, 5.f, 10.f});
+   addProgram("Electric Choir", {80.f, 52.f, 4.f, 20.f, 180.f, 100.f, 100.f, 70.f, 30.f, 0.f, 9.f, 12.f, 0.f, 0.f, 0.f, 82.f, 10.f, 80.f, 380.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 1.f, 0.f, 0.35f, 12.f, 0.f, 0.f});
+   addProgram("Neon Talkbox", {80.f, 60.f, 0.f, 3.f, 60.f, 100.f, 100.f, 70.f, 10.f, 0.f, 3.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 3.f, 0.f, 5.f, 7.f, 0.f, 0.f});
+   addProgram("Space Transmission", {80.f, 43.f, 0.f, 12.f, 210.f, 100.f, 100.f, 70.f, 55.f, 0.f, 0.f, 22.f, 0.f, 8.f, 0.f, 62.f, 35.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 1.f, 1.8f, 24.f, 0.f, 0.f});
+   addProgram("Analog Whisper", {80.f, 57.f, 0.f, 4.f, 95.f, 100.f, 100.f, 70.f, 10.f, 0.f, 0.f, 0.f, 0.f, 4.f, 0.f, 90.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 2.f, 0.f, 0.f, 0.f, 0.f, 0.f});
+   addProgram("Dark Machine", {80.f, 40.f, 2.f, 6.f, 110.f, 100.f, 100.f, 70.f, 70.f, 0.f, 18.f, 32.f, 0.f, 8.f, -1.f, 64.f, 28.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 2.f, 3.2f, 18.f, 0.f, 0.f});
+   addProgram("Funky Pulse", {80.f, 55.f, 2.f, 2.f, 55.f, 100.f, 100.f, 70.f, 80.f, 0.f, 6.f, 15.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 3.f, 1.f, 5.f, 10.f, 0.f, 0.f});
 
  }
  void prepare(double sr,int)override{sr_=float(sr);voc_.prepare(sr_);}
@@ -84,6 +86,7 @@ public:
    const float* l=ctx.inputs[0];
    const float* r=ctx.numInputs>1?ctx.inputs[1]:l;
    float* ol=ctx.outputs[0];float* orr=ctx.numOutputs>1?ctx.outputs[1]:ol;
+   float inputPeak=0.f,outputPeak=0.f;
    for(int n=0;n<ctx.numFrames;++n){
      float dryL=l[n],dryR=r[n];
      float mod=(mode==0?.5f*(dryL+dryR):(mode==1?dryR:dryL))*gain;
@@ -93,7 +96,13 @@ public:
      float left=std::tanh(((mode==0?dryL:dry)*(1.f-wet)+fx*wet)*level);
      float right=std::tanh(((mode==0?dryR:dry)*(1.f-wet)+fx*wet)*level);
      ol[n]=left;if(orr!=ol)orr[n]=right;
+     inputPeak=std::max(inputPeak,std::fabs(mod));
+     outputPeak=std::max(outputPeak,std::max(std::fabs(left),std::fabs(right)));
    }
+   // Scalar level telemetry for the MPC Plotter widget; not a waveform buffer.
+   // Update at most once per audio block, without allocations or host callbacks.
+   set(ScopeInput,std::min(inputPeak,1.f));
+   set(ScopeOutput,std::min(outputPeak,1.f));
  }
 private:
  vockit::Vocoder voc_;float sr_=44100.f;
