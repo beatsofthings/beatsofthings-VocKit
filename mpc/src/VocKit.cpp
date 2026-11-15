@@ -6,7 +6,7 @@
 #include <cstdio>
 class VocKit:public mpc::Plugin {
 public:
- enum Param{Level,Pitch,Chord,Attack,Release,Mix,Input,Carrier,Tone,Mode,Detune,Sub,Help,Noise,Octave,Cutoff,Resonance,SynthAttack,SynthRelease,Band01,NumParams};
+ enum Param{Level,Pitch,Chord,Attack,Release,Mix,Input,Carrier,Tone,Mode,Detune,Sub,Help,Noise,Octave,Cutoff,Resonance,SynthAttack,SynthRelease,Band01,Waveform=Band01+24,LfoShape,LfoRate,LfoDepth,NumParams};
  static mpc::PluginInfo makeInfo(){
    mpc::PluginInfo i;
    i.name="VocKit";i.vendor="Beats of Things";i.uniqueId=MPC_FOURCC('B','t','V','K');
@@ -40,6 +40,10 @@ public:
      addParam(mpc::floatParam(id,name,0.f,200.f,100.f,"%",0));
    }
 
+   addParam(mpc::choiceParam("waveform","Waveform",{"Saw/Pulse","Triangle","Sine","Square"},0));
+   addParam(mpc::choiceParam("lfoShape","LFO Shape",{"Sine","Triangle","Square"},0));
+   addParam(mpc::floatParam("lfoRate","LFO Rate",0.f,20.f,0.f,"Hz",1));
+   addParam(mpc::floatParam("lfoDepth","LFO Depth",0.f,100.f,0.f,"ct",1));
    // Plain values, exact parameter order; 24 band gains follow setup help.
    addProgram("Init", {80.f, 48.f, 0.f, 8.f, 90.f, 100.f, 100.f, 70.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f});
    addProgram("Robot Voice", {80.f, 48.f, 0.f, 5.f, 70.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f});
@@ -61,6 +65,8 @@ public:
    voc_.setAttackRelease(get(Attack),get(Release));
    voc_.setWet(1.f);voc_.setGate(true);voc_.setChord(getInt(Chord));
    voc_.setTone(get(Tone)*.01f);
+   voc_.setWaveform(getInt(Waveform));
+   voc_.setLfo(getInt(LfoShape),get(LfoRate),get(LfoDepth));
    voc_.setDetune(get(Detune));voc_.setSubLevel(get(Sub)*.01f);
    voc_.setNoiseLevel(get(Noise)*.01f);voc_.setOctave(int(std::round(get(Octave))));
    voc_.setCarrierFilter(get(Cutoff)*.01f,get(Resonance)*.01f);
