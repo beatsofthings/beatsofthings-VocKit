@@ -53,7 +53,14 @@ jobs:
           help_controls=tabs["HELP"]["componentDefinition"]["componentsData"]
           texts=[x["componentData"]["data"].get("text","") for x in help_controls]
           assert len(texts)>=13 and any("mpctoolkit.com" in x for x in texts), texts
-          print("Custom band layouts and HELP text present in generated skin")
+          filter_controls=tabs["FILTER"]["componentDefinition"]["componentsData"]
+          graphs=[x for x in filter_controls if x["componentData"]["type"]=="Image" and x["componentData"]["data"].get("imageType")=="FilmStrip"]
+          assert len(graphs)==4, "Missing parameter-bound filter/envelope graphs"
+          for graph in graphs:
+              assert graph["handle remapping"]["map"], graph
+              image=graph["componentData"]["data"]["image"]
+              assert (files[0].parent / image).exists(), image
+          print("Custom band layouts, HELP text and four parameter-linked diagrams present")
           PY
       - name: Run host simulator
         run: |
