@@ -8,7 +8,7 @@ VocKit is a 24-band vocoder FX for standalone Akai MPC. Load factory programs us
 
 ### Classic robot and talkbox
 - **Robot Voice** — original neutral robot sound; retained unchanged as a reference.
-- **Retro Robot**, **Electro Robot**, **Analog Talker**, **Electro Robot**, **Chrome Robot**, **Robot Drive**, **Industrial Android** — increasingly metallic and driven robotic textures.
+- **Retro Robot**, **Electro Robot**, **Analog Talker**, **Chrome Robot**, **Robot Drive**, **Industrial Android** — increasingly metallic and driven robotic textures.
 - **Neon Talkbox**, **Funky Pulse**, **Electro Funk Lead**, **Analog Brass Voice** — rhythmic, melodic electro-funk starting points.
 - **Clear Rap**, **Band Clear Speech** — shorter tracking times for fast consonants.
 
