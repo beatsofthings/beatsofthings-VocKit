@@ -42,7 +42,7 @@ injection=r'''
             children.insert(0, entry("VocKit BeatsOfThings logo", "Image",
                 obj(("version", 2), ("imageType", "Regular"),
                     ("colour", "0"), ("image", "vockit_logo.png")),
-                "795 508 430 79", "No", "Show", "Always"))
+                "795 470 430 143", "No", "Show", "Always"))
         if name == "OSC":
             children = kv(kv(tab, "componentDefinition"), "componentsData")
             children.insert(0, entry("osc background", "Image",
@@ -71,7 +71,7 @@ injection=r'''
             children.insert(1, entry("VocKit band page logo", "Image",
                 obj(("version", 2), ("imageType", "Regular"),
                     ("colour", "0"), ("image", "vockit_logo.png")),
-                "890 3 340 62", "No", "Show", "Always"))
+                "1010 3 205 68", "No", "Show", "Always"))
             put(kv(tab, "componentDefinition"), "componentsData", children)
             put(tab, "qlinkBoundsData", ["0 0 0 0"] * 4)
         elif name == "FILTER":
