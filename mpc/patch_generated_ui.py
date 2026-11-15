@@ -32,7 +32,7 @@ injection=r'''
         entry("name", "Label", label_data("Name", "ffffb84d", 20.0, "horizontallyCentred verticallyCentred"),
               "0 0 64 28", "No", "Show", "Always"),
         entry("value", "Label", label_data("Value", "fff2f5fa", 20.0, "horizontallyCentred verticallyCentred"),
-              "0 357 64 26", "No", "Show", "Always")
+              "0 440 64 30", "No", "Show", "Always")
     ]
     defs.append(("vockitVerticalBand", vertical))
     for tab in tabs:
@@ -47,11 +47,19 @@ injection=r'''
             for i in range(12):
                 children.append(entry("Band %02d" % ((n - 1) * 12 + i + 1),
                     "vockitVerticalBand", obj(("version", 1), ("handleName", "Data")),
-                    "%d 108 64 390" % (28 + i * 102),
+                    "%d 78 64 500" % (28 + i * 102),
                     "Yes", "Hide", "Always",
                     remap=[("Data", "Parameter %d" % (start + i))]))
             put(kv(tab, "componentDefinition"), "componentsData", children)
             put(tab, "qlinkBoundsData", ["0 0 0 0"] * 4)
+        elif name == "FILTER":
+            children = kv(kv(tab, "componentDefinition"), "componentsData")
+            children.append(entry("filter title", "Label",
+                label_data("Text", "ffffb84d", 27.0, "left", "FILTER RESPONSE / LOW PASS"),
+                "45 8 620 45", "No", "Show", "Always"))
+            children.append(entry("envelope title", "Label",
+                label_data("Text", "ffffb84d", 24.0, "left", "SYNTH ENVELOPE  /  ATTACK + RELEASE"),
+                "45 310 1100 40", "No", "Show", "Always"))
         elif name == "HELP":
             lines = [
                 "VOCKIT FX  /  SETUP AND TIPS",
