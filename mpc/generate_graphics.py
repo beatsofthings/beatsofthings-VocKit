@@ -97,3 +97,20 @@ from io import BytesIO
 check=Image.open(BytesIO(logo))
 check.verify()
 (out / "vockit_logo.png").write_bytes(logo)
+
+# Original vintage-poly-synth-inspired background: charcoal chassis, warm
+# copper/cream accent stripes and subtle grain; no third-party artwork.
+im=Image.new("RGBA",(1280,628),(13,20,29,255))
+d=ImageDraw.Draw(im)
+for y in range(628):
+    shade=int(9+12*y/628)
+    d.line((0,y,1279,y),fill=(shade+4,shade+11,shade+20,255))
+for y in (8,12,615,620):
+    d.line((0,y,1279,y),fill=(167,106,53,135),width=2)
+for y in range(45,600,108):
+    d.line((25,y,1254,y),fill=(55,73,88,55),width=1)
+for x in range(0,1280,26):
+    d.line((x,0,x,628),fill=(47,59,69,24),width=1)
+# Warm left rail reminiscent of classic analog synthesizer panel graphics.
+d.rounded_rectangle((8,42,15,582),radius=3,fill=(183,114,59,165))
+im.save(out/"vockit_vintage_background.png",optimize=True)
