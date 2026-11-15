@@ -24,3 +24,7 @@ jobs:
         run: |
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/postfx_smoke.cpp -o /tmp/vockit-postfx
           /tmp/vockit-postfx
+      - name: Verify real FFT spectrum telemetry
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/spectrum_smoke.cpp -o /tmp/vockit-spectrum
+          /tmp/vockit-spectrum
