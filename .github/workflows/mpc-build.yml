@@ -34,7 +34,7 @@ jobs:
           SKIN=$(find sdk/plugins/VocKit/build -type f -name TUI.json -printf '%h\n' | grep 'Plugin Skins' | head -n 1)
           test -n "$SKIN"
           python mpc/generate_graphics.py "$SKIN"
-          for file in filter_response.png synth_envelope.png osc_panels.png filter_panels.png; do test -s "$SKIN/$file"; done
+          for file in osc_panels.png; do test -s "$SKIN/$file"; done
       - name: Validate
         run: python sdk/tools/validate.py sdk/plugins/VocKit
       - name: Verify visible vertical bands and English help in generated TUI
@@ -64,12 +64,11 @@ jobs:
           texts=[x["componentData"]["data"].get("text","") for x in help_controls]
           assert len(texts)>=13 and any("mpctoolkit.com" in x for x in texts), texts
           filter_controls=tabs["FILTER"]["componentDefinition"]["componentsData"]
-          graphs=[x for x in filter_controls if x["componentData"]["type"]=="Image" and x["componentData"]["data"].get("imageType")=="Regular"]
-          assert {"filter_response.png","synth_envelope.png","filter_panels.png"}.issubset({g["componentData"]["data"]["image"] for g in graphs}), "Filter diagrams/panel missing"
-          for graph in graphs:
-              image=graph["componentData"]["data"]["image"]
-              assert (files[0].parent / image).exists(), image
-          print("Custom band layouts, HELP text and four parameter-linked diagrams present")
+          names=[x["componentData"]["name"] for x in filter_controls]
+          for name in ("Filter Cutoff","Resonance","Synth Attack","Synth Release","Attack","Release"):
+              assert name in names, "Missing filter/envelope control: "+name
+          assert not any(x["componentData"]["type"]=="Image" for x in filter_controls), "Old static diagrams remain"
+          print("Band layouts, HELP and grouped filter/envelope controls verified")
           PY
       - name: Run host simulator
         run: |
