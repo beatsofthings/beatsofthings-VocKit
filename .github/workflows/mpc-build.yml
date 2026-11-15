@@ -32,7 +32,7 @@ jobs:
           source=Path("mpc/src/VocKit.cpp").read_text()
           assert "NaNf" not in source, "Factory preset contains invalid NaNf literal"
           programs=re.findall(r'addProgram\("[^"]+", \{([^}]*)\}\);', source)
-          assert programs, "No factory programs"
+          assert len(programs)>=35, ("Expected at least 35 factory programs",len(programs))
           for index, program in enumerate(programs):
               values=[v.strip() for v in program.split(",")]
               assert len(values)==63, (index, len(values))
