@@ -50,6 +50,12 @@ jobs:
           for name in ("BAND1","BAND2"):
               controls=tabs[name]["componentDefinition"]["componentsData"]
               assert sum(x["componentData"]["type"]=="vockitVerticalBand" for x in controls)==12, name
+          qfiles=list(pathlib.Path("sdk/plugins/VocKit/build").rglob("Q-Links.json"))
+          q=json.loads(next(p for p in qfiles if "Plugin Skins" in str(p)).read_text())
+          for page,first in (("BAND1",19),("BAND2",31)):
+              tab_index=next(i for i,t in enumerate(t["pageData"]["tabs"],1) if t["tabName"]==page)
+              mapping=next(m["Q-Links"] for m in q["Screen Mode Q-Links"]["map"] if m["Tab"]==tab_index)
+              assert [mapping["Q-Link "+str(i)] for i in range(1,13)]==list(range(first,first+12)), page
           help_controls=tabs["HELP"]["componentDefinition"]["componentsData"]
           texts=[x["componentData"]["data"].get("text","") for x in help_controls]
           assert len(texts)>=13 and any("mpctoolkit.com" in x for x in texts), texts
