@@ -321,124 +321,63 @@
       ]
     },
     {
-      "name": "HELP1",
+      "name": "HELP",
       "controls": [
         {
           "widget": "text",
-          "text": "INTERNAL CARRIER SETUP"
+          "text": "VOCKIT FX - SETUP GUIDE"
         },
         {
           "widget": "text",
-          "text": "1. LOAD VOCAL AUDIO TRACK"
+          "text": "INTERNAL: FX ON VOICE TRACK"
         },
         {
           "widget": "text",
-          "text": "2. INSERT VOCKIT ON VOICE"
+          "text": "MODE INTERNAL / MIX 100%"
         },
         {
           "widget": "text",
-          "text": "3. INPUT MODE: INTERNAL"
+          "text": "JURA: PAN LEFT / VOICE RIGHT"
         },
         {
           "widget": "text",
-          "text": "4. SET MIX TO 100 PERCENT"
+          "text": "BOTH TRACKS TO SUBMIX 1"
         },
         {
           "widget": "text",
-          "text": "5. SELECT RETRO ROBOT"
+          "text": "FX ONLY ON SUBMIX 1"
         },
         {
           "widget": "text",
-          "text": "6. ADJUST PITCH AND CHORD"
+          "text": "MODE L CARRIER / R VOICE"
         },
         {
           "widget": "text",
-          "text": "7. FILTER / OSC SHAPE TONE"
+          "text": "MIC: INPUT MONITOR ON"
         },
         {
           "widget": "text",
-          "text": "8. SHORT RELEASE FOR RAP"
+          "text": "USE HEADPHONES WITH MIC"
         },
         {
           "widget": "text",
-          "text": "9. BOOST TOP BANDS FOR CLARITY"
+          "text": "BRIGHT CARRIER FOR CLARITY"
         },
         {
           "widget": "text",
-          "text": "10. USE DRY VOICE RECORDING"
+          "text": "SHORT RELEASE FOR FAST RAP"
         },
         {
           "widget": "text",
-          "text": "11. NO REVERB BEFORE VOCKIT"
+          "text": "NO REVERB BEFORE VOCKIT"
         },
         {
           "widget": "text",
-          "text": "12. SAVE USING MPC PRESET MENU"
-        }
-      ]
-    },
-    {
-      "name": "HELP2",
-      "controls": [
-        {
-          "widget": "text",
-          "text": "EXTERNAL JURA CARRIER"
+          "text": "PRESETS: MPC TOP MENU"
         },
         {
           "widget": "text",
-          "text": "1. ADD JURA PLUGIN TRACK"
-        },
-        {
-          "widget": "text",
-          "text": "2. PLAY JURA USING MIDI"
-        },
-        {
-          "widget": "text",
-          "text": "3. SEND JURA TO SUBMIX 1"
-        },
-        {
-          "widget": "text",
-          "text": "4. PAN JURA FULL LEFT"
-        },
-        {
-          "widget": "text",
-          "text": "5. SEND VOICE TO SUBMIX 1"
-        },
-        {
-          "widget": "text",
-          "text": "6. PAN VOICE FULL RIGHT"
-        },
-        {
-          "widget": "text",
-          "text": "7. INSERT VOCKIT ON SUBMIX 1"
-        },
-        {
-          "widget": "text",
-          "text": "8. MODE: L CARRIER / R VOICE"
-        },
-        {
-          "widget": "text",
-          "text": "9. START WITH 100 PERCENT WET"
-        },
-        {
-          "widget": "text",
-          "text": "10. KEEP JURA SOUND BRIGHT"
-        },
-        {
-          "widget": "text",
-          "text": "11. MIC: ENABLE INPUT MONITOR"
-        },
-        {
-          "widget": "text",
-          "text": "12. USE HEADPHONES FOR MIC"
-        },
-        {
-          "widget": "text",
-          "text": "13. CHECK LEFT/RIGHT ROUTING"
-        },
-        {
-          "widget": "text",
-          "text": "14. MPCTOOLKIT.COM"
+          "text": "HTTPS://MPCTOOLKIT.COM"
         }
       ]
     }
