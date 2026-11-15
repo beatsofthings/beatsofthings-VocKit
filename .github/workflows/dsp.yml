@@ -32,3 +32,7 @@ jobs:
         run: |
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/long_run.cpp -o /tmp/vockit-longrun
           /tmp/vockit-longrun
+      - name: Verify non-persistent 24-bin spectrum snapshot
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/snapshot_smoke.cpp -o /tmp/vockit-snapshot
+          /tmp/vockit-snapshot
