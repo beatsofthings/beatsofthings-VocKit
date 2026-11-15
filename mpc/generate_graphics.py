@@ -39,3 +39,21 @@ def release(x,v):
 for name,fn in [("filter_cutoff.png",cutoff),("filter_resonance.png",resonance),("env_attack.png",attack),("env_release.png",release)]:
     render(name,fn,{"filter_cutoff.png":"FILTER CUTOFF","filter_resonance.png":"FILTER RESONANCE","env_attack.png":"ENVELOPE ATTACK","env_release.png":"ENVELOPE RELEASE"}[name])
 print("Created four parameter-driven 48-frame filter/envelope displays in",out)
+
+# Combined, explicitly schematic diagrams. These are not falsely presented
+# as a complete response computed from two independent controls.
+def schematic(filename,title,points,labels):
+    im=Image.new("RGBA",(580,160),(0,0,0,0));d=ImageDraw.Draw(im)
+    d.rounded_rectangle((1,1,578,158),radius=12,fill=(17,30,44,255),outline=(65,85,102,255),width=2)
+    d.text((16,10),title,fill=(255,184,77,255))
+    for x in range(20,565,54):d.line((x,35,x,139),fill=(42,57,71,255))
+    for y in (44,75,106,137):d.line((20,y,560,y),fill=(42,57,71,255))
+    d.line(points,fill=(255,184,77,255),width=4,joint="curve")
+    for x,y,label in labels:d.text((x,y),label,fill=(220,232,240,255))
+    im.save(out/filename,optimize=True)
+schematic("filter_response.png","FILTER RESPONSE  /  SCHEMATIC",
+    [(24,54),(190,54),(260,48),(300,42),(330,67),(380,112),(445,134),(555,134)],
+    [(245,15,"RESONANCE"),(345,113,"CUTOFF")])
+schematic("synth_envelope.png","SYNTH ENVELOPE  /  SCHEMATIC",
+    [(24,137),(135,47),(370,47),(555,137)],
+    [(70,112,"ATTACK"),(445,112,"RELEASE")])
