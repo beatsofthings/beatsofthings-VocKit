@@ -28,3 +28,7 @@ jobs:
         run: |
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/spectrum_smoke.cpp -o /tmp/vockit-spectrum
           /tmp/vockit-spectrum
+      - name: Long-run DSP stability and throughput (CI machine, not MPC CPU)
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/long_run.cpp -o /tmp/vockit-longrun
+          /tmp/vockit-longrun
