@@ -84,6 +84,40 @@ injection=r'''
                 "1040 574 196 45", "No", "Show", "Always"))
             put(kv(tab, "componentDefinition"), "componentsData", children)
             put(tab, "qlinkBoundsData", ["0 0 0 0"] * 4)
+        elif name == "FX":
+            originals = kv(kv(tab, "componentDefinition"), "componentsData")
+            children = [entry("FX vintage background", "Image",
+                obj(("version", 2), ("imageType", "Regular"),
+                    ("colour", "0"), ("image", "vockit_vintage_background.png")),
+                "0 0 1280 628", "No", "Show", "Always"),
+                entry("FX module background", "Image",
+                obj(("version", 2), ("imageType", "Regular"),
+                    ("colour", "0"), ("image", "fx_sections.png")),
+                "0 0 1280 628", "No", "Show", "Always")]
+            def fx_heading(title, x):
+                children.append(entry("fx heading " + title, "Label",
+                    label_data("Text", "ffffb84d", 24.0, "left", title),
+                    "%d 30 390 40" % x, "No", "Show", "Always",
+                    remap=[("Data", "Parameter 0")]))
+            def fx_control(label, x, y, width=300):
+                original = next((item for item in originals
+                    if kv(kv(item, "componentData"), "name") == label), None)
+                if original is None:
+                    raise ValueError("Missing SDK-generated FX control: " + label)
+                put(kv(original, "bounds"), "bounds",
+                    "%d %d %d 126" % (x, y, width))
+                children.append(original)
+            fx_heading("SATURATION", 42)
+            fx_control("Saturation", 48, 130)
+            fx_heading("STEREO CHORUS", 426)
+            fx_control("Chorus Mix", 432, 112, 388)
+            fx_control("Chorus Rate", 432, 264, 388)
+            fx_control("Chorus Depth", 432, 418, 388)
+            fx_heading("VOICE SHAPING", 893)
+            fx_control("Band Profile", 892, 110, 340)
+            fx_control("Profile Amount", 892, 266, 340)
+            fx_control("Voice Character", 892, 424, 340)
+            put(kv(tab, "componentDefinition"), "componentsData", children)
         elif name == "FILTER":
             # The generator's 4x4 layout mixes filter and envelope controls.
             # Rebuild only this tab using the SDK's proven control components,
