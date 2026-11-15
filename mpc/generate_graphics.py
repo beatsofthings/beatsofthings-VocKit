@@ -68,3 +68,20 @@ def panel_background(filename,sections):
     im.save(out/filename,optimize=True)
 panel_background("osc_panels.png",[(18,8,1260,462),(18,469,1260,618)])
 panel_background("filter_panels.png",[(18,8,625,438),(645,8,1260,438)])
+
+# Three separate filter/envelope modules, no misleading static response curves.
+im=Image.new("RGBA",(1280,628),(0,0,0,0))
+d=ImageDraw.Draw(im)
+for top,bottom in ((8,193),(207,397),(411,616)):
+    d.rounded_rectangle((20,top,1260,bottom),radius=13,
+        fill=(21,36,53,225),outline=(64,91,113,255),width=2)
+    d.line((42,top+43,1236,top+43),fill=(255,184,77,130),width=2)
+im.save(out/"filter_sections.png",optimize=True)
+# Three reading columns on the HELP tab.
+im=Image.new("RGBA",(1280,628),(0,0,0,0))
+d=ImageDraw.Draw(im)
+for left,right in ((16,424),(436,844),(856,1264)):
+    d.rounded_rectangle((left,12,right,612),radius=13,
+        fill=(21,36,53,230),outline=(64,91,113,255),width=2)
+    d.line((left+15,66,right-15,66),fill=(255,184,77,130),width=2)
+im.save(out/"help_columns.png",optimize=True)
