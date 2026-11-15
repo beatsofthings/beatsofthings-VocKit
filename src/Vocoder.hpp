@@ -80,6 +80,7 @@ public:
    semitones=clamp(semitones,-12.f,12.f);
    if(semitones==formant_)return;
    formant_=semitones;
+   spectral_.setFormantShift(semitones);
    for(int i=0;i<kBands;++i){
      const float hz=100.f*std::pow(8500.f/100.f,(i+.5f)/kBands);
      syn_[i].configure(hz*std::pow(2.f,formant_/12.f),sr_,4.0f);
