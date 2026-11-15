@@ -30,6 +30,24 @@ jobs:
           python sdk/tools/build.py sdk/plugins/VocKit --target all
       - name: Validate
         run: python sdk/tools/validate.py sdk/plugins/VocKit
+      - name: Verify visible vertical bands and English help in generated TUI
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          files=list(pathlib.Path("sdk/plugins/VocKit/build").rglob("TUI.json"))
+          assert files, "TUI.json missing"
+          t=next((json.loads(p.read_text()) for p in files if "Plugin Skins" in str(p)), None)
+          assert t, "Packaged TUI missing"
+          tabs={x["tabName"]:x for x in t["pageData"]["tabs"]}
+          assert "HELP" in tabs and "BAND1" in tabs and "BAND2" in tabs
+          for name in ("BAND1","BAND2"):
+              controls=tabs[name]["componentDefinition"]["componentsData"]
+              assert sum(x["componentData"]["type"]=="vockitVerticalBand" for x in controls)==12, name
+          help_controls=tabs["HELP"]["componentDefinition"]["componentsData"]
+          texts=[x["componentData"]["data"].get("text","") for x in help_controls]
+          assert len(texts)>=13 and any("mpctoolkit.com" in x for x in texts), texts
+          print("Custom band layouts and HELP text present in generated skin")
+          PY
       - name: Run host simulator
         run: |
           set -euo pipefail
