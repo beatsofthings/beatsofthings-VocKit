@@ -20,8 +20,8 @@ jobs:
           mkdir -p sdk/plugins/VocKit/src
           cp mpc/plugin.json mpc/ui.json mpc/README.md sdk/plugins/VocKit/
           cp mpc/src/VocKit.cpp src/Vocoder.hpp src/SpectralVocoder.hpp sdk/plugins/VocKit/src/
-          mkdir -p sdk/plugins/VocKit/skins
-          cp mpc/skins/TUI.json mpc/skins/Q-Links.json sdk/plugins/VocKit/skins/
+          # Safety rollback: the custom TUI produced a blank MPC screen.
+          # Keep custom skin sources in Git, but use the proven ui.json generator.
       - name: Build ARM and native
         run: |
           export PATH="$HOME/.local/bin:$PATH"
@@ -47,8 +47,7 @@ jobs:
           test -d "$PLUGIN/Plugin Skins"
           test -f "$PLUGIN/Plugin Skins/TUI.json"
           test -f "$PLUGIN/Plugin Skins/Q-Links.json"
-          cmp mpc/skins/TUI.json "$PLUGIN/Plugin Skins/TUI.json"
-          cmp mpc/skins/Q-Links.json "$PLUGIN/Plugin Skins/Q-Links.json"
+          # Verify that generated skin files are included in the install archive.
           (cd "$(dirname "$PLUGIN")" && zip -qr "$GITHUB_WORKSPACE/dist/VocKit-MPC-install.zip" "$(basename "$PLUGIN")")
       - uses: actions/upload-artifact@v4
         if: success()
