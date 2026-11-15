@@ -108,5 +108,17 @@ s=s.replace(marker,
     '    subprocess.run([sys.executable, str(Path(__file__).resolve().parents[2] / "mpc" / "generate_graphics.py"), out_dir], check=True)\n'
     +marker)
 
+# Override the SDK generator's column-major default for the two custom
+# 12-fader band pages. Physical Q-Link numbering is sequential here.
+qlink_marker='    by_index = {p.index: p for p in params}'
+assert s.count(qlink_marker)==1, "SDK Q-Link generator changed"
+s=s.replace(qlink_marker, '''    for ti, page in enumerate(pages):
+        if page.name in ("BAND1", "BAND2"):
+            first = 19 if page.name == "BAND1" else 31
+            qmap = next(value for key, value in entries[ti] if key == "Q-Links")
+            qmap[:] = [("Q-Link %d" % q, first + q - 1 if q <= 12 else -1)
+                       for q in range(1, 17)]
+    ''' + qlink_marker)
+
 p.write_text(s)
 print("Patched official generator with vertical VocKit band controls and one English HELP page")
