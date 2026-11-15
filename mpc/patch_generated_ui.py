@@ -107,8 +107,10 @@ injection=r'''
                 put(kv(original, "bounds"), "bounds",
                     "%d %d %d 126" % (x, y, width))
                 children.append(original)
-            fx_heading("SATURATION", 42)
-            fx_control("Saturation", 48, 130)
+            fx_heading("SATURATION / RING MOD", 42)
+            fx_control("Saturation", 48, 105)
+            fx_control("Ring Mix", 48, 280)
+            fx_control("Ring Frequency", 48, 437)
             fx_heading("STEREO CHORUS", 426)
             fx_control("Chorus Mix", 432, 112, 388)
             fx_control("Chorus Rate", 432, 264, 388)
