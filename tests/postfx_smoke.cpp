@@ -19,5 +19,15 @@ int main(){
   peak=std::max(peak,std::max(std::fabs(l),std::fabs(r)));
  }
  if(peak<=0.f||peak>1.1f)return 3;
+ fx.prepare(48000.f);
+ float changed=0.f;
+ for(int i=0;i<5000;++i){
+   float l=.4f*std::sin(float(i)*.023f),r=l;
+   const float before=l;
+   fx.process(l,r,0.f,0.f,.8f,.5f,.65f,80.f);
+   if(!std::isfinite(l)||!std::isfinite(r))return 4;
+   changed+=std::fabs(l-before);
+ }
+ if(changed<1.f)return 5;
  std::puts("PostFx neutral bypass and active stereo chorus/saturation OK");
 }
