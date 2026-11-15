@@ -15,7 +15,7 @@ class SpectralVocoder {
  std::array<float,B> smooth_{};
  std::array<int,N/2+1> bins_{};
  int cursor_=0,clock_=0;
- float sr_=44100.f,attack_=8.f,release_=90.f;
+ float sr_=44100.f,attack_=8.f,release_=90.f,formantShift_=0.f;
  static void fft(std::array<C,N>& x,bool inverse){
   for(int i=1,j=0;i<N;++i){
    int bit=N>>1;
@@ -57,6 +57,7 @@ class SpectralVocoder {
    ++counts[band];
   }
   std::array<float,B> gain{};
+  std::array<float,B> envelope{};
   for(int j=0;j<B;++j){
    const float v=std::sqrt(va[j]/std::max(1,counts[j]));
    const float c=std::sqrt(ca[j]/std::max(1,counts[j]));
@@ -64,9 +65,25 @@ class SpectralVocoder {
    const float rel=std::exp(-float(H)*1000.f/(sr_*std::max(2.f,release_)));
    const float coeff=v>smooth_[j]?atk:rel;
    smooth_[j]=coeff*smooth_[j]+(1.f-coeff)*v;
-   // One gain per spectral band, preserving relative speech formants.
+   envelope[j]=smooth_[j];
+   // Zero shift follows the original gain path bit-for-bit.
    gain[j]=std::min(12.f,smooth_[j]/std::max(.002f,c))*
            std::max(0.f,bandLevels[j]);
+  }
+  if(formantShift_!=0.f){
+   // Resample the 24-band speech envelope on its logarithmic frequency axis.
+   // Keep carrier normalisation and band mixer at the *destination* band.
+   const float offset=formantShift_*B*std::log(2.f)/
+       (12.f*std::log(10000.f/80.f));
+   for(int j=0;j<B;++j){
+    const float src=std::max(0.f,std::min(float(B-1),float(j)-offset));
+    const int lo=int(src),hi=std::min(B-1,lo+1);
+    const float t=src-float(lo);
+    const float shifted=envelope[lo]*(1.f-t)+envelope[hi]*t;
+    const float carrierRms=std::sqrt(ca[j]/std::max(1,counts[j]));
+    gain[j]=std::min(12.f,shifted/std::max(.002f,carrierRms))*
+            std::max(0.f,bandLevels[j]);
+   }
   }
   b_[0]={0,0};b_[N/2]={0,0};
   for(int k=1;k<N/2;++k){
@@ -94,6 +111,7 @@ public:
   }
  }
  void setAttackRelease(float a,float r){attack_=a;release_=r;}
+ void setFormantShift(float semitones){formantShift_=std::max(-12.f,std::min(12.f,semitones));}
  float tick(float voice,float carrier,const std::array<float,B>& levels){
   const float output=ola_[clock_&(R-1)];
   ola_[clock_&(R-1)]=0.f;
