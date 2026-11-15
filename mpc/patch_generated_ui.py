@@ -30,9 +30,9 @@ injection=r'''
                   ("isBipolar", False), ("handleName", "Data")),
               "26 30 38 145", "No", "Show", "Always"),
         entry("name", "Label", label_data("Name", "ffffb84d", 20.0, "horizontallyCentred verticallyCentred"),
-              "0 0 95 28", "No", "Show", "Always"),
+              "0 0 64 28", "No", "Show", "Always"),
         entry("value", "Label", label_data("Value", "fff2f5fa", 20.0, "horizontallyCentred verticallyCentred"),
-              "0 180 95 25", "No", "Show", "Always")
+              "0 357 64 26", "No", "Show", "Always")
     ]
     defs.append(("vockitVerticalBand", vertical))
     for tab in tabs:
@@ -47,7 +47,7 @@ injection=r'''
             for i in range(12):
                 children.append(entry("Band %02d" % ((n - 1) * 12 + i + 1),
                     "vockitVerticalBand", obj(("version", 1), ("handleName", "Data")),
-                    "%d %d 95 210" % (35 + (i % 6) * 198, 110 + (i // 6) * 242),
+                    "%d 108 64 390" % (28 + i * 102),
                     "Yes", "Hide", "Always",
                     remap=[("Data", "Parameter %d" % (start + i))]))
             put(kv(tab, "componentDefinition"), "componentsData", children)
