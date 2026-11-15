@@ -65,7 +65,10 @@ injection=r'''
         if name.startswith("BAND") and name[-1] in "123":
             n = int(name[-1])
             start = 19 + (n - 1) * 12
-            children = []
+            children = [entry("vintage background", "Image",
+                obj(("version", 2), ("imageType", "Regular"),
+                    ("colour", "0"), ("image", "vockit_vintage_background.png")),
+                "0 0 1280 628", "No", "Show", "Always")]
             children.append(entry("heading", "Label",
                 label_data("Text", "ffffb84d", 32.0, "left", "VOCKIT / 24-BAND SPECTRAL MIXER"),
                 "45 12 1160 55", "No", "Show", "Always"))
