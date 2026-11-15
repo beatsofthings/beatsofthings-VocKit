@@ -86,13 +86,14 @@ for left,right in ((16,424),(436,844),(856,1264)):
     d.line((left+15,66,right-15,66),fill=(255,184,77,130),width=2)
 im.save(out/"help_columns.png",optimize=True)
 
-# VocKit / BeatsOfThings identity graphic, designed for the MPC's dark skin.
-# Kept as a generated PNG so the official SDK's Image widget can display it.
-im=Image.new("RGBA",(520,95),(0,0,0,0))
-d=ImageDraw.Draw(im)
-d.rounded_rectangle((1,1,518,93),radius=13,
-    fill=(18,33,49,245),outline=(76,99,119,255),width=2)
-d.rounded_rectangle((14,13,23,82),radius=4,fill=(255,184,77,255))
-d.text((39,16),"VocKit",fill=(255,184,77,255),stroke_width=0)
-d.text((40,53),"BEATS OF THINGS",fill=(218,230,239,255))
-im.save(out/"vockit_logo.png",optimize=True)
+# Decode the original user-supplied VocKit artwork (stored as base64 text).
+# The image is pre-sized for MPC to avoid a large resource footprint.
+import base64
+source=Path(__file__).resolve().parent / "assets" / "vockit_uploaded_logo.b64"
+if not source.is_file():
+    raise FileNotFoundError("Uploaded VocKit logo asset missing: " + str(source))
+logo=base64.b64decode(source.read_text().strip(), validate=True)
+from io import BytesIO
+check=Image.open(BytesIO(logo))
+check.verify()
+(out / "vockit_logo.png").write_bytes(logo)
