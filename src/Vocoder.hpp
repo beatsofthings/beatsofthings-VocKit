@@ -49,7 +49,7 @@ public:
      env_[i].env=0.f;
    }
    spectral_.prepare(sr_);
-   phase_.fill(0.f);detunePhase_=subPhase_=0.f;
+   phase_.fill(0.f);detunePhase_=subPhase_=lfoPhase_=0.f;
    filterLow_=filterBand_=synthEnvelope_=0.f;
    sibilanceLow_=0.f; sibilanceEnv_=0.f; noiseState_=0x12345678u;
  }
@@ -65,6 +65,8 @@ public:
  void setGate(bool v){gate_=v;}
  void setChord(int v){chord_=std::max(0,std::min(4,v));}
  void setTone(float v){tone_=clamp(v,0.f,1.f);}
+ void setWaveform(int shape){waveform_=std::max(0,std::min(3,shape));}
+ void setLfo(int shape,float rateHz,float depthCents){lfoShape_=std::max(0,std::min(2,shape));lfoRate_=clamp(rateHz,0.f,20.f);lfoDepth_=clamp(depthCents,0.f,100.f);}
  void setDetune(float cents){detune_=clamp(cents,0.f,35.f);}
  void setSubLevel(float amount){subLevel_=clamp(amount,0.f,1.f);}
  void setNoiseLevel(float amount){noiseLevel_=clamp(amount,0.f,1.f);}
@@ -89,7 +91,10 @@ public:
    constexpr float major[]={1.f,1.259921f,1.4983071f};
    const float* ratios=chord_==3?minor:major;
    int voices=(chord_==0)?1:(chord_==1||chord_==2)?2:3;
-   const float oscillatorFrequency=freq_*std::pow(2.f,float(octave_));
+   lfoPhase_+=lfoRate_/sr_;
+   if(lfoPhase_>=1.f)lfoPhase_-=1.f;
+   const float lfoValue=lfoShape_==1?(1.f-4.f*std::fabs(lfoPhase_-.5f)):(lfoShape_==2?(lfoPhase_<.5f?1.f:-1.f):std::sin(2.f*pi*lfoPhase_));
+   const float oscillatorFrequency=freq_*std::pow(2.f,float(octave_)+lfoDepth_*lfoValue/1200.f);
    float carrier=0.f;
    for(int i=0;i<voices;++i){
      float ratio=i==0?1.f:(chord_==1?2.f:(chord_==2?1.4983071f:ratios[i]));
@@ -97,7 +102,10 @@ public:
      if(phase_[i]>=1.f)phase_[i]-=1.f;
      float saw=2.f*phase_[i]-1.f;
      float pulse=phase_[i]<.45f?1.f:-1.f;
-     carrier+=(saw*(1.f-tone_)+pulse*tone_)/voices;
+     const float triangle=1.f-4.f*std::fabs(phase_[i]-.5f);
+     const float sine=std::sin(2.f*pi*phase_[i]);
+     const float wave=waveform_==1?triangle:(waveform_==2?sine:(waveform_==3?pulse:(saw*(1.f-tone_)+pulse*tone_)));
+     carrier+=wave/voices;
    }
    if(!gate_)carrier=0.f;
    // Additional detuned saw voice and sub octave for a richer internal carrier.
@@ -151,7 +159,8 @@ private:
  float detune_=0.f,subLevel_=0.f,noiseLevel_=0.f,detunePhase_=0.f,subPhase_=0.f;
  float cutoff_=1.f,resonance_=0.f,synthAttack_=1.f,synthRelease_=5.f;
  float filterLow_=0.f,filterBand_=0.f,synthEnvelope_=0.f;
- int octave_=0;
+ int octave_=0,waveform_=0,lfoShape_=0;
+ float lfoPhase_=0.f,lfoRate_=0.f,lfoDepth_=0.f;
  std::array<float,kBands> bandLevel_=[](){std::array<float,kBands> a{};a.fill(1.f);return a;}();
  bool gate_=false;int chord_=0;
  float sibilanceLow_=0.f,sibilanceEnv_=0.f;
