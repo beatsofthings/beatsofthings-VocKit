@@ -22,6 +22,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout VocKitProcessor::makeParams(
  add("resonance","Synth Resonance",0,0.95f,0);
  add("envAttack","Synth Attack ms",1,500,1);
  add("envRelease","Synth Release ms",5,2000,5);
+ p.push_back(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID{"waveform",1},"Waveform",juce::StringArray{"Saw/Pulse","Triangle","Sine","Square"},0));
+ p.push_back(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID{"lfoShape",1},"LFO Shape",juce::StringArray{"Sine","Triangle","Square"},0));
+ add("lfoRate","LFO Rate Hz",0,20,0);
+ add("lfoDepth","LFO Pitch Depth Cents",0,100,0);
  p.push_back(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID{"mode",1},"Carrier Mode",juce::StringArray{"Internal","Sidechain","Left Carrier / Right Voice","Right Carrier / Left Voice"},0));
  for(int i=0;i<24;++i)add("band"+juce::String(i+1),"Band "+juce::String(i+1),0,2,1);
  return {p.begin(),p.end()};
@@ -108,6 +112,8 @@ void VocKitProcessor::processBlock(juce::AudioBuffer<float>& buffer,juce::MidiBu
  const float level=val("level"),input=val("input"),carrierGain=val("carrier"),wet=val("mix");
  voc.setAttackRelease(val("attack"),val("release"));
  voc.setTone(val("tone"));
+ voc.setWaveform(int(val("waveform")));
+ voc.setLfo(int(val("lfoShape")),val("lfoRate"),val("lfoDepth"));
  voc.setDetune(val("detune"));
  voc.setSubLevel(val("sub"));
  voc.setNoiseLevel(val("noise"));
