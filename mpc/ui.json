@@ -312,6 +312,19 @@
         {
           "widget": "text",
           "text": "ZERO MIX = ORIGINAL SOUND"
+        },
+        {
+          "param": "Band Profile",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Profile Amount",
+          "widget": "fader"
+        },
+        {
+          "param": "Voice Character",
+          "widget": "knob"
         }
       ]
     },
