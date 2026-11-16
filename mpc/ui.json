@@ -287,6 +287,60 @@
       ]
     },
     {
+      "name": "CLARITY",
+      "controls": [
+        {
+          "param": "Band Sensitivity",
+          "widget": "knob"
+        },
+        {
+          "param": "Voice Threshold",
+          "widget": "knob"
+        },
+        {
+          "param": "Spectral Smoothing",
+          "widget": "knob"
+        },
+        {
+          "param": "Unvoiced Mix",
+          "widget": "knob"
+        },
+        {
+          "param": "Carrier EQ",
+          "widget": "knob"
+        },
+        {
+          "param": "Band Spread",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "DYNAMICS",
+      "controls": [
+        {
+          "param": "Spectral Tilt",
+          "widget": "knob"
+        },
+        {
+          "param": "Low Band Time",
+          "widget": "knob"
+        },
+        {
+          "param": "High Band Time",
+          "widget": "knob"
+        },
+        {
+          "param": "Dynamic Range",
+          "widget": "knob"
+        },
+        {
+          "param": "Stereo Width",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
       "name": "FX",
       "controls": [
         {
