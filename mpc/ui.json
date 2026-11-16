@@ -129,6 +129,35 @@
       ]
     },
     {
+      "name": "CARRIER",
+      "controls": [
+        {
+          "param": "Pulse Width",
+          "widget": "knob"
+        },
+        {
+          "param": "PWM Depth",
+          "widget": "knob"
+        },
+        {
+          "param": "PWM Rate",
+          "widget": "knob"
+        },
+        {
+          "param": "OSC 2 Blend",
+          "widget": "knob"
+        },
+        {
+          "param": "Carrier Drive",
+          "widget": "knob"
+        },
+        {
+          "param": "Noise Color",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
       "name": "FILTER",
       "controls": [
         {
