@@ -16,6 +16,8 @@ class SpectralVocoder {
  std::array<int,N/2+1> bins_{};
  int cursor_=0,clock_=0;
  float sr_=44100.f,attack_=8.f,release_=90.f,formantShift_=0.f;
+ float sensitivity_=1.f,smoothing_=0.f,spread_=0.f,tilt_=0.f,brightness_=0.f;
+ float lowTime_=1.f,highTime_=1.f,range_=1.f;
  static void fft(std::array<C,N>& x,bool inverse){
   for(int i=1,j=0;i<N;++i){
    int bit=N>>1;
@@ -61,8 +63,9 @@ class SpectralVocoder {
   for(int j=0;j<B;++j){
    const float v=std::sqrt(va[j]/std::max(1,counts[j]));
    const float c=std::sqrt(ca[j]/std::max(1,counts[j]));
-   const float atk=std::exp(-float(H)*1000.f/(sr_*std::max(.5f,attack_)));
-   const float rel=std::exp(-float(H)*1000.f/(sr_*std::max(2.f,release_)));
+   const float timeScale=j<8?lowTime_:(j>=16?highTime_:1.f);
+   const float atk=std::exp(-float(H)*1000.f/(sr_*std::max(.5f,attack_*timeScale*(1.f+smoothing_*3.f))));
+   const float rel=std::exp(-float(H)*1000.f/(sr_*std::max(2.f,release_*timeScale*(1.f+smoothing_*3.f))));
    const float coeff=v>smooth_[j]?atk:rel;
    smooth_[j]=coeff*smooth_[j]+(1.f-coeff)*v;
    // Measured per-band voice energy, no host parameter updates.
@@ -71,6 +74,13 @@ class SpectralVocoder {
    // Zero shift follows the original gain path bit-for-bit.
    gain[j]=std::min(12.f,smooth_[j]/std::max(.002f,c))*
            std::max(0.f,bandLevels[j]);
+  }
+  if(spread_>0.f){
+   const auto original=envelope;
+   for(int j=0;j<B;++j){
+    const float near=(original[std::max(0,j-1)]+original[j]+original[std::min(B-1,j+1)])/3.f;
+    envelope[j]=original[j]*(1.f-spread_)+near*spread_;
+   }
   }
   if(formantShift_!=0.f){
    // Resample the 24-band speech envelope on its logarithmic frequency axis.
@@ -85,6 +95,16 @@ class SpectralVocoder {
     const float carrierRms=std::sqrt(ca[j]/std::max(1,counts[j]));
     gain[j]=std::min(12.f,shifted/std::max(.002f,carrierRms))*
             std::max(0.f,bandLevels[j]);
+   }
+  }
+  if(sensitivity_!=1.f||range_!=1.f||tilt_!=0.f||brightness_!=0.f||spread_>0.f){
+   for(int j=0;j<B;++j){
+    const float c=std::sqrt(ca[j]/std::max(1,counts[j]));
+    const float target=std::min(12.f,envelope[j]*sensitivity_/std::max(.002f,c));
+    if(formantShift_==0.f)gain[j]=target*std::max(0.f,bandLevels[j]);
+    gain[j]=std::pow(std::max(0.f,gain[j]),range_);
+    const float x=float(j)/float(B-1)-.5f;
+    gain[j]*=std::pow(2.f,x*(tilt_+brightness_));
    }
   }
   b_[0]={0,0};b_[N/2]={0,0};
@@ -114,6 +134,12 @@ public:
  }
  const std::array<float,B>& spectrum()const noexcept{return spectrum_;}
  void setAttackRelease(float a,float r){attack_=a;release_=r;}
+ void setVoiceShape(float sensitivity,float smoothing,float spread,float tilt,float brightness,float lowTime,float highTime,float range){
+  sensitivity_=std::max(.25f,std::min(4.f,sensitivity));smoothing_=std::max(0.f,std::min(1.f,smoothing));
+  spread_=std::max(0.f,std::min(1.f,spread));tilt_=std::max(-2.f,std::min(2.f,tilt));
+  brightness_=std::max(-2.f,std::min(2.f,brightness));lowTime_=std::max(.25f,std::min(4.f,lowTime));
+  highTime_=std::max(.25f,std::min(4.f,highTime));range_=std::max(.5f,std::min(1.5f,range));
+ }
  void setFormantShift(float semitones){formantShift_=std::max(-12.f,std::min(12.f,semitones));}
  float tick(float voice,float carrier,const std::array<float,B>& levels){
   const float output=ola_[clock_&(R-1)];
