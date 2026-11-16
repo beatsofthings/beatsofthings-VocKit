@@ -50,7 +50,7 @@ public:
    }
    spectral_.prepare(sr_);
    phase_.fill(0.f);detunePhase_=subPhase_=lfoPhase_=osc2Phase_=0.f;
-   filterLow_=filterBand_=synthEnvelope_=0.f;
+   filterLow_=filterBand_=synthEnvelope_=pwmPhase_=noiseLow_=0.f;
    sibilanceLow_=0.f; sibilanceEnv_=0.f; gateEnv_=0.f; noiseState_=0x12345678u;
  }
  const std::array<float,kBands>& spectrum()const noexcept{return spectral_.spectrum();}
@@ -68,6 +68,11 @@ public:
  void setTone(float v){tone_=clamp(v,0.f,1.f);}
  void setWaveform(int shape){waveform_=std::max(0,std::min(3,shape));}
  void setLfo(int shape,float rateHz,float depthCents){lfoShape_=std::max(0,std::min(2,shape));lfoRate_=clamp(rateHz,0.f,20.f);lfoDepth_=clamp(depthCents,0.f,100.f);}
+ void setCarrierDesign(float pulseWidth,float pwmDepth,float pwmRate,float oscBlend,float drive,float noiseColor){
+   pulseWidth_=clamp(pulseWidth,.1f,.9f);pwmDepth_=clamp(pwmDepth,0.f,.4f);
+   pwmRate_=clamp(pwmRate,0.f,12.f);oscBlend_=clamp(oscBlend,0.f,1.f);
+   carrierDrive_=clamp(drive,0.f,1.f);noiseColor_=clamp(noiseColor,0.f,1.f);
+ }
  void setOsc2(int shape,float level,float semitones,float cents){osc2Shape_=std::max(0,std::min(3,shape));osc2Level_=clamp(level,0.f,1.f);osc2Semi_=clamp(semitones,-24.f,24.f);osc2Cents_=clamp(cents,-50.f,50.f);}
  void setVoiceProcessing(float sensitivity,float smoothing,float spread,float tilt,float brightness,float lowTime,float highTime,float range,float gateDb,float unvoiced){
    spectral_.setVoiceShape(sensitivity,smoothing,spread,tilt,brightness,lowTime,highTime,range);
@@ -104,13 +109,15 @@ public:
    if(lfoPhase_>=1.f)lfoPhase_-=1.f;
    const float lfoValue=lfoShape_==1?(1.f-4.f*std::fabs(lfoPhase_-.5f)):(lfoShape_==2?(lfoPhase_<.5f?1.f:-1.f):std::sin(2.f*pi*lfoPhase_));
    const float oscillatorFrequency=freq_*std::pow(2.f,float(octave_)+lfoDepth_*lfoValue/1200.f);
+   pwmPhase_+=pwmRate_/sr_;if(pwmPhase_>=1.f)pwmPhase_-=std::floor(pwmPhase_);
+   const float duty=clamp(pulseWidth_+pwmDepth_*std::sin(2.f*pi*pwmPhase_),.1f,.9f);
    float carrier=0.f;
    for(int i=0;i<voices;++i){
      float ratio=i==0?1.f:(chord_==1?2.f:(chord_==2?1.4983071f:ratios[i]));
      phase_[i]+=oscillatorFrequency*ratio/sr_;
      if(phase_[i]>=1.f)phase_[i]-=1.f;
      float saw=2.f*phase_[i]-1.f;
-     float pulse=phase_[i]<.45f?1.f:-1.f;
+     float pulse=phase_[i]<duty?1.f:-1.f;
      const float triangle=1.f-4.f*std::fabs(phase_[i]-.5f);
      const float sine=std::sin(2.f*pi*phase_[i]);
      const float wave=waveform_==1?triangle:(waveform_==2?sine:(waveform_==3?pulse:(saw*(1.f-tone_)+pulse*tone_)));
@@ -126,7 +133,9 @@ public:
      const float sine=std::sin(2.f*pi*osc2Phase_);
      const float square=osc2Phase_<.5f?1.f:-1.f;
      const float wave=osc2Shape_==1?triangle:(osc2Shape_==2?sine:(osc2Shape_==3?square:saw));
-     carrier=(carrier+osc2Level_*wave)/(1.f+osc2Level_);
+     // Default oscBlend=0 keeps the established carrier mix unchanged.
+     const float mix=osc2Level_*(1.f-oscBlend_)+oscBlend_;
+     carrier=(carrier+mix*wave)/(1.f+mix);
    }
    // Additional detuned saw voice and sub octave for a richer internal carrier.
    // Only active in internal mode; external JURA audio is never altered here.
@@ -142,7 +151,9 @@ public:
    if(!useExternal && gate_ && noiseLevel_>0.f){
      noiseState_=noiseState_*1664525u+1013904223u;
      const float white=float((noiseState_>>8)&0xffffu)/32767.5f-1.f;
-     carrier=carrier*(1.f-.5f*noiseLevel_)+white*.35f*noiseLevel_;
+     noiseLow_+=clamp(2.f*pi*800.f/sr_,0.f,1.f)*(white-noiseLow_);
+     const float colored=white*(1.f-noiseColor_)+noiseLow_*noiseColor_;
+     carrier=carrier*(1.f-.5f*noiseLevel_)+colored*.35f*noiseLevel_;
    }
    // Optional resonant two-pole low-pass; default cutoff=1 bypasses filter.
    if(!useExternal && cutoff_<.999f){
@@ -164,6 +175,10 @@ public:
      const float coeff=std::exp(-1000.f/(sr_*ms));
      synthEnvelope_=coeff*synthEnvelope_+(1.f-coeff)*target;
      carrier*=synthEnvelope_;
+   }
+   if(!useExternal && carrierDrive_>0.f){
+     const float drive=1.f+carrierDrive_*7.f;
+     carrier=std::tanh(carrier*drive)/std::tanh(drive);
    }
    carrier*=.42f;
    if(useExternal)carrier=std::isfinite(externalCarrier)?clamp(externalCarrier,-2.f,2.f):0.f;
@@ -191,6 +206,8 @@ private:
  float sr_=44100.f,freq_=110.f,wet_=1.f,attack_=8.f,release_=90.f,tone_=0.f,formant_=0.f;
  float detune_=0.f,subLevel_=0.f,noiseLevel_=0.f,detunePhase_=0.f,subPhase_=0.f;
  float osc2Phase_=0.f,osc2Level_=0.f,osc2Semi_=0.f,osc2Cents_=0.f,sibilance_=0.f;
+ float pulseWidth_=.45f,pwmDepth_=0.f,pwmRate_=0.f,pwmPhase_=0.f;
+ float oscBlend_=0.f,carrierDrive_=0.f,noiseColor_=0.f,noiseLow_=0.f;
  int osc2Shape_=0;
  float cutoff_=1.f,resonance_=0.f,synthAttack_=1.f,synthRelease_=5.f;
  float filterLow_=0.f,filterBand_=0.f,synthEnvelope_=0.f;
