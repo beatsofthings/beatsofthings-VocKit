@@ -1,7 +1,7 @@
 {
   "name": "VocKit",
   "manufacturer": "Beats of Things",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "format": "vst2",
   "kind": "effect",
   "uid": "BtVK",
