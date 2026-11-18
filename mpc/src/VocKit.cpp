@@ -12,7 +12,7 @@ public:
  static mpc::PluginInfo makeInfo(){
    mpc::PluginInfo i;
    i.name="VocKit";i.vendor="Beats of Things";i.uniqueId=MPC_FOURCC('B','t','V','K');
-   i.version=1100;i.isInstrument=false;i.numInputs=2;i.numOutputs=2;return i;
+   i.version=1100;i.isInstrument=false;i.wantsMidi=true;i.numInputs=2;i.numOutputs=2;return i;
  }
  VocKit():mpc::Plugin(makeInfo()){
    addParam(mpc::floatParam("level","Level",0.f,100.f,80.f,"%",0));
