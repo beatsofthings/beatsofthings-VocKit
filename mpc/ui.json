@@ -207,16 +207,20 @@
           "overlay": "menu"
         },
         {
-          "widget": "text",
-          "text": "INTERNAL CARRIER / MIDI CONTROL"
+          "param": "Pitch",
+          "widget": "knob"
+        },
+        {
+          "param": "Octave",
+          "widget": "knob"
         },
         {
           "widget": "text",
-          "text": "FIXED PITCH OR MIDI NOTES"
+          "text": "FIXED: SELECT PITCH + OCTAVE"
         },
         {
           "widget": "text",
-          "text": "MPC FX MIDI ROUTING MAY BE LIMITED"
+          "text": "MIDI NOTES: HOST ROUTING REQUIRED"
         }
       ]
     },
