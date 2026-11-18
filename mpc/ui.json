@@ -8,6 +8,11 @@
       "name": "VOICE",
       "controls": [
         {
+          "param": "Carrier Note Mode",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
           "param": "Audio Monitor",
           "widget": "slider",
           "overlay": "menu"
@@ -160,11 +165,6 @@
     {
       "name": "SYNTH+",
       "controls": [
-        {
-          "param": "Carrier Note Mode",
-          "widget": "slider",
-          "overlay": "menu"
-        },
         {
           "param": "Unison Voices",
           "widget": "slider",
