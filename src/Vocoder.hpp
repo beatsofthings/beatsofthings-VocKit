@@ -49,8 +49,8 @@ public:
      env_[i].env=0.f;
    }
    spectral_.prepare(sr_);
-   phase_.fill(0.f);detunePhase_=subPhase_=lfoPhase_=osc2Phase_=0.f;
-   filterLow_=filterBand_=synthEnvelope_=pwmPhase_=noiseLow_=0.f;
+   phase_.fill(0.f);unisonPhase_.fill(0.f);osc3Phase_=0.f;detunePhase_=subPhase_=lfoPhase_=osc2Phase_=0.f;
+   filterLow_=filterBand_=synthEnvelope_=filterEnvState_=pwmPhase_=noiseLow_=0.f;
    sibilanceLow_=0.f; sibilanceEnv_=0.f; gateEnv_=0.f; noiseState_=0x12345678u;
  }
  const std::array<float,kBands>& spectrum()const noexcept{return spectral_.spectrum();}
@@ -68,6 +68,12 @@ public:
  void setTone(float v){tone_=clamp(v,0.f,1.f);}
  void setWaveform(int shape){waveform_=std::max(0,std::min(3,shape));}
  void setLfo(int shape,float rateHz,float depthCents){lfoShape_=std::max(0,std::min(2,shape));lfoRate_=clamp(rateHz,0.f,20.f);lfoDepth_=clamp(depthCents,0.f,100.f);}
+ void setCarrierAdvanced(int unison,float spread,int osc3Shape,float osc3Level,float osc3Semi,int filterMode,float filterEnv){
+   unison_=std::max(1,std::min(8,unison));unisonSpread_=clamp(spread,0.f,35.f);
+   osc3Shape_=std::max(0,std::min(3,osc3Shape));osc3Level_=clamp(osc3Level,0.f,1.f);
+   osc3Semi_=clamp(osc3Semi,-24.f,24.f);filterMode_=std::max(0,std::min(2,filterMode));
+   filterEnvAmount_=clamp(filterEnv,0.f,1.f);
+ }
  void setCarrierDesign(float pulseWidth,float pwmDepth,float pwmRate,float oscBlend,float drive,float noiseColor){
    pulseWidth_=clamp(pulseWidth,.1f,.9f);pwmDepth_=clamp(pwmDepth,0.f,.4f);
    pwmRate_=clamp(pwmRate,0.f,12.f);oscBlend_=clamp(oscBlend,0.f,1.f);
@@ -124,6 +130,28 @@ public:
      carrier+=wave/voices;
    }
    if(!gate_)carrier=0.f;
+   if(!useExternal && gate_ && unison_>1){
+     float voices=0.f;
+     for(int u=0;u<unison_;++u){
+       const float cents=unisonSpread_*(2.f*float(u)/float(unison_-1)-1.f);
+       unisonPhase_[u]+=oscillatorFrequency*std::pow(2.f,cents/1200.f)/sr_;
+       if(unisonPhase_[u]>=1.f)unisonPhase_[u]-=std::floor(unisonPhase_[u]);
+       const float p=unisonPhase_[u];
+       voices+=waveform_==1?1.f-4.f*std::fabs(p-.5f):
+               waveform_==2?std::sin(2.f*pi*p):
+               waveform_==3?(p<duty?1.f:-1.f):
+               ((2.f*p-1.f)*(1.f-tone_)+(p<duty?1.f:-1.f)*tone_);
+     }
+     carrier=.5f*carrier+.5f*voices/float(unison_);
+   }
+   if(!useExternal && gate_ && osc3Level_>0.f){
+     osc3Phase_+=oscillatorFrequency*std::pow(2.f,osc3Semi_/12.f)/sr_;
+     if(osc3Phase_>=1.f)osc3Phase_-=std::floor(osc3Phase_);
+     const float p=osc3Phase_;
+     const float wave=osc3Shape_==1?1.f-4.f*std::fabs(p-.5f):
+       osc3Shape_==2?std::sin(2.f*pi*p):osc3Shape_==3?(p<duty?1.f:-1.f):(2.f*p-1.f);
+     carrier=(carrier+osc3Level_*wave)/(1.f+osc3Level_);
+   }
    if(!useExternal && gate_ && osc2Level_>0.f){
      const float hz=oscillatorFrequency*std::pow(2.f,osc2Semi_/12.f+osc2Cents_/1200.f);
      osc2Phase_+=hz/sr_;
@@ -156,8 +184,13 @@ public:
      carrier=carrier*(1.f-.5f*noiseLevel_)+colored*.35f*noiseLevel_;
    }
    // Optional resonant two-pole low-pass; default cutoff=1 bypasses filter.
-   if(!useExternal && cutoff_<.999f){
-     const float hz=80.f*std::pow(160.f,cutoff_);
+   if(!useExternal && (cutoff_<.999f||filterEnvAmount_>0.f)){
+     const float envTarget=gate_?1.f:0.f;
+     const float envMs=envTarget>filterEnvState_?synthAttack_:synthRelease_;
+     const float envCoeff=std::exp(-1000.f/(sr_*std::max(1.f,envMs)));
+     filterEnvState_=envCoeff*filterEnvState_+(1.f-envCoeff)*envTarget;
+     const float effective=clamp(cutoff_+filterEnvAmount_*(filterEnvState_-.5f),0.f,1.f);
+     const float hz=80.f*std::pow(160.f,effective);
      const float f=clamp(2.f*std::sin(pi*hz/sr_),0.f,.8f);
      const float damp=1.8f-1.65f*resonance_;
      for(int j=0;j<2;++j){
@@ -165,7 +198,7 @@ public:
        const float high=carrier-filterLow_-damp*filterBand_;
        filterBand_+=f*high*.5f;
      }
-     carrier=filterLow_;
+     carrier=filterMode_==1?(carrier-filterLow_):filterMode_==2?filterBand_:filterLow_;
    }
    // Voice-triggered carrier envelope. At default attack/release the FFT
    // envelope remains the main speech modulator, preserving classic sound.
@@ -210,7 +243,9 @@ private:
  float oscBlend_=0.f,carrierDrive_=0.f,noiseColor_=0.f,noiseLow_=0.f;
  int osc2Shape_=0;
  float cutoff_=1.f,resonance_=0.f,synthAttack_=1.f,synthRelease_=5.f;
- float filterLow_=0.f,filterBand_=0.f,synthEnvelope_=0.f;
+ float filterLow_=0.f,filterBand_=0.f,synthEnvelope_=0.f,filterEnvState_=0.f;
+ int unison_=1,osc3Shape_=0,filterMode_=0;float unisonSpread_=0.f,osc3Phase_=0.f,osc3Level_=0.f,osc3Semi_=0.f,filterEnvAmount_=0.f;
+ std::array<float,8> unisonPhase_{};
  int octave_=0,waveform_=0,lfoShape_=0;
  float lfoPhase_=0.f,lfoRate_=0.f,lfoDepth_=0.f;
  std::array<float,kBands> bandLevel_=[](){std::array<float,kBands> a{};a.fill(1.f);return a;}();
