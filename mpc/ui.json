@@ -199,6 +199,28 @@
       ]
     },
     {
+      "name": "MIDI",
+      "controls": [
+        {
+          "param": "Carrier Note Mode",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "widget": "text",
+          "text": "INTERNAL CARRIER / MIDI CONTROL"
+        },
+        {
+          "widget": "text",
+          "text": "FIXED PITCH OR MIDI NOTES"
+        },
+        {
+          "widget": "text",
+          "text": "MPC FX MIDI ROUTING MAY BE LIMITED"
+        }
+      ]
+    },
+    {
       "name": "FILTER",
       "controls": [
         {
