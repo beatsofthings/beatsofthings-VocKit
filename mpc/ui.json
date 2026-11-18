@@ -190,6 +190,11 @@
         {
           "param": "Filter Env Amount",
           "widget": "knob"
+        },
+        {
+          "param": "Carrier Note Mode",
+          "widget": "slider",
+          "overlay": "menu"
         }
       ]
     },
