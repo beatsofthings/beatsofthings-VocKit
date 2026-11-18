@@ -1,0 +1,50 @@
+name: Build VocKit Carrier MIDI instrument
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'mpc-carrier/**'
+      - '.github/workflows/carrier-build.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch official MPC SDK
+        run: git clone --depth 1 https://github.com/inmusic-software/mpc-plugin-builder-sdk.git sdk
+      - name: Install toolchain
+        run: python -m pip install ziglang Pillow
+      - name: Stage independent instrument
+        run: |
+          mkdir -p sdk/plugins/VocKitCarrier/src
+          cp mpc-carrier/plugin.json mpc-carrier/ui.json mpc-carrier/README.md sdk/plugins/VocKitCarrier/
+          cp mpc-carrier/src/VocKitCarrier.cpp sdk/plugins/VocKitCarrier/src/
+      - name: Build ARM and native
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          python sdk/tools/build.py sdk/plugins/VocKitCarrier --target all
+      - name: Validate plugin
+        run: python sdk/tools/validate.py sdk/plugins/VocKitCarrier
+      - name: Host simulation
+        run: |
+          set -euo pipefail
+          SIM=sdk/.sdk-tools/host_sim
+          NATIVE=$(find sdk/plugins/VocKitCarrier/build/native -maxdepth 1 -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) | head -n 1)
+          test -n "$NATIVE"
+          "$SIM" "$NATIVE" test --seconds 2 --wav sdk/plugins/VocKitCarrier/build/test.wav
+      - name: Create installation archive
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          PLUGIN=$(find sdk/plugins/VocKitCarrier/build -type f -name version.xml -printf '%h\n' | head -n 1)
+          test -n "$PLUGIN"
+          test -f "$PLUGIN/plugin.json"
+          test -d "$PLUGIN/VST"
+          test -f "$PLUGIN/Plugin Skins/TUI.json"
+          cp mpc-carrier/README.md "$PLUGIN/CARRIER_SETUP_EN.md"
+          (cd "$(dirname "$PLUGIN")" && zip -qr "$GITHUB_WORKSPACE/dist/VocKit-Carrier-MPC-install.zip" "$(basename "$PLUGIN")")
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: VocKit-Carrier-MPC-install
+          path: dist/VocKit-Carrier-MPC-install.zip
