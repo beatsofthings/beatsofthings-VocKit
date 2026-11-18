@@ -201,7 +201,7 @@ public:
    const float* r=(ctx.numInputs>1 && ctx.inputs)?ctx.inputs[1]:nullptr;
    float* ol=ctx.outputs[0];float* orr=ctx.numOutputs>1?ctx.outputs[1]:ol;
    int midiIndex=0;
-   const int noteMode=getInt(MidiCarrierMode);
+   const int noteMode=getInt(MidiCarrierMode)==0?1:getInt(MidiCarrierMode);
    const bool seqEnabled=getInt(SeqEnable)==1 && mode==0 && ctx.transport.valid && ctx.transport.ppqValid && ctx.transport.playing;
    const int seqLen=std::max(1,std::min(16,int(std::round(get(SeqLength)))));
    const double stepsPerQuarter=std::pow(2.0,double(getInt(SeqDivision)));
