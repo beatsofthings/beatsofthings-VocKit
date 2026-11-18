@@ -259,6 +259,11 @@
       "name": "KEYS",
       "controls": [
         {
+          "param": "Key Record",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
           "param": "Keyboard Octave",
           "widget": "knob"
         },
