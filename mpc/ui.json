@@ -256,6 +256,75 @@
       ]
     },
     {
+      "name": "KEYS",
+      "controls": [
+        {
+          "param": "Keyboard Octave",
+          "widget": "knob"
+        },
+        {
+          "param": "Key C",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key C#",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key D",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key D#",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key E",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key F",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key F#",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key G",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key G#",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key A",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key A#",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key B",
+          "widget": "slider",
+          "overlay": "menu"
+        }
+      ]
+    },
+    {
       "name": "STEP1",
       "controls": [
         {
