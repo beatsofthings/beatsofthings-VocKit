@@ -86,7 +86,7 @@ public:
    addParam(mpc::floatParam("osc3Semi","OSC 3 Semitone",-24.f,24.f,0.f,"st",0));
    addParam(mpc::choiceParam("filterMode","Filter Mode",{"Lowpass","Highpass","Bandpass"},0));
    addParam(mpc::floatParam("filterEnvAmount","Filter Env Amount",0.f,100.f,0.f,"%",0));
-   addParam(mpc::choiceParam("midiCarrierMode","Carrier Note Mode",{"Fixed Pitch","MIDI Notes"},0));
+   addParam(mpc::choiceParam("midiCarrierMode","Carrier Note Mode",{"Fixed Pitch","MIDI Notes","MIDI Test Tone"},0));
    // Plain values, exact parameter order; 24 band gains follow setup help.
    addProgram("Init", {80.f, 48.f, 0.f, 8.f, 90.f, 100.f, 100.f, 70.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.8f, 50.f, 0.f, 100.f, 0.f, 0.f, 80.f, 100.f, -80.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 100.f, 100.f, 100.f, 45.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f});
    addProgram("Robot Voice", {80.f, 48.f, 0.f, 5.f, 70.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 0.f, 1.f, 5.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.8f, 50.f, 0.f, 100.f, 0.f, 0.f, 80.f, 100.f, -80.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 100.f, 100.f, 100.f, 45.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f});
@@ -179,7 +179,8 @@ public:
    const float* r=ctx.numInputs>1?ctx.inputs[1]:l;
    float* ol=ctx.outputs[0];float* orr=ctx.numOutputs>1?ctx.outputs[1]:ol;
    int midiIndex=0;
-   const bool midiMode=getInt(MidiCarrierMode)==1 && mode==0;
+   const int noteMode=getInt(MidiCarrierMode);
+   const bool midiMode=noteMode!=0 && mode==0;
    for(int n=0;n<ctx.numFrames;++n){
      if(midiMode){
        while(midiIndex<ctx.numMidiEvents && ctx.midi && ctx.midi[midiIndex].sampleOffset<=n){
@@ -198,6 +199,19 @@ public:
      } else if(n==0){voc_.setGate(true);midiHeld_.fill(false);midiActive_=-1;}
 
      float dryL=l[n],dryR=r[n];
+     // Diagnostic tone proves MIDI delivery independently of mic/vocoder routing.
+     // Only active when explicitly selected on the MIDI page.
+     if(noteMode==2 && mode==0){
+       float test=0.f;
+       if(midiActive_>=0){
+         const float hz=440.f*std::pow(2.f,(float(midiActive_)-69.f)/12.f);
+         midiTestPhase_+=hz/sr_;
+         if(midiTestPhase_>=1.f)midiTestPhase_-=std::floor(midiTestPhase_);
+         test=.15f*std::sin(6.28318530718f*midiTestPhase_);
+       }
+       ol[n]=test;if(orr!=ol)orr[n]=test;
+       continue;
+     }
      if(monitor!=0){
        const float test=monitor==1?dryL:(monitor==2?dryR:0.5f*(dryL+dryR));
        const float sample=std::tanh(test*level);
@@ -223,7 +237,7 @@ public:
 private:
  vockit::Vocoder voc_;vockit::PostFx post_;
  vockit::SpectrumSnapshot spectrumSnapshot_;
- float sr_=44100.f;
+ float sr_=44100.f,midiTestPhase_=0.f;
  std::array<bool,128> midiHeld_{};
  int midiActive_=-1;
 };
