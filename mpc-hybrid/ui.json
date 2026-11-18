@@ -1,0 +1,766 @@
+{
+  "kit": {
+    "theme": "amber",
+    "accent": "FFFFB84D"
+  },
+  "pages": [
+    {
+      "name": "VOICE",
+      "controls": [
+        {
+          "param": "Carrier Note Mode",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Audio Monitor",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Input Mode",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Input",
+          "widget": "knob"
+        },
+        {
+          "param": "Carrier",
+          "widget": "knob"
+        },
+        {
+          "param": "Mix",
+          "widget": "fader"
+        },
+        {
+          "param": "Attack",
+          "widget": "knob"
+        },
+        {
+          "param": "Release",
+          "widget": "knob"
+        },
+        {
+          "param": "Level",
+          "widget": "fader"
+        },
+        {
+          "widget": "text",
+          "text": "VOICE / MODULATOR"
+        },
+        {
+          "param": "Consonant Clarity",
+          "widget": "knob"
+        },
+        {
+          "param": "Formant Shift",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "OSC",
+      "controls": [
+        {
+          "param": "Waveform",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Pitch",
+          "widget": "knob"
+        },
+        {
+          "param": "Octave",
+          "widget": "knob"
+        },
+        {
+          "param": "Chord",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Tone",
+          "widget": "knob"
+        },
+        {
+          "param": "Detune",
+          "widget": "knob"
+        },
+        {
+          "param": "Sub Osc",
+          "widget": "fader"
+        },
+        {
+          "param": "Noise Osc",
+          "widget": "fader"
+        },
+        {
+          "param": "LFO Shape",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "LFO Rate",
+          "widget": "knob"
+        },
+        {
+          "param": "LFO Depth",
+          "widget": "knob"
+        },
+        {
+          "param": "Carrier",
+          "widget": "fader"
+        },
+        {
+          "param": "OSC 2 Wave",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "OSC 2 Level",
+          "widget": "fader"
+        },
+        {
+          "param": "OSC 2 Semitone",
+          "widget": "knob"
+        },
+        {
+          "param": "OSC 2 Detune",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "CARRIER",
+      "controls": [
+        {
+          "param": "Pulse Width",
+          "widget": "knob"
+        },
+        {
+          "param": "PWM Depth",
+          "widget": "knob"
+        },
+        {
+          "param": "PWM Rate",
+          "widget": "knob"
+        },
+        {
+          "param": "OSC 2 Blend",
+          "widget": "knob"
+        },
+        {
+          "param": "Carrier Drive",
+          "widget": "knob"
+        },
+        {
+          "param": "Noise Color",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "SYNTH+",
+      "controls": [
+        {
+          "param": "Unison Voices",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Unison Detune",
+          "widget": "knob"
+        },
+        {
+          "param": "OSC 3 Wave",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "OSC 3 Level",
+          "widget": "knob"
+        },
+        {
+          "param": "OSC 3 Semitone",
+          "widget": "knob"
+        },
+        {
+          "param": "Filter Mode",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Filter Env Amount",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "MIDI",
+      "controls": [
+        {
+          "param": "Carrier Note Mode",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Pitch",
+          "widget": "knob"
+        },
+        {
+          "param": "Octave",
+          "widget": "knob"
+        },
+        {
+          "widget": "text",
+          "text": "FIXED: SELECT PITCH + OCTAVE"
+        },
+        {
+          "widget": "text",
+          "text": "MIDI NOTES: HOST ROUTING REQUIRED"
+        }
+      ]
+    },
+    {
+      "name": "SEQ",
+      "controls": [
+        {
+          "param": "Sequencer",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Seq Rate",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Seq Length",
+          "widget": "knob"
+        },
+        {
+          "widget": "text",
+          "text": "MPC PLAY / STOP CONTROLS SEQUENCE"
+        },
+        {
+          "widget": "text",
+          "text": "0-35 REST / 36-84 NOTE"
+        },
+        {
+          "widget": "text",
+          "text": "STEPS SAVE WITH PROJECT"
+        }
+      ]
+    },
+    {
+      "name": "KEYS",
+      "controls": [
+        {
+          "param": "Key Record",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Keyboard Octave",
+          "widget": "knob"
+        },
+        {
+          "param": "Key C",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key C#",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key D",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key D#",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key E",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key F",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key F#",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key G",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key G#",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key A",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key A#",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Key B",
+          "widget": "slider",
+          "overlay": "menu"
+        }
+      ]
+    },
+    {
+      "name": "PADS",
+      "controls": [
+        {
+          "param": "Pad Audio Input",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Pad Base Note",
+          "widget": "knob"
+        },
+        {
+          "widget": "text",
+          "text": "MIC LEFT / PILOT TONES RIGHT"
+        },
+        {
+          "widget": "text",
+          "text": "A02-A05: FOUR TEST NOTES"
+        },
+        {
+          "widget": "text",
+          "text": "PILOT: 750 1000 1250 1500 HZ"
+        },
+        {
+          "widget": "text",
+          "text": "KEEP PILOTS OUT OF VOCODER VOICE"
+        }
+      ]
+    },
+    {
+      "name": "STEP1",
+      "controls": [
+        {
+          "param": "Step 01 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 02 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 03 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 04 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 05 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 06 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 07 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 08 Note",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "STEP2",
+      "controls": [
+        {
+          "param": "Step 09 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 10 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 11 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 12 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 13 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 14 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 15 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 16 Note",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "FILTER",
+      "controls": [
+        {
+          "widget": "text",
+          "text": "ANALOG FILTER"
+        },
+        {
+          "param": "Filter Cutoff",
+          "widget": "knob"
+        },
+        {
+          "param": "Resonance",
+          "widget": "knob"
+        },
+        {
+          "widget": "empty"
+        },
+        {
+          "widget": "text",
+          "text": "SYNTH ENVELOPE"
+        },
+        {
+          "param": "Synth Attack",
+          "widget": "fader"
+        },
+        {
+          "param": "Synth Release",
+          "widget": "fader"
+        },
+        {
+          "param": "Carrier",
+          "widget": "fader"
+        },
+        {
+          "widget": "text",
+          "text": "VOCODER ENVELOPE"
+        },
+        {
+          "param": "Attack",
+          "widget": "fader"
+        },
+        {
+          "param": "Release",
+          "widget": "fader"
+        },
+        {
+          "param": "Level",
+          "widget": "fader"
+        }
+      ]
+    },
+    {
+      "name": "BAND1",
+      "controls": [
+        {
+          "param": "Band 01",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 02",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 03",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 04",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 05",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 06",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 07",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 08",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 09",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 10",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 11",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 12",
+          "widget": "fader"
+        }
+      ]
+    },
+    {
+      "name": "BAND2",
+      "controls": [
+        {
+          "param": "Band 13",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 14",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 15",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 16",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 17",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 18",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 19",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 20",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 21",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 22",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 23",
+          "widget": "fader"
+        },
+        {
+          "param": "Band 24",
+          "widget": "fader"
+        }
+      ]
+    },
+    {
+      "name": "CLARITY",
+      "controls": [
+        {
+          "param": "Band Sensitivity",
+          "widget": "knob"
+        },
+        {
+          "param": "Voice Threshold",
+          "widget": "knob"
+        },
+        {
+          "param": "Spectral Smoothing",
+          "widget": "knob"
+        },
+        {
+          "param": "Unvoiced Mix",
+          "widget": "knob"
+        },
+        {
+          "param": "Carrier EQ",
+          "widget": "knob"
+        },
+        {
+          "param": "Band Spread",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "DYNAMICS",
+      "controls": [
+        {
+          "param": "Spectral Tilt",
+          "widget": "knob"
+        },
+        {
+          "param": "Low Band Time",
+          "widget": "knob"
+        },
+        {
+          "param": "High Band Time",
+          "widget": "knob"
+        },
+        {
+          "param": "Dynamic Range",
+          "widget": "knob"
+        },
+        {
+          "param": "Stereo Width",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "FX",
+      "controls": [
+        {
+          "widget": "text",
+          "text": "POST VOCODER EFFECTS"
+        },
+        {
+          "param": "Saturation",
+          "widget": "knob"
+        },
+        {
+          "param": "Chorus Mix",
+          "widget": "fader"
+        },
+        {
+          "param": "Chorus Rate",
+          "widget": "knob"
+        },
+        {
+          "param": "Chorus Depth",
+          "widget": "knob"
+        },
+        {
+          "widget": "text",
+          "text": "ZERO MIX = ORIGINAL SOUND"
+        },
+        {
+          "param": "Band Profile",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Profile Amount",
+          "widget": "fader"
+        },
+        {
+          "param": "Voice Character",
+          "widget": "knob"
+        },
+        {
+          "param": "Ring Mix",
+          "widget": "fader"
+        },
+        {
+          "param": "Ring Frequency",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "HELP",
+      "controls": [
+        {
+          "widget": "text",
+          "text": "VOCKIT FX / SETUP GUIDE"
+        },
+        {
+          "widget": "text",
+          "text": "INTERNAL: FX ON VOICE TRACK"
+        },
+        {
+          "widget": "text",
+          "text": "MODE INTERNAL / MIX 100%"
+        },
+        {
+          "widget": "text",
+          "text": "JURA: PAN LEFT / VOICE RIGHT"
+        },
+        {
+          "widget": "text",
+          "text": "BOTH TRACKS TO SUBMIX 1"
+        },
+        {
+          "widget": "text",
+          "text": "FX ONLY ON SUBMIX 1"
+        },
+        {
+          "widget": "text",
+          "text": "MODE L CARRIER / R VOICE"
+        },
+        {
+          "widget": "text",
+          "text": "MIC: INPUT MONITOR ON"
+        },
+        {
+          "widget": "text",
+          "text": "USE HEADPHONES WITH MIC"
+        },
+        {
+          "widget": "text",
+          "text": "BRIGHT CARRIER FOR CLARITY"
+        },
+        {
+          "widget": "text",
+          "text": "SHORT RELEASE FOR FAST RAP"
+        },
+        {
+          "widget": "text",
+          "text": "NO REVERB BEFORE VOCKIT"
+        },
+        {
+          "widget": "text",
+          "text": "PRESETS: MPC TOP MENU"
+        },
+        {
+          "widget": "text",
+          "text": "HTTPS://MPCTOOLKIT.COM"
+        }
+      ]
+    }
+  ],
+  "style": {
+    "background": "ff111a25",
+    "accent": "ffffb84d",
+    "text": "fff1f5f9",
+    "muted": "ff9fb0c3"
+  }
+}
