@@ -325,6 +325,36 @@
       ]
     },
     {
+      "name": "PADS",
+      "controls": [
+        {
+          "param": "Pad Audio Input",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Pad Base Note",
+          "widget": "knob"
+        },
+        {
+          "widget": "text",
+          "text": "MIC LEFT / PILOT TONES RIGHT"
+        },
+        {
+          "widget": "text",
+          "text": "A02-A05: FOUR TEST NOTES"
+        },
+        {
+          "widget": "text",
+          "text": "PILOT: 750 1000 1250 1500 HZ"
+        },
+        {
+          "widget": "text",
+          "text": "KEEP PILOTS OUT OF VOCODER VOICE"
+        }
+      ]
+    },
+    {
       "name": "STEP1",
       "controls": [
         {
