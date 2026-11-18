@@ -103,3 +103,8 @@ Suggested test:
 3. Route MIDI notes to the VocKit instance *if the MPC host exposes it as a MIDI destination*.
 4. Play C3, E3, G3 and release notes. Check pitch, note-off silence and project save/reload.
 5. If the MPC does not expose VocKit as a MIDI destination, this is a host-routing limitation, **not** evidence that MIDI notes reach the FX plugin. Continue using Fixed Pitch until a supported routing solution is implemented.
+
+## Fixed Pitch note selection — 0.6.4
+The MIDI page now displays **Pitch** and **Octave** directly alongside **Carrier Note Mode**. In **Fixed Pitch** mode, use Pitch to choose the internal carrier's MIDI note number (36–84), and Octave to transpose it (-2 to +2). Example: MIDI note 60 is middle C (C4 in scientific pitch notation; octave labels may differ on MPC).
+
+**MIDI Notes is experimental:** MIDI event parsing is implemented in VocKit, but the standalone MPC may not deliver MIDI events to an insert effect. If the MPC does not offer VocKit as a MIDI destination, select Fixed Pitch and set the note manually. This is a host-routing limitation, not something the Pitch control fixes. A dedicated MIDI-playable instrument/carrier plugin may be needed for sequenced melodies. Do not claim MIDI-pad playing works without a hardware test.
