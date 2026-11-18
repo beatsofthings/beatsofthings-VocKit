@@ -161,6 +161,11 @@
       "name": "SYNTH+",
       "controls": [
         {
+          "param": "Carrier Note Mode",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
           "param": "Unison Voices",
           "widget": "slider",
           "overlay": "menu"
@@ -190,11 +195,6 @@
         {
           "param": "Filter Env Amount",
           "widget": "knob"
-        },
-        {
-          "param": "Carrier Note Mode",
-          "widget": "slider",
-          "overlay": "menu"
         }
       ]
     },
