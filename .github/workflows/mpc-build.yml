@@ -35,7 +35,7 @@ jobs:
           assert len(programs)>=35, ("Expected at least 35 factory programs",len(programs))
           for index, program in enumerate(programs):
               values=[v.strip() for v in program.split(",")]
-              assert len(values)==124, (index, len(values))
+              assert len(values)==123, (index, len(values))
               assert all(re.fullmatch(r'-?(?:\d+\.?\d*|\.\d+)f',v) for v in values), index
           print("Validated",len(programs),"complete factory programs")
           PY
