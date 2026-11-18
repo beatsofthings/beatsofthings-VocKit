@@ -1,0 +1,70 @@
+{
+  "kit": {
+    "theme": "amber",
+    "accent": "FFFFB84D"
+  },
+  "pages": [
+    {
+      "name": "OSC",
+      "controls": [
+        {
+          "param": "Waveform",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Level",
+          "widget": "knob"
+        },
+        {
+          "param": "Unison",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Detune",
+          "widget": "knob"
+        },
+        {
+          "param": "Sub",
+          "widget": "knob"
+        },
+        {
+          "param": "Octave",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "SHAPE",
+      "controls": [
+        {
+          "param": "Attack",
+          "widget": "knob"
+        },
+        {
+          "param": "Release",
+          "widget": "knob"
+        },
+        {
+          "param": "Cutoff",
+          "widget": "knob"
+        },
+        {
+          "param": "Resonance",
+          "widget": "knob"
+        },
+        {
+          "param": "Drive",
+          "widget": "knob"
+        }
+      ]
+    }
+  ],
+  "style": {
+    "background": "ff111a25",
+    "accent": "ffffb84d",
+    "text": "fff1f5f9",
+    "muted": "ff9fb0c3"
+  }
+}
