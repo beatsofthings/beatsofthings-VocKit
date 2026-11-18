@@ -10,7 +10,7 @@ class VocKitCarrier final : public mpc::Plugin {
  std::array<bool,128> held_{};
  std::array<float,8> phase_{};
  float subPhase_=0.f,env_=0.f,filter_=0.f,sr_=44100.f;
- int active_=-1;
+ int active_=-1,lastNote_=60;
  static float clip(float x,float lo,float hi){return std::max(lo,std::min(x,hi));}
  static mpc::PluginInfo info(){
   mpc::PluginInfo i;i.name="VocKit Carrier";i.vendor="Beats of Things";
@@ -37,7 +37,7 @@ public:
   addProgram("Dark Robot", {0.f,60.f,5.f,130.f,42.f,15.f,1.f,13.f,20.f,15.f,-1.f});
  }
  void prepare(double sr,int) override {sr_=float(sr);reset();}
- void reset() override {held_.fill(false);phase_.fill(0.f);subPhase_=env_=filter_=0.f;active_=-1;}
+ void reset() override {held_.fill(false);phase_.fill(0.f);subPhase_=env_=filter_=0.f;active_=-1;lastNote_=60;}
  void process(mpc::ProcessContext& ctx) override {
   int event=0;
   const int count=std::max(0,ctx.numMidiEvents);
@@ -50,7 +50,7 @@ public:
    while(ctx.midi&&event<count&&ctx.midi[event].sampleOffset<=n){
     const auto& m=ctx.midi[event++];
     if(m.isAllNotesOff()){held_.fill(false);active_=-1;}
-    else if(m.isNoteOn()&&m.note()<128){held_[m.note()]=true;active_=m.note();}
+    else if(m.isNoteOn()&&m.note()<128){held_[m.note()]=true;active_=m.note();lastNote_=active_;}
     else if(m.isNoteOff()&&m.note()<128){held_[m.note()]=false;if(active_==m.note())chooseHeld();}
    }
    const float target=active_>=0?1.f:0.f;
@@ -58,7 +58,7 @@ public:
    env_=coeff*env_+(1.f-coeff)*target;
    float value=0.f;
    if(active_>=0||env_>1e-5f){
-    const float hz=440.f*std::pow(2.f,(float(std::max(0,active_))+octave*12.f-69.f)/12.f);
+    const float hz=440.f*std::pow(2.f,(float(active_>=0?active_:lastNote_)+octave*12.f-69.f)/12.f);
     for(int u=0;u<voices;++u){
      const float cents=voices==1?0.f:detune*(2.f*float(u)/float(voices-1)-1.f);
      phase_[u]+=hz*std::pow(2.f,cents/1200.f)/sr_;
