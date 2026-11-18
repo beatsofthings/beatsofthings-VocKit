@@ -89,3 +89,17 @@ The internal carrier is independent of the external JURA audio. Select **Interna
 
 ### Compatibility and release status
 All newly added parameters default to their neutral settings in the 35 factory programs. Keep a backup of your previous working version and MPC projects. This is an experimental build: verify project persistence, DSP stability, CPU load, GUI controls and Q-Link mapping on actual MPC hardware before distributing it as a release.
+
+## MIDI-controlled internal carrier — experimental (0.6.1)
+The **SYNTH+** page includes **Carrier Note Mode**:
+- **Fixed Pitch** (default): legacy internal carrier controlled by the Pitch parameter.
+- **MIDI Notes**: monophonic note input, last received note takes priority. Note Off releases the carrier; held notes fall back to the highest held note. MIDI note events are handled at their sample offsets.
+
+**Important host limitation:** The DSP can accept MIDI events delivered to the plugin, but the MPC standalone host may not route pad or MIDI-track note events to an *insert FX plugin*. This must be verified on the actual MPC Live III. The feature does not convert VocKit into an MPC instrument and does not yet provide independent polyphonic notes.
+
+Suggested test:
+1. Back up the working VocKit plugin and project.
+2. Insert VocKit on a microphone audio track; select **Internal** and **Carrier Note Mode: MIDI Notes**.
+3. Route MIDI notes to the VocKit instance *if the MPC host exposes it as a MIDI destination*.
+4. Play C3, E3, G3 and release notes. Check pitch, note-off silence and project save/reload.
+5. If the MPC does not expose VocKit as a MIDI destination, this is a host-routing limitation, **not** evidence that MIDI notes reach the FX plugin. Continue using Fixed Pitch until a supported routing solution is implemented.
