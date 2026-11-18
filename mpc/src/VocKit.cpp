@@ -12,7 +12,13 @@ public:
  static mpc::PluginInfo makeInfo(){
    mpc::PluginInfo i;
    i.name="VocKit";i.vendor="Beats of Things";i.uniqueId=MPC_FOURCC('B','t','V','K');
-   i.version=1100;i.isInstrument=false;i.wantsMidi=true;i.numInputs=2;i.numOutputs=2;return i;
+#ifdef VOcKIT_HYBRID
+   i.name="VocKit Hybrid";i.uniqueId=MPC_FOURCC('B','t','V','H');
+   i.version=1000;i.isInstrument=true;i.wantsMidi=true;i.numInputs=2;i.numOutputs=2;
+#else
+   i.version=1100;i.isInstrument=false;i.wantsMidi=true;i.numInputs=2;i.numOutputs=2;
+#endif
+   return i;
  }
  VocKit():mpc::Plugin(makeInfo()){
    addParam(mpc::floatParam("level","Level",0.f,100.f,80.f,"%",0));
@@ -195,11 +201,18 @@ public:
      band*=1.f+character*(i<7?-.14f:(i<17?.12f:-.10f));
      voc_.setBandLevel(i,band);
    }
-   const float* l=ctx.inputs[0];
-   const float* r=ctx.numInputs>1?ctx.inputs[1]:l;
+   // Some MPC instrument hosts may provide zero audio inputs despite the
+   // declared stereo input bus. Never dereference absent buffers.
+   const float* l=(ctx.numInputs>0 && ctx.inputs)?ctx.inputs[0]:nullptr;
+   const float* r=(ctx.numInputs>1 && ctx.inputs)?ctx.inputs[1]:l;
    float* ol=ctx.outputs[0];float* orr=ctx.numOutputs>1?ctx.outputs[1]:ol;
    int midiIndex=0;
-   const int noteMode=getInt(MidiCarrierMode);
+   int noteMode=getInt(MidiCarrierMode);
+#ifdef VOcKIT_HYBRID
+   // Hybrid is a true instrument: prefer MIDI notes for its internal carrier.
+   // Existing FX keeps its user-selected carrier mode.
+   if(noteMode==0)noteMode=1;
+#endif
    const bool seqEnabled=getInt(SeqEnable)==1 && mode==0 && ctx.transport.valid && ctx.transport.ppqValid && ctx.transport.playing;
    const int seqLen=std::max(1,std::min(16,int(std::round(get(SeqLength)))));
    const double stepsPerQuarter=std::pow(2.0,double(getInt(SeqDivision)));
@@ -260,7 +273,7 @@ public:
        if(midiActive_>=0)voc_.setFrequency(440.f*std::pow(2.f,(float(midiActive_)-69.f)/12.f));
      } else if(n==0){voc_.setGate(true);midiHeld_.fill(false);midiActive_=-1;}
 
-     float dryL=l[n],dryR=r[n];
+     float dryL=l?l[n]:0.f,dryR=r?r[n]:0.f;
      // Diagnostic tone proves MIDI delivery independently of mic/vocoder routing.
      // Only active when explicitly selected on the MIDI page.
      if(noteMode==2 && mode==0){
