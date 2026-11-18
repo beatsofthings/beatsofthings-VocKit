@@ -59,3 +59,33 @@ VocKit — BeatsOfThings. Unofficial third-party MPC plugin; not affiliated with
 - **Ring Mix** blends the vocoder output with a metallic, amplitude-modulated version; 0% is bypass.
 - **Ring Frequency** sets the modulation oscillator from 10 to 1000 Hz. Try 50–120 Hz for a vintage robot texture, or higher values for metallic effects.
 - Ring modulation is not pitch correction and can reduce speech intelligibility at high mix settings.
+
+## Live Microphone + JURA (verified on MPC Live III)
+1. Route the microphone audio track and JURA instrument track to the same submix (for example Submix 1).
+2. Pan the microphone fully **left** and JURA fully **right**.
+3. Insert VocKit on the submix and select **R Carrier / L Voice**.
+4. On the microphone audio track, set monitoring to **IN**, not AUTO. This keeps microphone monitoring active while the JURA track is selected for pad playing.
+5. Select JURA to play the pads while speaking into the microphone. Start with low output levels to avoid feedback.
+
+## Internal Carrier Synth — 0.6.0 Preview
+The internal carrier is independent of the external JURA audio. Select **Internal** under Input Mode.
+
+- **OSC page:** choose the primary oscillator wave, pitch, chord, detune, OSC 2 wave/level/semitone, sub oscillator, noise and LFO.
+- **CARRIER page:** Pulse Width, PWM Depth, PWM Rate, OSC 2 Blend, Carrier Drive and Noise Color.
+- **SYNTH+ page:** Unison Voices (1–8), Unison Detune, OSC 3 Wave, OSC 3 Level, OSC 3 Semitone, Filter Mode (lowpass/highpass/bandpass), Filter Env Amount.
+- **FILTER page:** Filter Cutoff and Resonance, Synth Attack/Release. The new filter envelope amount currently uses the existing Synth Attack and Synth Release controls; a dedicated four-stage filter ADSR is not yet implemented.
+- **CLARITY / DYNAMICS pages:** Band Sensitivity, Voice Threshold, Spectral Smoothing, Unvoiced Mix, Carrier EQ, Band Spread, Spectral Tilt, Low/High Band Time, Dynamic Range and Stereo Width.
+- **BAND1 / BAND2:** 24 individual band level controls.
+- **FX:** Saturation, Ring Modulation, Stereo Chorus, Band Profile and Voice Character.
+
+### Internal carrier sound recipes
+**Classic Robot:** Saw/Pulse primary, Unison Voices 1, OSC 3 Level 0, Filter Mode Lowpass, Carrier Drive 0. Start from the original Robot Voice preset.
+
+**Electro Funk:** Saw/Pulse, Unison Voices 3, Unison Detune 8 ct, OSC 3 Wave Pulse, OSC 3 Level 20%, OSC 3 Semitone +12, Pulse Width 35%, PWM Depth 10%, PWM Rate 0.5 Hz.
+
+**Soft Choir:** Triangle primary, Unison Voices 4, Unison Detune 6 ct, OSC 3 Wave Sine, OSC 3 Level 20%, low Filter Resonance, moderate Chorus Mix.
+
+**Dark Machine:** Saw primary, Unison Voices 2, Unison Detune 12 ct, OSC 3 Wave Saw, OSC 3 Level 25%, OSC 3 Semitone -12, moderate Carrier Drive.
+
+### Compatibility and release status
+All newly added parameters default to their neutral settings in the 35 factory programs. Keep a backup of your previous working version and MPC projects. This is an experimental build: verify project persistence, DSP stability, CPU load, GUI controls and Q-Link mapping on actual MPC hardware before distributing it as a release.
