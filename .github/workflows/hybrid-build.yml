@@ -1,0 +1,130 @@
+name: Build VocKit Hybrid instrument test
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'mpc-hybrid/**'
+      - 'src/**'
+      - '.github/workflows/hybrid-build.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get official SDK
+        run: git clone --depth 1 https://github.com/inmusic-software/mpc-plugin-builder-sdk.git sdk
+      - name: Install toolchain
+        run: python -m pip install ziglang Pillow
+      - name: Install VocKit source into SDK
+        run: |
+          mkdir -p sdk/plugins/VocKitHybrid/src
+          cp mpc-hybrid/plugin.json mpc-hybrid/ui.json mpc-hybrid/README.md sdk/plugins/VocKitHybrid/
+          cp mpc-hybrid/src/VocKitHybrid.cpp src/Vocoder.hpp src/SpectralVocoder.hpp src/PostFx.hpp src/SpectrumSnapshot.hpp sdk/plugins/VocKitHybrid/src/
+          # Safety rollback: the custom TUI produced a blank MPC screen.
+          # Keep custom skin sources in Git, but use the proven ui.json generator.
+      - name: Patch SDK UI generator (vertical bands + English help)
+        run: python mpc/patch_generated_ui.py sdk/tools/gen_ui.py
+      - name: Check factory preset numeric literals
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          source=Path("mpc-hybrid/src/VocKitHybrid.cpp").read_text()
+          assert "NaNf" not in source, "Factory preset contains invalid NaNf literal"
+          programs=re.findall(r'addProgram\("[^"]+", \{([^}]*)\}\);', source)
+          assert len(programs)>=35, ("Expected at least 35 factory programs",len(programs))
+          for index, program in enumerate(programs):
+              values=[v.strip() for v in program.split(",")]
+              assert len(values)==123, (index, len(values))
+              assert all(re.fullmatch(r'-?(?:\d+\.?\d*|\.\d+)f',v) for v in values), index
+          print("Validated",len(programs),"complete factory programs")
+          PY
+      - name: Build ARM and native
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          python sdk/tools/build.py sdk/plugins/VocKitHybrid --target all
+      - name: Render parameter-linked filter and envelope graphics
+        run: |
+          set -euo pipefail
+          SKIN=$(find sdk/plugins/VocKitHybrid/build -type f -name TUI.json -printf '%h\n' | grep 'Plugin Skins' | head -n 1)
+          test -n "$SKIN"
+          python mpc/generate_graphics.py "$SKIN"
+          for file in osc_panels.png filter_sections.png help_columns.png vockit_logo.png vockit_vintage_background.png fx_sections.png; do test -s "$SKIN/$file"; done
+      - name: Validate
+        run: python sdk/tools/validate.py sdk/plugins/VocKitHybrid
+      - name: Verify visible vertical bands and English help in generated TUI
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          files=list(pathlib.Path("sdk/plugins/VocKitHybrid/build").rglob("TUI.json"))
+          assert files, "TUI.json missing"
+          t=next((json.loads(p.read_text()) for p in files if "Plugin Skins" in str(p)), None)
+          assert t, "Packaged TUI missing"
+          tabs={x["tabName"]:x for x in t["pageData"]["tabs"]}
+          assert "HELP" in tabs and "BAND1" in tabs and "BAND2" in tabs
+          voice=tabs["VOICE"]["componentDefinition"]["componentsData"]
+          assert any("Audio Monitor" in str(item) for item in voice), "Audio Monitor missing from VOICE UI"
+          params=json.loads(pathlib.Path("sdk/plugins/VocKitHybrid/build/params.json").read_text())
+          assert "Audio Monitor" in str(params), "Audio Monitor parameter missing from binary"
+          for name in ("BAND1","BAND2"):
+              controls=tabs[name]["componentDefinition"]["componentsData"]
+              assert sum(x["componentData"]["type"]=="vockitVerticalBand" for x in controls)==12, name
+          qfiles=list(pathlib.Path("sdk/plugins/VocKitHybrid/build").rglob("Q-Links.json"))
+          q=json.loads(next(p for p in qfiles if "Plugin Skins" in str(p)).read_text())
+          for page,first in (("BAND1",19),("BAND2",31)):
+              tab_index=next(i for i,t in enumerate(t["pageData"]["tabs"],1) if t["tabName"]==page)
+              mapping=next(m["Q-Links"] for m in q["Screen Mode Q-Links"]["map"] if m["Tab"]==tab_index)
+              assert [mapping["Q-Link "+str(i)] for i in range(1,13)]==list(range(first,first+12)), page
+          help_controls=tabs["HELP"]["componentDefinition"]["componentsData"]
+          texts=[x["componentData"]["data"].get("text","") for x in help_controls]
+          assert len(texts)>=39 and any("mpctoolkit.com" in x for x in texts), texts
+          assert any("24-BAND SPECTRAL MIXER" in x for x in texts), texts
+          assert any("SYNTH / SOUND RECIPES" in x for x in texts), texts
+          fx_controls=tabs["FX"]["componentDefinition"]["componentsData"]
+          fx_names=[x["componentData"]["name"] for x in fx_controls]
+          for name in ("Saturation","Chorus Mix","Chorus Rate","Chorus Depth","Band Profile","Profile Amount","Voice Character","Ring Mix","Ring Frequency"):
+              assert name in fx_names, "Missing grouped FX control: "+name
+          assert any(x["componentData"]["data"].get("image")=="fx_sections.png" for x in fx_controls if x["componentData"]["type"]=="Image"), "FX panel background missing"
+          filter_controls=tabs["FILTER"]["componentDefinition"]["componentsData"]
+          names=[x["componentData"]["name"] for x in filter_controls]
+          for name in ("Filter Cutoff","Resonance","Synth Attack","Synth Release","Attack","Release"):
+              assert name in names, "Missing filter/envelope control: "+name
+          assert any(x["componentData"]["data"].get("image")=="filter_sections.png" for x in filter_controls if x["componentData"]["type"]=="Image"), "Filter section background missing"
+          assert not any(x["componentData"]["data"].get("image") in ("filter_response.png","synth_envelope.png") for x in filter_controls if x["componentData"]["type"]=="Image"), "Old static diagrams remain"
+          print("Band layouts, HELP and grouped filter/envelope controls verified")
+          PY
+      - name: Run host simulator
+        run: |
+          set -euo pipefail
+          SIM=sdk/.sdk-tools/host_sim
+          NATIVE=$(find sdk/plugins/VocKitHybrid/build/native -maxdepth 1 -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) | head -n 1)
+          test -n "$NATIVE"
+          "$SIM" "$NATIVE" test --seconds 3 --wav sdk/plugins/VocKitHybrid/build/test.wav
+      - name: Prepare installable plugin archive
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          find sdk/plugins/VocKitHybrid/build -name 'version.xml' -print
+          PLUGIN=$(find sdk/plugins/VocKitHybrid/build -type f -name version.xml -printf '%h\n' | head -n 1)
+          test -n "$PLUGIN"
+          test -f "$PLUGIN/plugin.json"
+          test -d "$PLUGIN/VST"
+          test -d "$PLUGIN/Plugin Skins"
+          test -f "$PLUGIN/Plugin Skins/TUI.json"
+          test -f "$PLUGIN/Plugin Skins/Q-Links.json"
+          cp mpc-hybrid/README.md "$PLUGIN/INSTALL_EN.md"
+          cp mpc/FACTORY_SOUNDS_EN.md "$PLUGIN/FACTORY_SOUNDS_EN.md"
+          python mpc/make_pad_pilots.py
+          mkdir -p "$PLUGIN/PAD_PILOTS_TEST"
+          cp pad-pilots/*.wav "$PLUGIN/PAD_PILOTS_TEST/"
+          cp mpc/PAD_AUDIO_TEST_EN.md "$PLUGIN/PAD_PILOTS_TEST/README_EN.md"
+          test -s "$PLUGIN/INSTALL_EN.md"
+          test -s "$PLUGIN/FACTORY_SOUNDS_EN.md"
+          test -s "$PLUGIN/Plugin Skins/vockit_vintage_background.png"
+          # Verify that generated skin files are included in the install archive.
+          (cd "$(dirname "$PLUGIN")" && zip -qr "$GITHUB_WORKSPACE/dist/VocKit-Hybrid-MPC-install.zip" "$(basename "$PLUGIN")")
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: VocKit-Hybrid-MPC-install
+          path: dist/VocKit-Hybrid-MPC-install.zip
