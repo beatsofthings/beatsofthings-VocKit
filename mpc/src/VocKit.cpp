@@ -323,7 +323,6 @@ private:
  }
  std::array<float,512> pilotRing_{};
  int pilotWrite_=0,pilotCounter_=0,pilotActive_=-1;
- int lastRecordedKey_=-1;
  vockit::Vocoder voc_;vockit::PostFx post_;
  vockit::SpectrumSnapshot spectrumSnapshot_;
  float sr_=44100.f,midiTestPhase_=0.f;
