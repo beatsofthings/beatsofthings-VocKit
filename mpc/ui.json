@@ -225,6 +225,111 @@
       ]
     },
     {
+      "name": "SEQ",
+      "controls": [
+        {
+          "param": "Sequencer",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Seq Rate",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Seq Length",
+          "widget": "knob"
+        },
+        {
+          "widget": "text",
+          "text": "MPC PLAY / STOP CONTROLS SEQUENCE"
+        },
+        {
+          "widget": "text",
+          "text": "0-35 REST / 36-84 NOTE"
+        },
+        {
+          "widget": "text",
+          "text": "STEPS SAVE WITH PROJECT"
+        }
+      ]
+    },
+    {
+      "name": "STEP1",
+      "controls": [
+        {
+          "param": "Step 01 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 02 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 03 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 04 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 05 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 06 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 07 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 08 Note",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "STEP2",
+      "controls": [
+        {
+          "param": "Step 09 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 10 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 11 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 12 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 13 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 14 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 15 Note",
+          "widget": "knob"
+        },
+        {
+          "param": "Step 16 Note",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
       "name": "FILTER",
       "controls": [
         {
