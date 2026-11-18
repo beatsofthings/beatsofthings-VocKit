@@ -158,6 +158,42 @@
       ]
     },
     {
+      "name": "SYNTH+",
+      "controls": [
+        {
+          "param": "Unison Voices",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Unison Detune",
+          "widget": "knob"
+        },
+        {
+          "param": "OSC 3 Wave",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "OSC 3 Level",
+          "widget": "knob"
+        },
+        {
+          "param": "OSC 3 Semitone",
+          "widget": "knob"
+        },
+        {
+          "param": "Filter Mode",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Filter Env Amount",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
       "name": "FILTER",
       "controls": [
         {
