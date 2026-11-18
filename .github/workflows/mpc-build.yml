@@ -114,6 +114,10 @@ jobs:
           test -f "$PLUGIN/Plugin Skins/Q-Links.json"
           cp mpc/INSTALL_EN.md "$PLUGIN/INSTALL_EN.md"
           cp mpc/FACTORY_SOUNDS_EN.md "$PLUGIN/FACTORY_SOUNDS_EN.md"
+          python mpc/make_pad_pilots.py
+          mkdir -p "$PLUGIN/PAD_PILOTS_TEST"
+          cp pad-pilots/*.wav "$PLUGIN/PAD_PILOTS_TEST/"
+          cp mpc/PAD_AUDIO_TEST_EN.md "$PLUGIN/PAD_PILOTS_TEST/README_EN.md"
           test -s "$PLUGIN/INSTALL_EN.md"
           test -s "$PLUGIN/FACTORY_SOUNDS_EN.md"
           test -s "$PLUGIN/Plugin Skins/vockit_vintage_background.png"
