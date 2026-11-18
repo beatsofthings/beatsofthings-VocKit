@@ -1,0 +1,15 @@
+{
+  "name": "VocKit Hybrid",
+  "manufacturer": "Beats of Things",
+  "version": "0.1.0",
+  "format": "vst2",
+  "kind": "instrument",
+  "uid": "BtVH",
+  "numInputs": 2,
+  "numOutputs": 2,
+  "category": "Instrument",
+  "file32": "VST/vockit-arm32.so",
+  "file64": "VST/vockit-arm64.so",
+  "description": "Experimental all-in-one MIDI instrument with existing VocKit vocoder DSP and live audio input test",
+  "license": "MIT"
+}
