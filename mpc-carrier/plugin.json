@@ -1,11 +1,11 @@
 {
-  "name": "VocKit Carrier",
+  "name": "VocKit Synth",
   "manufacturer": "Beats of Things",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "format": "vst2",
   "kind": "instrument",
   "uid": "BtVC",
   "numInputs": 0,
   "numOutputs": 2,
-  "description": "MIDI-playable carrier synthesizer for VocKit FX"
+  "description": "Original VocKit carrier synth engine as MIDI-playable instrument for VocKit FX"
 }
