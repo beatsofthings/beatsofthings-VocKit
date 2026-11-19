@@ -11,7 +11,7 @@ class VocKitCarrier final:public mpc::Plugin {
    Osc3Wave,Osc3Level,Osc3Semi,Unison,UnisonDetune,
    Cutoff,Resonance,FilterMode,FilterEnv,SynthAttack,SynthRelease,
    LfoShape,LfoRate,LfoDepth,Drive,NoiseColor,AmpDecay,AmpSustain,FilterAttack,FilterDecay,FilterSustain,FilterRelease,PolyVoices,ArpMode,ArpRate,ArpGate,ChorusMix,ChorusRate,DelayMix,DelayTime,DelayFeedback,NumParams};
- struct Voice{vockit::Vocoder synth;int note=-1;bool held=false;float amp=0.f;float filt=0.f;unsigned age=0;};
+ struct Voice{vockit::Vocoder synth;int note=-1;bool held=false;float amp=0.f;float filt=0.f;int ampStage=0,filterStage=0;unsigned age=0;};
  std::array<Voice,8> voices_{};
  std::array<bool,128> held_{};
  unsigned age_=0;
@@ -31,7 +31,7 @@ class VocKitCarrier final:public mpc::Plugin {
      if(!voices_[i].held && voices_[i].amp<.001f){slot=i;break;}
      if(voices_[i].age<oldest){oldest=voices_[i].age;slot=i;}
    }
-   auto& v=voices_[slot];v.note=note;v.held=true;v.age=++age_;v.amp=0.f;v.filt=0.f;
+   auto& v=voices_[slot];v.note=note;v.held=true;v.age=++age_;v.amp=0.f;v.filt=0.f;v.ampStage=1;v.filterStage=1;
  }
  void noteOff(int note){for(auto& v:voices_)if(v.note==note)v.held=false;}
  void allOff(){held_.fill(false);for(auto& v:voices_)v.held=false;arpNote_=-1;}
@@ -124,7 +124,7 @@ public:
    addProgram("BoT Robot Lead", {85.f, 3.f, 65.f, 0.f, 0.f, 6.f, 12.f, 0.f, 28.f, 22.f, 4.f, 0.f, 22.f, 12.f, 0.f, 0.f, 3.f, 18.f, 0.f, 1.f, 6.f, 92.f, 12.f, 0.f, 0.f, 1.f, 110.f, 0.f, 4.f, 12.f, 28.f, 0.f, 180.f, 75.f, 15.f, 250.f, 35.f, 350.f, 7.f, 0.f, 2.f, 70.f, 0.f, 0.8f, 0.f, 300.f, 25.f});
  }
  void prepare(double sr,int)override{
-   sr_=float(sr);for(auto& v:voices_){v.synth.prepare(sr_);v.note=-1;v.held=false;v.amp=0.f;v.filt=0.f;}
+   sr_=float(sr);for(auto& v:voices_){v.synth.prepare(sr_);v.note=-1;v.held=false;v.amp=0.f;v.filt=0.f;v.ampStage=0;v.filterStage=0;}
    held_.fill(false);arpPhase_=0.f;arpIndex_=0;arpNote_=-1;delay_.fill(0.f);delayCursor_=0;
  }
  void reset()override{prepare(sr_,0);}
@@ -178,18 +178,23 @@ public:
      for(int i=0;i<poly;++i){
        auto& v=voices_[i];
        if(v.note<0)continue;
-       const float ampTarget=v.held?1.f:0.f;
-       const float ampTime=v.held?get(SynthAttack):get(SynthRelease);
-       const float ampCoeff=std::exp(-1000.f/(sr_*std::max(1.f,ampTime)));
-       v.amp=ampCoeff*v.amp+(1.f-ampCoeff)*ampTarget;
-       if(v.held){
-         const float decayCoeff=std::exp(-1000.f/(sr_*std::max(1.f,get(AmpDecay))));
-         v.amp=decayCoeff*v.amp+(1.f-decayCoeff)*get(AmpSustain)*.01f;
-       }
-       const float filterTarget=v.held?get(FilterSustain)*.01f:0.f;
-       const float filterMs=v.held?get(FilterDecay):get(FilterRelease);
-       const float filterCoeff=std::exp(-1000.f/(sr_*std::max(1.f,filterMs)));
-       v.filt=filterCoeff*v.filt+(1.f-filterCoeff)*filterTarget;
+       if(!v.held){v.ampStage=4;v.filterStage=4;}
+       float ampTarget=0.f,ampTime=get(SynthRelease);
+       if(v.ampStage==1){ampTarget=1.f;ampTime=get(SynthAttack);}
+       else if(v.ampStage==2){ampTarget=get(AmpSustain)*.01f;ampTime=get(AmpDecay);}
+       else if(v.ampStage==3){ampTarget=get(AmpSustain)*.01f;ampTime=1.f;}
+       const float ac=std::exp(-1000.f/(sr_*std::max(1.f,ampTime)));
+       v.amp=ac*v.amp+(1.f-ac)*ampTarget;
+       if(v.ampStage==1&&v.amp>.995f)v.ampStage=2;
+       if(v.ampStage==2&&std::fabs(v.amp-ampTarget)<.002f)v.ampStage=3;
+       float filterTarget=0.f,filterTime=get(FilterRelease);
+       if(v.filterStage==1){filterTarget=1.f;filterTime=get(FilterAttack);}
+       else if(v.filterStage==2){filterTarget=get(FilterSustain)*.01f;filterTime=get(FilterDecay);}
+       else if(v.filterStage==3){filterTarget=get(FilterSustain)*.01f;filterTime=1.f;}
+       const float fc=std::exp(-1000.f/(sr_*std::max(1.f,filterTime)));
+       v.filt=fc*v.filt+(1.f-fc)*filterTarget;
+       if(v.filterStage==1&&v.filt>.995f)v.filterStage=2;
+       if(v.filterStage==2&&std::fabs(v.filt-filterTarget)<.002f)v.filterStage=3;
        v.synth.setGate(v.held||v.amp>.0001f);
        v.synth.setFrequency(440.f*std::pow(2.f,(float(v.note)-69.f)/12.f));
        const float cutoff=std::max(0.f,std::min(1.f,get(Cutoff)*.01f+get(FilterEnv)*.01f*(v.filt-.5f)));
