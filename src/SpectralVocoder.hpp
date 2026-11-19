@@ -17,6 +17,8 @@ class SpectralVocoder {
  int cursor_=0,clock_=0;
  float sr_=44100.f,attack_=8.f,release_=90.f,formantShift_=0.f;
  float sensitivity_=1.f,smoothing_=0.f,spread_=0.f,tilt_=0.f,brightness_=0.f;
+ bool freeze_=false;
+ std::array<float,B> frozen_{};
  float lowTime_=1.f,highTime_=1.f,range_=1.f;
  static void fft(std::array<C,N>& x,bool inverse){
   for(int i=1,j=0;i<N;++i){
@@ -70,9 +72,10 @@ class SpectralVocoder {
    smooth_[j]=coeff*smooth_[j]+(1.f-coeff)*v;
    // Measured per-band voice energy, no host parameter updates.
    spectrum_[j]=smooth_[j];
-   envelope[j]=smooth_[j];
+   if(!freeze_)frozen_[j]=smooth_[j];
+   envelope[j]=freeze_?frozen_[j]:smooth_[j];
    // Zero shift follows the original gain path bit-for-bit.
-   gain[j]=std::min(12.f,smooth_[j]/std::max(.002f,c))*
+   gain[j]=std::min(12.f,envelope[j]/std::max(.002f,c))*
            std::max(0.f,bandLevels[j]);
   }
   if(spread_>0.f){
@@ -124,7 +127,7 @@ class SpectralVocoder {
 public:
  void prepare(float sr){
   sr_=std::max(8000.f,sr);voice_.fill(0);carrier_.fill(0);
-  ola_.fill(0);smooth_.fill(0);spectrum_.fill(0);cursor_=clock_=0;
+  ola_.fill(0);smooth_.fill(0);spectrum_.fill(0);frozen_.fill(0);freeze_=false;cursor_=clock_=0;
   for(int j=0;j<N;++j)window_[j]=.5f-.5f*std::cos(2.f*3.14159265358979323846f*j/N);
   for(int k=0;k<=N/2;++k){
    const float hz=std::max(80.f,float(k)*sr_/N);
@@ -140,6 +143,7 @@ public:
   brightness_=std::max(-2.f,std::min(2.f,brightness));lowTime_=std::max(.25f,std::min(4.f,lowTime));
   highTime_=std::max(.25f,std::min(4.f,highTime));range_=std::max(.5f,std::min(1.5f,range));
  }
+ void setFreeze(bool enabled){freeze_=enabled;}
  void setFormantShift(float semitones){formantShift_=std::max(-12.f,std::min(12.f,semitones));}
  float tick(float voice,float carrier,const std::array<float,B>& levels){
   const float output=ola_[clock_&(R-1)];
