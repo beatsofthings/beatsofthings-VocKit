@@ -123,36 +123,95 @@ public:
    addProgram("BoT Analog Brass", {85.f, 0.f, 38.f, 2.f, 0.f, 12.f, 0.f, 0.f, 45.f, 0.f, 0.f, 0.f, 50.f, 7.f, 0.f, 0.f, 0.f, 28.f, 0.f, 3.f, 12.f, 84.f, 25.f, 0.f, 28.f, 18.f, 260.f, 0.f, 0.f, 0.f, 15.f, 0.f, 180.f, 75.f, 15.f, 250.f, 35.f, 350.f, 7.f, 0.f, 2.f, 70.f, 0.f, 0.8f, 0.f, 300.f, 25.f});
    addProgram("BoT Robot Lead", {85.f, 3.f, 65.f, 0.f, 0.f, 6.f, 12.f, 0.f, 28.f, 22.f, 4.f, 0.f, 22.f, 12.f, 0.f, 0.f, 3.f, 18.f, 0.f, 1.f, 6.f, 92.f, 12.f, 0.f, 0.f, 1.f, 110.f, 0.f, 4.f, 12.f, 28.f, 0.f, 180.f, 75.f, 15.f, 250.f, 35.f, 350.f, 7.f, 0.f, 2.f, 70.f, 0.f, 0.8f, 0.f, 300.f, 25.f});
  }
- void prepare(double sr,int)override{sr_=float(sr);synth_.prepare(sr_);held_.fill(false);active_=-1;}
- void reset()override{synth_.prepare(sr_);held_.fill(false);active_=-1;}
+ void prepare(double sr,int)override{
+   sr_=float(sr);for(auto& v:voices_){v.synth.prepare(sr_);v.note=-1;v.held=false;v.amp=0.f;v.filt=0.f;}
+   held_.fill(false);arpPhase_=0.f;arpIndex_=0;arpNote_=-1;delay_.fill(0.f);delayCursor_=0;
+ }
+ void reset()override{prepare(sr_,0);}
  void process(mpc::ProcessContext& ctx)override{
-   synth_.setWet(1.f);synth_.setChord(getInt(Chord));
-   synth_.setWaveform(getInt(Waveform));synth_.setTone(get(Tone)*.01f);
-   synth_.setDetune(get(Detune));synth_.setSubLevel(get(Sub)*.01f);
-   synth_.setNoiseLevel(get(Noise)*.01f);synth_.setOctave(int(std::round(get(Octave))));
-   synth_.setLfo(getInt(LfoShape),get(LfoRate),get(LfoDepth));
-   synth_.setOsc2(getInt(Osc2Wave),get(Osc2Level)*.01f,get(Osc2Semi),get(Osc2Detune));
-   synth_.setCarrierAdvanced(getInt(Unison)+1,get(UnisonDetune),getInt(Osc3Wave),
-      get(Osc3Level)*.01f,get(Osc3Semi),getInt(FilterMode),get(FilterEnv)*.01f);
-   synth_.setCarrierDesign(get(PulseWidth)*.01f,get(PwmDepth)*.01f,get(PwmRate),
-      get(OscBlend)*.01f,get(Drive)*.01f,get(NoiseColor)*.01f);
-   synth_.setCarrierFilter(get(Cutoff)*.01f,get(Resonance)*.01f);
-   synth_.setSynthEnvelope(get(SynthAttack),get(SynthRelease));
+   for(auto& v:voices_){
+     auto& e=v.synth;
+     e.setWet(1.f);e.setChord(getInt(Chord));e.setWaveform(getInt(Waveform));
+     e.setTone(get(Tone)*.01f);e.setDetune(get(Detune));
+     e.setSubLevel(get(Sub)*.01f);e.setNoiseLevel(get(Noise)*.01f);
+     e.setOctave(int(std::round(get(Octave))));
+     e.setLfo(getInt(LfoShape),get(LfoRate),get(LfoDepth));
+     e.setOsc2(getInt(Osc2Wave),get(Osc2Level)*.01f,get(Osc2Semi),get(Osc2Detune));
+     e.setCarrierAdvanced(getInt(Unison)+1,get(UnisonDetune),getInt(Osc3Wave),
+       get(Osc3Level)*.01f,get(Osc3Semi),getInt(FilterMode),get(FilterEnv)*.01f);
+     e.setCarrierDesign(get(PulseWidth)*.01f,get(PwmDepth)*.01f,get(PwmRate),
+       get(OscBlend)*.01f,get(Drive)*.01f,get(NoiseColor)*.01f);
+     e.setSynthEnvelope(get(SynthAttack),get(SynthRelease));
+   }
    int ev=0;
    for(int n=0;n<ctx.numFrames;++n){
      while(ctx.midi&&ev<ctx.numMidiEvents&&ctx.midi[ev].sampleOffset<=n){
        const auto& m=ctx.midi[ev++];
-       if(m.isAllNotesOff()){held_.fill(false);active_=-1;}
-       else if(m.isNoteOn()&&m.note()>=0&&m.note()<128){held_[m.note()]=true;active_=m.note();}
-       else if(m.isNoteOff()&&m.note()>=0&&m.note()<128){
-         held_[m.note()]=false;if(active_==m.note())fallback();
+       if(m.isAllNotesOff())allOff();
+       else if(m.isNoteOn()&&m.note()>=0&&m.note()<128){
+         held_[m.note()]=true;if(getInt(ArpMode)==0)noteOn(m.note());
+       }else if(m.isNoteOff()&&m.note()>=0&&m.note()<128){
+         held_[m.note()]=false;if(getInt(ArpMode)==0)noteOff(m.note());
        }
      }
-     synth_.setGate(active_>=0);
-     if(active_>=0)synth_.setFrequency(440.f*std::pow(2.f,(float(active_)-69.f)/12.f));
-     const float v=synth_.tickCarrier()*get(Level)*.01f;
-     if(ctx.numOutputs>0&&ctx.outputs&&ctx.outputs[0])ctx.outputs[0][n]=v;
-     if(ctx.numOutputs>1&&ctx.outputs&&ctx.outputs[1])ctx.outputs[1][n]=v;
+     if(getInt(ArpMode)!=0){
+       int notes[128],count=0;
+       for(int k=0;k<128;++k)if(held_[k])notes[count++]=k;
+       const float bpm=ctx.transport.tempoValid?float(ctx.transport.bpm):120.f;
+       const float advance=(bpm>0.f?bpm:120.f)*float(1<<getInt(ArpRate))/(60.f*sr_);
+       arpPhase_+=advance;
+       if(count==0){if(arpNote_>=0)noteOff(arpNote_);arpNote_=-1;arpPhase_=0.f;}
+       else{
+         if(arpNote_<0||arpPhase_>=1.f){
+           if(arpNote_>=0)noteOff(arpNote_);
+           if(arpPhase_>=1.f)arpPhase_-=std::floor(arpPhase_);
+           int index=arpIndex_++%count;
+           if(getInt(ArpMode)==2)index=count-1-index;
+           if(getInt(ArpMode)==3){int period=std::max(1,2*count-2);int j=(arpIndex_-1)%period;index=j<count?j:period-j;}
+           arpNote_=notes[index];noteOn(arpNote_);
+         }
+         if(arpPhase_>get(ArpGate)*.01f&&arpNote_>=0){noteOff(arpNote_);arpNote_=-1;}
+       }
+     }
+     float sum=0.f;
+     const int poly=getInt(PolyVoices)+1;
+     for(int i=0;i<poly;++i){
+       auto& v=voices_[i];
+       if(v.note<0)continue;
+       const float ampTarget=v.held?1.f:0.f;
+       const float ampTime=v.held?get(SynthAttack):get(SynthRelease);
+       const float ampCoeff=std::exp(-1000.f/(sr_*std::max(1.f,ampTime)));
+       v.amp=ampCoeff*v.amp+(1.f-ampCoeff)*ampTarget;
+       if(v.held){
+         const float decayCoeff=std::exp(-1000.f/(sr_*std::max(1.f,get(AmpDecay))));
+         v.amp=decayCoeff*v.amp+(1.f-decayCoeff)*get(AmpSustain)*.01f;
+       }
+       const float filterTarget=v.held?get(FilterSustain)*.01f:0.f;
+       const float filterMs=v.held?get(FilterDecay):get(FilterRelease);
+       const float filterCoeff=std::exp(-1000.f/(sr_*std::max(1.f,filterMs)));
+       v.filt=filterCoeff*v.filt+(1.f-filterCoeff)*filterTarget;
+       v.synth.setGate(v.held||v.amp>.0001f);
+       v.synth.setFrequency(440.f*std::pow(2.f,(float(v.note)-69.f)/12.f));
+       const float cutoff=std::max(0.f,std::min(1.f,get(Cutoff)*.01f+get(FilterEnv)*.01f*(v.filt-.5f)));
+       v.synth.setCarrierFilter(cutoff,get(Resonance)*.01f);
+       sum+=v.synth.tickCarrier()*v.amp;
+       if(!v.held&&v.amp<.0001f)v.note=-1;
+     }
+     const float dry=std::tanh(sum*get(Level)*.01f/std::sqrt(float(std::max(1,poly))));
+     chorusPhase_+=get(ChorusRate)/sr_;if(chorusPhase_>=1.f)chorusPhase_-=1.f;
+     const float wobble=std::sin(6.2831853f*chorusPhase_);
+     const int chorusTap=(delayCursor_-int(sr_*(.018f+.006f*wobble))+65536)&65535;
+     const float chorus=delay_[chorusTap];
+     const float cm=get(ChorusMix)*.01f;
+     const float signal=dry*(1.f-cm*.5f)+chorus*cm*.5f;
+     const int delayTap=(delayCursor_-int(std::max(1.f,std::min(65535.f,sr_*get(DelayTime)*.001f)))+65536)&65535;
+     const float echo=delay_[delayTap];
+     const float dm=get(DelayMix)*.01f;
+     const float out=signal*(1.f-dm)+echo*dm;
+     delay_[delayCursor_]=std::tanh(signal+echo*get(DelayFeedback)*.01f);
+     delayCursor_=(delayCursor_+1)&65535;
+     if(ctx.numOutputs>0&&ctx.outputs&&ctx.outputs[0])ctx.outputs[0][n]=out;
+     if(ctx.numOutputs>1&&ctx.outputs&&ctx.outputs[1])ctx.outputs[1][n]=out;
    }
  }
 };
