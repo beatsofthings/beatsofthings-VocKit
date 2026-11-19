@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - 'mpc-carrier/**'
+      - 'src/Vocoder.hpp'
+      - 'src/SpectralVocoder.hpp'
       - '.github/workflows/carrier-build.yml'
 jobs:
   build:
@@ -18,7 +20,7 @@ jobs:
         run: |
           mkdir -p sdk/plugins/VocKitCarrier/src
           cp mpc-carrier/plugin.json mpc-carrier/ui.json mpc-carrier/README.md sdk/plugins/VocKitCarrier/
-          cp mpc-carrier/src/VocKitCarrier.cpp sdk/plugins/VocKitCarrier/src/
+          cp mpc-carrier/src/VocKitCarrier.cpp src/Vocoder.hpp src/SpectralVocoder.hpp sdk/plugins/VocKitCarrier/src/
       - name: Build ARM and native
         run: |
           export PATH="$HOME/.local/bin:$PATH"
