@@ -1,28 +1,30 @@
-# VocKit Carrier — Standalone MIDI Instrument (Experimental)
+# VocKit Synth 0.2.0 — original VocKit carrier as an MPC instrument
 
-VocKit Carrier is a **separate MPC instrument plugin** designed to supply a MIDI-playable audio carrier to **VocKit FX**. It has its own plugin ID (`BtVC`) and does not replace the VocKit FX (`BtVK`).
+**Two-plugin product:**
+- **VocKit FX** is the existing 24-band vocoder with microphone/sample audio input and external carrier mode.
+- **VocKit Synth** is the original internal carrier synthesis code from `src/Vocoder.hpp`, now played by MPC MIDI pads/keyboard/sequencer.
 
-## Install
-1. Keep your working VocKit FX installation and MPC project backed up.
-2. Download the **VocKit-Carrier-MPC-install** artifact from the successful **Build VocKit Carrier MIDI instrument** workflow.
-3. Extract the complete plugin folder into the same supported VST2 Plugins directory used for other third-party MPC plugins.
-4. Restart MPC and look for **VocKit Carrier** in the **Plugin Instrument** selector, not in the FX selector.
+The synth uses the same carrier oscillator, chord, unison, three-oscillator, PWM, noise, LFO, filter and drive DSP as VocKit FX. The instrument is currently monophonic for MIDI note selection; unison and chord modes can sound multiple oscillator pitches but do not provide independently voiced polyphony.
 
-## Live microphone + melodic carrier
-1. Create an **Audio Track** with your microphone input, set monitoring to **IN** (not AUTO), and pan fully **left**.
-2. Create a **Plugin Instrument Track**, choose **VocKit Carrier**, and pan its output fully **right**.
-3. Route both tracks to **Submix 1**.
-4. Insert **VocKit FX** on Submix 1, select **R Carrier / L Voice**.
-5. Select the VocKit Carrier instrument track and play pads or an external MIDI keyboard while speaking into the mic.
-6. To sequence melodies, record MIDI notes on the instrument track. The plugin is currently **monophonic with last-note priority**; chords are not independently polyphonic yet.
-7. If the signal sounds too hot, reduce Carrier Level and VocKit input gain before adding saturation.
+## Installation
+1. Back up your working VocKit FX plugin and MPC project.
+2. Download **VocKit-Carrier-MPC-install** from the successful **Build VocKit Carrier MIDI instrument** GitHub Actions run.
+3. Extract the complete plugin directory into the MPC's supported VST2 Plugins location, and restart.
+4. Select **VocKit Synth** as a **Plugin Instrument** on a track. VocKit FX remains a separate **Insert Effect**.
 
-## Included synth controls
-Saw/Pulse/Triangle/Sine waveform, Level, Attack/Release, lowpass Cutoff, Resonance, 1–8 Unison, Detune, Sub oscillator, Drive, Octave; four starting presets: Clean Saw, Electro Pulse, Soft Choir, Dark Robot.
+## Live microphone + MIDI melody
+1. On an Audio Track select the microphone input, set monitoring to **IN**, pan hard **LEFT**.
+2. On a Plugin Instrument Track select **VocKit Synth**, pan hard **RIGHT**, and play it from MPC pads or MIDI keyboard.
+3. Send both tracks to **Submix 1**.
+4. Insert the existing **VocKit FX** on Submix 1, set **Input Mode = R Carrier / L Voice**, **Audio Monitor = Normal**, **Mix = 100%**.
+5. Speak into the microphone while holding a note on VocKit Synth. Adjust VocKit FX Carrier/Input/Level as needed.
+6. For a recorded voice sample instead of live mic, route a Drum Track playing that sample to Submix 1, panned left; keep the Synth right.
+7. Save the MPC project: MIDI notes live on the Synth's instrument track, and plugin settings are stored in each plugin's project state.
 
-## Known limitations
-- This first instrument version uses a simple oscillator and lowpass architecture, not the full VocKit FX internal synthesizer; it is a practical separate MIDI carrier prototype.
-- It does not receive microphone audio. VocKit FX handles the 24-band vocoding.
-- MIDI note-off uses a release envelope; note tracking is monophonic.
-- Build/host simulator success is not a hardware MIDI-routing or sound-quality certification.
-- Keep the previous working VocKit FX until the MPC Live III test succeeds.
+## Other carrier plugins
+Replace VocKit Synth on the carrier track with JURA, OPx-4, Mini D or any other instrument. VocKit FX routing stays the same.
+
+## Important
+- The old simplified four-wave VocKit Carrier prototype is replaced by this shared-engine instrument; use the 0.2.0 package.
+- The existing VocKit FX is NOT replaced and is still necessary for vocoding.
+- A successful CI build does not prove hardware operation. Test MIDI note-on/off, microphone/submix routing, project save/reload and output levels.
