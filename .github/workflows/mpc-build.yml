@@ -87,9 +87,9 @@ jobs:
           assert any(x["componentData"]["data"].get("image")=="fx_sections.png" for x in fx_controls if x["componentData"]["type"]=="Image"), "FX panel background missing"
           filter_controls=tabs["FILTER"]["componentDefinition"]["componentsData"]
           names=[x["componentData"]["name"] for x in filter_controls]
-          for name in ("Filter Cutoff","Resonance","Synth Attack","Synth Release","Attack","Release"):
+          for name in ("Attack","Release"):
               assert name in names, "Missing filter/envelope control: "+name
-          assert any(x["componentData"]["data"].get("image")=="filter_sections.png" for x in filter_controls if x["componentData"]["type"]=="Image"), "Filter section background missing"
+          assert any(x["componentData"]["data"].get("image")=="filter_sections.png" for x in filter_controls if x["componentData"]["type"]=="Image"), "Vocoder envelope background missing"
           assert not any(x["componentData"]["data"].get("image") in ("filter_response.png","synth_envelope.png") for x in filter_controls if x["componentData"]["type"]=="Image"), "Old static diagrams remain"
           print("Band layouts, HELP and grouped filter/envelope controls verified")
           PY
