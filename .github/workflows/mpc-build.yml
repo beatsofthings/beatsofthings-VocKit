@@ -74,7 +74,9 @@ jobs:
           for page,first in (("BAND1",19),("BAND2",31)):
               tab_index=next(i for i,t in enumerate(t["pageData"]["tabs"],1) if t["tabName"]==page)
               mapping=next(m["Q-Links"] for m in q["Screen Mode Q-Links"]["map"] if m["Tab"]==tab_index)
-              assert [mapping["Q-Link "+str(i)] for i in range(1,13)]==list(range(first,first+12)), page
+              physical_order=[4,8,12,0,3,7,11,0,2,6,10,0,1,5,9,0]
+              expected=[first+n-1 if n else -1 for n in physical_order]
+              assert [mapping["Q-Link "+str(i)] for i in range(1,17)]==expected, page
           help_controls=tabs["HELP"]["componentDefinition"]["componentsData"]
           texts=[x["componentData"]["data"].get("text","") for x in help_controls]
           assert len(texts)>=39 and any("mpctoolkit.com" in x for x in texts), texts
