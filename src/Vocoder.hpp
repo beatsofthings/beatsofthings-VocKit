@@ -104,6 +104,10 @@ public:
    }
  }
  float tick(float input){return tick(input,0.f,false);}
+ // Render the exact same carrier oscillator path used inside VocKit FX.
+ // A zero modulator is supplied only to advance the shared engine; the raw
+ // carrier is captured before FFT vocoding, so no separate synth is created.
+ float tickCarrier(){tick(0.f,0.f,false);return lastCarrier_;}
  float tick(float input,float externalCarrier,bool useExternal){
    if(!std::isfinite(input))input=0.f;
    // Oscillator pitch ratios: unison / octave / fifth / minor / major.
@@ -215,6 +219,7 @@ public:
    }
    carrier*=.42f;
    if(useExternal)carrier=std::isfinite(externalCarrier)?clamp(externalCarrier,-2.f,2.f):0.f;
+   lastCarrier_=carrier;
    // Optional modulator gate with gentle 20 ms release. Zero threshold bypasses.
    const float detector=std::fabs(input);
    const float ga=std::exp(-1.f/(sr_*.005f)),gr=std::exp(-1.f/(sr_*.020f));
@@ -236,6 +241,7 @@ public:
    for(std::size_t i=0;i<n;++i)out[i]=tick(in?in[i]:0.f);
  }
 private:
+ float lastCarrier_=0.f;
  float sr_=44100.f,freq_=110.f,wet_=1.f,attack_=8.f,release_=90.f,tone_=0.f,formant_=0.f;
  float detune_=0.f,subLevel_=0.f,noiseLevel_=0.f,detunePhase_=0.f,subPhase_=0.f;
  float osc2Phase_=0.f,osc2Level_=0.f,osc2Semi_=0.f,osc2Cents_=0.f,sibilance_=0.f;
