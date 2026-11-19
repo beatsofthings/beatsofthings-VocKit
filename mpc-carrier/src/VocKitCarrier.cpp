@@ -90,6 +90,9 @@ public:
    addProgram("LoFi Broadcast", {85.f, 3.f, 60.f, 0.f, 0.f, 0.f, 0.f, 0.f, 45.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 70.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f});
    addProgram("Whispering Synth", {85.f, 1.f, 20.f, 0.f, 35.f, 0.f, 0.f, 0.f, 45.f, 0.f, 0.f, 0.f, 12.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 100.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f});
    addProgram("Industrial Android", {85.f, 3.f, 75.f, 0.f, 0.f, 0.f, 30.f, 0.f, 45.f, 0.f, 0.f, 0.f, 22.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 100.f, 100.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f});
+   addProgram("BoT Funk Bass", {85.f, 0.f, 25.f, 0.f, 0.f, 8.f, 30.f, 0.f, 38.f, 15.f, 0.f, 0.f, 45.f, -12.f, 0.f, 0.f, 3.f, 22.f, 0.f, 2.f, 9.f, 72.f, 18.f, 0.f, 0.f, 4.f, 180.f, 0.f, 0.f, 0.f, 12.f, 0.f});
+   addProgram("BoT Analog Brass", {85.f, 0.f, 38.f, 2.f, 0.f, 12.f, 0.f, 0.f, 45.f, 0.f, 0.f, 0.f, 50.f, 7.f, 0.f, 0.f, 0.f, 28.f, 0.f, 3.f, 12.f, 84.f, 25.f, 0.f, 28.f, 18.f, 260.f, 0.f, 0.f, 0.f, 15.f, 0.f});
+   addProgram("BoT Robot Lead", {85.f, 3.f, 65.f, 0.f, 0.f, 6.f, 12.f, 0.f, 28.f, 22.f, 4.f, 0.f, 22.f, 12.f, 0.f, 0.f, 3.f, 18.f, 0.f, 1.f, 6.f, 92.f, 12.f, 0.f, 0.f, 1.f, 110.f, 0.f, 4.f, 12.f, 28.f, 0.f});
  }
  void prepare(double sr,int)override{sr_=float(sr);synth_.prepare(sr_);held_.fill(false);active_=-1;}
  void reset()override{synth_.prepare(sr_);held_.fill(false);active_=-1;}
