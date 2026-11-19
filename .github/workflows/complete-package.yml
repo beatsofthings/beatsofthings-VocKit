@@ -52,6 +52,8 @@ jobs:
           They are separate plugins. The package contains the latest successful
           build of each, which may have different source commit dates.
           EOF
+          mkdir -p bundle/Documentation
+          cp docs/VocKit-BoT-User-Guide-EN.md bundle/Documentation/USER-GUIDE-EN.md
           (cd bundle && zip -qr ../VocKit-BoT-MPC.zip .)
           unzip -t VocKit-BoT-MPC.zip | tail -n 1
       - uses: actions/upload-artifact@v4
