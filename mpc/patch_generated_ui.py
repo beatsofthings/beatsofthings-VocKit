@@ -247,8 +247,7 @@ s=s.replace(qlink_marker, '''    for ti, page in enumerate(pages):
             missing = [name for name in band_names if name not in lookup]
             if missing:
                 raise ValueError("Missing band parameters for Q-Links: " + str(missing))
-            qmap[:] = [("Q-Link %d" % q, lookup[band_names[q-1]] if q <= 12 else -1)
-                       for q in range(1, 17)]
+            # Live III physical layout: four switch positions x four knobs.\n            # Measured: position 1, knob 4 reads slot 1; knob 3 slot 5;\n            # knob 2 slot 9; knob 1 slot 13. Invert this column-major map.\n            # Positions 1/2/3: knobs 1..4 -> bands 1..4 / 5..8 / 9..12.\n            # Position 4: no assignment.\n            physical_order = [4, 8, 12, 0, 3, 7, 11, 0,\n                              2, 6, 10, 0, 1, 5, 9, 0]\n            qmap[:] = [("Q-Link %d" % q,\n                        lookup[band_names[n-1]] if n else -1)\n                       for q, n in enumerate(physical_order, 1)]
     ''' + qlink_marker)
 
 p.write_text(s)
