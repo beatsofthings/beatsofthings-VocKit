@@ -1,4 +1,4 @@
-name: Package VocKit Complete MPC
+name: Package VocKit BoT
 on:
   workflow_dispatch:
   workflow_run:
@@ -52,9 +52,9 @@ jobs:
           They are separate plugins. The package contains the latest successful
           build of each, which may have different source commit dates.
           EOF
-          (cd bundle && zip -qr ../VocKit-Complete-MPC.zip .)
-          unzip -t VocKit-Complete-MPC.zip | tail -n 1
+          (cd bundle && zip -qr ../VocKit-BoT-MPC.zip .)
+          unzip -t VocKit-BoT-MPC.zip | tail -n 1
       - uses: actions/upload-artifact@v4
         with:
-          name: VocKit-Complete-MPC
-          path: VocKit-Complete-MPC.zip
+          name: VocKit-BoT-MPC
+          path: VocKit-BoT-MPC.zip
