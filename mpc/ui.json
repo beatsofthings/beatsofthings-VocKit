@@ -233,6 +233,41 @@
       ]
     },
     {
+      "name": "DESIGN",
+      "controls": [
+        {
+          "param": "Voice Designer",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Spectral Freeze",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Formant Shift",
+          "widget": "knob"
+        },
+        {
+          "param": "Consonant Clarity",
+          "widget": "knob"
+        },
+        {
+          "param": "Voice Character",
+          "widget": "knob"
+        },
+        {
+          "widget": "text",
+          "text": "FREEZE CAPTURES 24-BAND VOICE ENVELOPE"
+        },
+        {
+          "widget": "text",
+          "text": "HOLD VOICE THEN PLAY EXTERNAL CARRIER"
+        }
+      ]
+    },
+    {
       "name": "FX",
       "controls": [
         {
