@@ -61,6 +61,36 @@
       ]
     },
     {
+      "name": "PROBE",
+      "controls": [
+        {
+          "param": "Input Probe",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "widget": "text",
+          "text": "LEFT DETECT: 660 HZ IF MIC INPUT"
+        },
+        {
+          "widget": "text",
+          "text": "RIGHT DETECT: 660 HZ IF AUDIO"
+        },
+        {
+          "widget": "text",
+          "text": "INPUT COUNT: 330 HZ IF BUS EXISTS"
+        },
+        {
+          "widget": "text",
+          "text": "PROBE BYPASSES VOCODER + MIXER"
+        },
+        {
+          "widget": "text",
+          "text": "RETURN TO OFF AFTER TEST"
+        }
+      ]
+    },
+    {
       "name": "OSC",
       "controls": [
         {
