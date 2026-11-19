@@ -1,7 +1,9 @@
 {
-  "kit": {
-    "theme": "amber",
-    "accent": "FFFFB84D"
+  "style": {
+    "background": "ff111a25",
+    "accent": "ffffb84d",
+    "text": "fff1f5f9",
+    "muted": "ff9fb0c3"
   },
   "pages": [
     {
@@ -13,41 +15,114 @@
           "overlay": "menu"
         },
         {
-          "param": "Level",
+          "param": "Tone",
           "widget": "knob"
         },
         {
-          "param": "Unison",
+          "param": "Chord",
           "widget": "slider",
           "overlay": "menu"
+        },
+        {
+          "param": "Octave",
+          "widget": "knob"
         },
         {
           "param": "Detune",
           "widget": "knob"
         },
         {
-          "param": "Sub",
+          "param": "Sub Osc",
           "widget": "knob"
         },
         {
-          "param": "Octave",
+          "param": "Noise Osc",
+          "widget": "knob"
+        },
+        {
+          "param": "Level",
           "widget": "knob"
         }
       ]
     },
     {
-      "name": "SHAPE",
+      "name": "OSC2",
       "controls": [
         {
-          "param": "Attack",
+          "param": "OSC 2 Wave",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "OSC 2 Level",
           "widget": "knob"
         },
         {
-          "param": "Release",
+          "param": "OSC 2 Semitone",
           "widget": "knob"
         },
         {
-          "param": "Cutoff",
+          "param": "OSC 2 Detune",
+          "widget": "knob"
+        },
+        {
+          "param": "OSC 2 Blend",
+          "widget": "knob"
+        },
+        {
+          "param": "Pulse Width",
+          "widget": "knob"
+        },
+        {
+          "param": "PWM Depth",
+          "widget": "knob"
+        },
+        {
+          "param": "PWM Rate",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "OSC3",
+      "controls": [
+        {
+          "param": "OSC 3 Wave",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "OSC 3 Level",
+          "widget": "knob"
+        },
+        {
+          "param": "OSC 3 Semitone",
+          "widget": "knob"
+        },
+        {
+          "param": "Unison Voices",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Unison Detune",
+          "widget": "knob"
+        },
+        {
+          "param": "Carrier Drive",
+          "widget": "knob"
+        },
+        {
+          "param": "Noise Color",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "FILTER",
+      "controls": [
+        {
+          "param": "Filter Cutoff",
           "widget": "knob"
         },
         {
@@ -55,16 +130,41 @@
           "widget": "knob"
         },
         {
-          "param": "Drive",
+          "param": "Filter Mode",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Filter Env Amount",
+          "widget": "knob"
+        },
+        {
+          "param": "Synth Attack",
+          "widget": "knob"
+        },
+        {
+          "param": "Synth Release",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "LFO",
+      "controls": [
+        {
+          "param": "LFO Shape",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "LFO Rate",
+          "widget": "knob"
+        },
+        {
+          "param": "LFO Depth",
           "widget": "knob"
         }
       ]
     }
-  ],
-  "style": {
-    "background": "ff111a25",
-    "accent": "ffffb84d",
-    "text": "fff1f5f9",
-    "muted": "ff9fb0c3"
-  }
+  ]
 }
