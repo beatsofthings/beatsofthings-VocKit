@@ -160,9 +160,10 @@ public:
        const float bpm=ctx.transport.tempoValid?float(ctx.transport.bpm):120.f;
        const float advance=(bpm>0.f?bpm:120.f)*float(1<<getInt(ArpRate))/(60.f*sr_);
        arpPhase_+=advance;
-       if(count==0){if(arpNote_>=0)noteOff(arpNote_);arpNote_=-1;arpPhase_=0.f;}
+       const bool arpStep=arpPhase_>=1.f;
+       if(count==0){if(arpNote_>=0)noteOff(arpNote_);arpNote_=-1;arpPhase_=0.f;arpIndex_=0;}
        else{
-         if(arpNote_<0||arpPhase_>=1.f){
+         if((arpNote_<0&&arpIndex_==0)||arpStep){
            if(arpNote_>=0)noteOff(arpNote_);
            if(arpPhase_>=1.f)arpPhase_-=std::floor(arpPhase_);
            int index=arpIndex_++%count;
