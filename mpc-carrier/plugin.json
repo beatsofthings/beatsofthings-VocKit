@@ -7,5 +7,7 @@
   "uid": "BtVC",
   "numInputs": 0,
   "numOutputs": 2,
-  "description": "Original VocKit carrier synth engine as MIDI-playable instrument for VocKit FX"
+  "description": "Original VocKit carrier synth engine as MIDI-playable instrument for VocKit FX",
+  "file32": "VST/vockit-synth-arm32.so",
+  "file64": "VST/vockit-synth-arm64.so"
 }
