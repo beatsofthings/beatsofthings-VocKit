@@ -240,9 +240,14 @@ qlink_marker='    by_index = {p.index: p for p in params}'
 assert s.count(qlink_marker)==1, "SDK Q-Link generator changed"
 s=s.replace(qlink_marker, '''    for ti, page in enumerate(pages):
         if page.name in ("BAND1", "BAND2"):
-            first = 19 if page.name == "BAND1" else 31
+            first = 1 if page.name == "BAND1" else 13
             qmap = next(value for key, value in entries[ti] if key == "Q-Links")
-            qmap[:] = [("Q-Link %d" % q, first + q - 1 if q <= 12 else -1)
+            band_names = ["Band %02d" % n for n in range(first, first + 12)]
+            lookup = {p.name: p.index for p in params}
+            missing = [name for name in band_names if name not in lookup]
+            if missing:
+                raise ValueError("Missing band parameters for Q-Links: " + str(missing))
+            qmap[:] = [("Q-Link %d" % q, lookup[band_names[q-1]] if q <= 12 else -1)
                        for q in range(1, 17)]
     ''' + qlink_marker)
 
