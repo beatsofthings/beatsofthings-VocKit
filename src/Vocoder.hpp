@@ -85,6 +85,7 @@ public:
    gateThreshold_=gateDb<=-79.9f?0.f:std::pow(10.f,gateDb/20.f);
    unvoicedMix_=clamp(unvoiced,0.f,1.f);
  }
+ void setSpectralFreeze(bool enabled){spectral_.setFreeze(enabled);}
  void setSibilance(float amount){sibilance_=clamp(amount,0.f,1.f);}
  void setDetune(float cents){detune_=clamp(cents,0.f,35.f);}
  void setSubLevel(float amount){subLevel_=clamp(amount,0.f,1.f);}
