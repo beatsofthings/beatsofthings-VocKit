@@ -165,6 +165,101 @@
           "widget": "knob"
         }
       ]
+    },
+    {
+      "name": "AMP",
+      "controls": [
+        {
+          "param": "Synth Attack",
+          "widget": "knob"
+        },
+        {
+          "param": "Amp Decay",
+          "widget": "knob"
+        },
+        {
+          "param": "Amp Sustain",
+          "widget": "knob"
+        },
+        {
+          "param": "Synth Release",
+          "widget": "knob"
+        },
+        {
+          "param": "Poly Voices",
+          "widget": "slider",
+          "overlay": "menu"
+        }
+      ]
+    },
+    {
+      "name": "FENV",
+      "controls": [
+        {
+          "param": "Filter Attack",
+          "widget": "knob"
+        },
+        {
+          "param": "Filter Decay",
+          "widget": "knob"
+        },
+        {
+          "param": "Filter Sustain",
+          "widget": "knob"
+        },
+        {
+          "param": "Filter Release",
+          "widget": "knob"
+        },
+        {
+          "param": "Filter Env Amount",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "ARP",
+      "controls": [
+        {
+          "param": "Arp Mode",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Arp Rate",
+          "widget": "slider",
+          "overlay": "menu"
+        },
+        {
+          "param": "Arp Gate",
+          "widget": "knob"
+        }
+      ]
+    },
+    {
+      "name": "SYNFX",
+      "controls": [
+        {
+          "param": "Synth Chorus",
+          "widget": "knob"
+        },
+        {
+          "param": "Chorus Speed",
+          "widget": "knob"
+        },
+        {
+          "param": "Synth Delay",
+          "widget": "knob"
+        },
+        {
+          "param": "Delay Time",
+          "widget": "knob"
+        },
+        {
+          "param": "Delay Feedback",
+          "widget": "knob"
+        }
+      ]
     }
   ]
 }
