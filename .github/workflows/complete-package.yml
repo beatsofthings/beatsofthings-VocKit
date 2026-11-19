@@ -1,0 +1,60 @@
+name: Package VocKit Complete MPC
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Build VocKit Carrier MIDI instrument
+      - Build and test VocKit for MPC
+    types: [completed]
+permissions:
+  actions: read
+  contents: read
+jobs:
+  package:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download latest successful FX and Synth builds
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p staging/fx staging/synth
+          for item in "Build and test VocKit for MPC|VocKit-MPC-install|fx" "Build VocKit Carrier MIDI instrument|VocKit-Carrier-MPC-install|synth"; do
+            IFS='|' read -r workflow artifact folder <<< "$item"
+            run_id=$(gh run list --workflow "$workflow" --branch main --status success --limit 10 --json databaseId --jq '.[0].databaseId')
+            test -n "$run_id"
+            echo "$workflow: run $run_id"
+            gh run download "$run_id" --name "$artifact" --dir "staging/$folder"
+          done
+      - name: Assemble both independent plugins in one package
+        run: |
+          set -euo pipefail
+          mkdir -p bundle/"VST2 Plugins"
+          for component in fx synth; do
+            archive=$(find "staging/$component" -type f -name '*.zip' | head -n 1)
+            test -n "$archive"
+            mkdir -p "unpacked/$component"
+            unzip -q "$archive" -d "unpacked/$component"
+            plugin=$(find "unpacked/$component" -type f -name plugin.json -printf '%h\n' | head -n 1)
+            test -n "$plugin"
+            test -d "$plugin/VST"
+            cp -a "$plugin" bundle/"VST2 Plugins/"
+          done
+          test "$(find bundle/'VST2 Plugins' -mindepth 1 -maxdepth 1 -type d | wc -l)" -eq 2
+          cat > bundle/INSTALL_EN.md <<'EOF'
+          VocKit Complete for Akai MPC
+          ===========================
+          Copy BOTH plugin folders from 'VST2 Plugins' into the 'VST2 Plugins'
+          folder on your MPC storage (USB/SD). Restart the MPC.
+          VocKit FX appears as an insert effect; VocKit Synth as an instrument.
+          They are separate plugins. The package contains the latest successful
+          build of each, which may have different source commit dates.
+          EOF
+          (cd bundle && zip -qr ../VocKit-Complete-MPC.zip .)
+          unzip -t VocKit-Complete-MPC.zip | tail -n 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VocKit-Complete-MPC
+          path: VocKit-Complete-MPC.zip
