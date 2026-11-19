@@ -287,15 +287,11 @@
       "controls": [
         {
           "widget": "text",
+          "text": "EXTERNAL CARRIER ONLY: USE SYNTH OR JURA"
+        },
+        {
+          "widget": "text",
           "text": "VOCKIT FX / SETUP GUIDE"
-        },
-        {
-          "widget": "text",
-          "text": "INTERNAL: FX ON VOICE TRACK"
-        },
-        {
-          "widget": "text",
-          "text": "MODE INTERNAL / MIX 100%"
         },
         {
           "widget": "text",
