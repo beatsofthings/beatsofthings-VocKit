@@ -17,7 +17,7 @@ class VocKitCarrier final:public mpc::Plugin {
  unsigned age_=0;
  float sr_=44100.f,arpPhase_=0.f,chorusPhase_=0.f;
  int arpIndex_=0,arpNote_=-1;
- std::array<float,65536> delay_{};
+ std::array<float,65536> delay_{},chorusBuffer_{};
  int delayCursor_=0;
  static mpc::PluginInfo info(){
    mpc::PluginInfo i;i.name="VocKit Synth";i.vendor="Beats of Things";
@@ -130,7 +130,7 @@ public:
  }
  void prepare(double sr,int)override{
    sr_=float(sr);for(auto& v:voices_){v.synth.prepare(sr_);v.note=-1;v.held=false;v.amp=0.f;v.filt=0.f;v.ampStage=0;v.filterStage=0;}
-   held_.fill(false);arpPhase_=0.f;arpIndex_=0;arpNote_=-1;delay_.fill(0.f);delayCursor_=0;
+   held_.fill(false);arpPhase_=0.f;arpIndex_=0;arpNote_=-1;delay_.fill(0.f);chorusBuffer_.fill(0.f);delayCursor_=0;
  }
  void reset()override{prepare(sr_,0);}
  void process(mpc::ProcessContext& ctx)override{
@@ -148,6 +148,7 @@ public:
        get(OscBlend)*.01f,get(Drive)*.01f,get(NoiseColor)*.01f);
      e.setSynthEnvelope(get(SynthAttack),get(SynthRelease));
    }
+   if(!ctx.outputs || ctx.numOutputs<=0)return;
    int ev=0;
    for(int n=0;n<ctx.numFrames;++n){
      while(ctx.midi&&ev<ctx.numMidiEvents&&ctx.midi[ev].sampleOffset<=n){
@@ -212,17 +213,19 @@ public:
      chorusPhase_+=get(ChorusRate)/sr_;if(chorusPhase_>=1.f)chorusPhase_-=1.f;
      const float wobble=std::sin(6.2831853f*chorusPhase_);
      const int chorusTap=(delayCursor_-int(sr_*(.018f+.006f*wobble))+65536)&65535;
-     const float chorus=delay_[chorusTap];
+     const float chorus=chorusBuffer_[chorusTap];
      const float cm=get(ChorusMix)*.01f;
      const float signal=dry*(1.f-cm*.5f)+chorus*cm*.5f;
      const int delayTap=(delayCursor_-int(std::max(1.f,std::min(65535.f,sr_*get(DelayTime)*.001f)))+65536)&65535;
      const float echo=delay_[delayTap];
      const float dm=get(DelayMix)*.01f;
      const float out=signal*(1.f-dm)+echo*dm;
+     chorusBuffer_[delayCursor_]=dry;
      delay_[delayCursor_]=std::tanh(signal+echo*get(DelayFeedback)*.01f);
      delayCursor_=(delayCursor_+1)&65535;
-     if(ctx.numOutputs>0&&ctx.outputs&&ctx.outputs[0])ctx.outputs[0][n]=out;
-     if(ctx.numOutputs>1&&ctx.outputs&&ctx.outputs[1])ctx.outputs[1][n]=out;
+     const float safeOut=std::isfinite(out)?std::max(-1.f,std::min(1.f,out)):0.f;
+     if(ctx.numOutputs>0&&ctx.outputs&&ctx.outputs[0])ctx.outputs[0][n]=safeOut;
+     if(ctx.numOutputs>1&&ctx.outputs&&ctx.outputs[1])ctx.outputs[1][n]=safeOut;
    }
  }
 };
