@@ -13,6 +13,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Get official SDK
         run: git clone --depth 1 https://github.com/inmusic-software/mpc-plugin-builder-sdk.git sdk
+      - name: Keep FX Input Mode independent of factory presets
+        run: python mpc/patch_routing_presets.py sdk/framework/mpc_plugin.h
       - name: Install toolchain
         run: python -m pip install ziglang Pillow
       - name: Install VocKit source into SDK
